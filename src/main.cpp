@@ -34,6 +34,8 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
+#ifndef _main_cpp
+#define _main_cpp
 
 #include <cstdlib>
 #include <iostream>
@@ -51,3 +53,5 @@ int main (int, char**)
     std::cout << "Found some packages: " << Packages.size() << endl;
     return EXIT_SUCCESS;
 }
+
+#endif

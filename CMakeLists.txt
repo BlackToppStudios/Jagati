@@ -39,11 +39,27 @@ Message(STATUS "Putting all major output in: ${ProjectBinaryDir}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -std=c++11")
 
 set(SRC_LIST
+    "src/binarybuffer.cpp"
+    "src/datatypes.cpp"
+    "src/dependency.cpp"
+    "src/githubmezzaninepackage.cpp"
+    "src/insourcebinarypackage.cpp"
     "src/main.cpp"
+    "src/package.cpp"
+    "src/tests.cpp"
+    "src/version.cpp"
 )
 
 set(HEADER_LIST
+    "src/binarybuffer.h"
+    "src/datatypes.h"
+    "src/dependency.h"
+    "src/githubmezzaninepackage.h"
+    "src/insourcebinarypackage.h"
+    "src/main.h"
     "src/package.h"
+    "src/tests.h"
+    "src/version.h"
 )
 
 #######################################

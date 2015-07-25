@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* The original authors have included a copy of the license specified above in the
+   'Docs' folder. See 'gpl.txt'
+*/
 /* We welcome the use of the Mezzanine engine to anyone, including companies who wish to
    Build professional software and charge for their product.
 
@@ -34,39 +37,6 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _Foundation_h
-#define _Foundation_h
-
-#include "package.h"
-
-class foundation : public Package
-{
-    public:
-        virtual String Name() const
-        {
-            return String("Foundation");
-        }
-
-
-        virtual String BriefDescription() const
-        {
-            return String("Provides basic header files for universal datatypes and library exports.");
-        }
-
-        virtual String GitURL() const
-        {
-            return Placeholder;
-        }
-
-        virtual DependencyList DependsOn() const
-        {
-            return DependencyList();
-        }
-
-        virtual Version CurrentVersion() const
-        {
-            return Version(0,9,0);
-        }
-};
-
+#ifndef _dependency_h
+#define _dependency_h
 #endif
