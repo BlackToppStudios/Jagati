@@ -37,16 +37,15 @@
 #ifndef _Foundation_h
 #define _Foundation_h
 
-#include "package.h"
+#include "githubmezzaninepackage.h"
 
-class foundation : public Package
+class foundation : public GithubMezzaninePackage
 {
     public:
         virtual String Name() const
         {
             return String("Foundation");
         }
-
 
         virtual String BriefDescription() const
         {
@@ -55,7 +54,7 @@ class foundation : public Package
 
         virtual String GitURL() const
         {
-            return Placeholder;
+            return String("git@github.com:BlackToppStudios/Mezz_Foundation.git");
         }
 
         virtual DependencyList DependsOn() const

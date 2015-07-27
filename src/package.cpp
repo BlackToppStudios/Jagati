@@ -38,20 +38,6 @@
 #define _Package_cpp
 
 #include "package.h"
-#include <sstream>
 
-Version::Version(int MajorVersion, int MinorVersion, int PatchVersion):
-    Major(MajorVersion),
-    Minor(MinorVersion),
-    Patch(PatchVersion)
-{}
-
-
-String Version::ToString() const
-{
-    std::stringstream versioner;
-    versioner << Major << "." << Minor << "." << Patch;
-    return String(versioner.str());
-}
 
 #endif

@@ -39,4 +39,15 @@
 */
 #ifndef _binarytool_cpp
 #define _binarytool_cpp
+
+#include "package.h"
+
+class InSourceBinaryPackage : public Package
+{
+    public:
+        virtual String Git() const = 0;
+        virtual void Install() const;
+};
+
+
 #endif

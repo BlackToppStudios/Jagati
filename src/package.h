@@ -37,48 +37,10 @@
 #ifndef _Package_h
 #define _Package_h
 
-#include <string>
-#include <vector>
-
-/// @brief This allows us to match the Mezzanine types and potentially change from std::string in the future.
-typedef std::string String;
-
-/// @brief This allows us to maybe from std::vector in the future.
-typedef std::vector<String> StringList;
+#include "datatypes.h"
+#include "dependency.h"
 
 const String Placeholder("Not Setup Yet");
-
-//// @brief Used when comparing versions to described the lowest version that matters
-enum class VersionScope
-{
-    Patch,
-    Minor,
-    Major
-};
-
-
-class Version
-{
-    private:
-        int Major;
-        int Minor;
-        int Patch;
-
-    public:
-
-        Version(int MajorVersion = 0, int MinorVersion = 0, int PatchVersion = 0);
-        String ToString() const;
-};
-
-struct Dependency
-{
-    public:
-        String Name;
-        Version Required;
-        VersionScope CompareAt;
-};
-
-typedef std::vector<Dependency> DependencyList;
 
 /// @brief This is the base class for all packages
 /// @detail This
@@ -92,19 +54,7 @@ class Package
         virtual void Install() const = 0;
 };
 
-class GithubMezzaninePackage
-{
-    public:
-        virtual String GitURL() const = 0;
-        virtual void Install() const;
-};
 
-class InSourceBinaryPackage
-{
-    public:
-        virtual String Git() const = 0;
-        virtual void Install() const;
-};
 
 
 #endif

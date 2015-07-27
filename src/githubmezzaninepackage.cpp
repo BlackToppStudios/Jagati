@@ -39,4 +39,12 @@
 */
 #ifndef _githubmezzaninepackage_cpp
 #define _githubmezzaninepackage_cpp
+
+#include "githubmezzaninepackage.h"
+
+void GithubMezzaninePackage::Install() const
+{
+
+}
+
 #endif

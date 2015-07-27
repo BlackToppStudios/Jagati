@@ -39,4 +39,20 @@
 */
 #ifndef _version_h
 #define _version_h
+
+#include "datatypes.h"
+
+/// @brief Used to assist in comparing version numbers
+class Version
+{
+    private:
+        Integer Major;
+        Integer Minor;
+        Integer Patch;
+
+    public:
+        Version(int MajorVersion = 0, int MinorVersion = 0, int PatchVersion = 0);
+        String ToString() const;
+};
+
 #endif

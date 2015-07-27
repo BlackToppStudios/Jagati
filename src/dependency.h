@@ -39,4 +39,29 @@
 */
 #ifndef _dependency_h
 #define _dependency_h
+
+
+#include "version.h"
+
+//// @brief Used when comparing versions to described the lowest version that matters
+enum class VersionScope
+{
+    Patch,  ///< The Patch value can be comparable, but the minor and Major must match
+    Minor,  ///< The Major value must match, and minor must be comparable and patch is ignored
+    Major   ///< The Major is comparable and other values are ignored.
+};
+
+/// @brief Tracks the name and version of other libraries this library requires.
+struct Dependency
+{
+    public:
+        String Name;            ///< The name of the other library this requires.
+        Version Required;       ///< The minumum version required.
+        VersionScope CompareAt; ///< What level of comparison is to be used.
+
+        //Boole operator>(const Dependency& Other);
+};
+
+typedef std::vector<Dependency> DependencyList;
+
 #endif

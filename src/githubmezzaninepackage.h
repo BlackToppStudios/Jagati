@@ -37,6 +37,16 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _githubmezzaninepackage_cpp
-#define _githubmezzaninepackage_cpp
+#ifndef _githubmezzaninepackage_h
+#define _githubmezzaninepackage_h
+
+#include "package.h"
+
+class GithubMezzaninePackage : public Package
+{
+    public:
+        virtual String GitURL() const = 0;
+        virtual void Install() const;
+};
+
 #endif
