@@ -37,4 +37,21 @@
 #ifndef _main_h
 #define _main_h
 
+#include "datatypes.h"
+
+/// @brief This is the first thing the application should call, it will prepare all the passed commands
+/// This will cache the command line args for later storage as passing args to TCLAP for preparations
+/// @param ArgCount The amount of arguments passed
+/// @param The contents of the passed arguments
+void HandleCommandLineArgs(int ArgCount, char** ArgVars);
+
+/// @brief Checks the command line options if the menu should be used
+/// @return A true or false
+Boole UseMenu();
+
+/// @brief Checks the command line options if the menu should be used
+/// @return A true or false
+Boole WorkStationInstall();
+
+
 #endif

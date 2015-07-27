@@ -125,18 +125,10 @@ namespace
             *(Results.Binary+Output+1) = ((Second & 0xf) << 4) + ((Third & 0x3c) >> 2);
             if(*(Progress+3)!='=')
             {
-                #ifdef MEZZDEBUG
-                if(Output+2>Results.Size)
-                    { MEZZ_EXCEPTION(Exception::INVALID_STATE_EXCEPTION, "Output of base64 Decoding is larger than it should be."); }
-                #endif
                 Fourth = Base64Chars.find(*(Progress+3));
                 *(Results.Binary+Output+2) = ((Third & 0x3) << 6) + Fourth;
             }
 
-            #ifdef MEZZDEBUG
-            if(Progress>EncodedString.end())
-                { MEZZ_EXCEPTION(Exception::INVALID_STATE_EXCEPTION, "Gone past the end of the input while decoding a base64 string."); }
-            #endif
             Output+=3;
             Progress+=4;
         }
@@ -236,10 +228,6 @@ void BinaryBuffer::CreateFromBase64(const String& EncodedBinaryData)
 
 BinaryBuffer::Byte& BinaryBuffer::operator[] (Whole Index)
 {
-    #ifdef MEZZDEBUG
-    if(Index>=Size)
-        { MEZZ_EXCEPTION(Exception::MM_OUT_OF_BOUNDS_EXCEPTION, "Attempted access beyond range of Binary Buffer"); }
-    #endif
     return *(Binary+Index);
 }
 

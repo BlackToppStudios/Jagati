@@ -42,7 +42,6 @@
 
 #include "datatypes.h"
 
-#define MEZZ_LIB
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief A way to store and pass binary buffers, for example compiled bytecode.
 /// @details Originally intended for use with ScriptCompilable as a basic way to store and pass bytecode around.

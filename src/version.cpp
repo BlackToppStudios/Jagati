@@ -42,7 +42,7 @@
 
 #include "version.h"
 
-#include <sstream>
+
 
 Version::Version(int MajorVersion, int MinorVersion, int PatchVersion):
     Major(MajorVersion),
@@ -52,7 +52,7 @@ Version::Version(int MajorVersion, int MinorVersion, int PatchVersion):
 
 String Version::ToString() const
 {
-    std::stringstream versioner;
+    StringStream versioner;
     versioner << Major << "." << Minor << "." << Patch;
     return String(versioner.str());
 }

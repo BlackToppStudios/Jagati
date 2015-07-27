@@ -40,7 +40,11 @@
 #include <cstdlib>
 #include <iostream>
 
-#include <autodetect.h>
+#include "main.h"
+#include "autodetect.h"
+#include "resourceutilities.h"
+
+#include <tclap/CmdLine.h>
 
 using namespace std;
 
@@ -48,10 +52,83 @@ using namespace std;
 /// @return This will return EXIT_SUCCESS, it will do more later.
 /// @param argc Is interpretted as the amount of passed arguments
 /// @param argv Is interpretted as the arguments passed in from the launching shell.
-int main (int, char**)
+int main (int ArgCount, char** ArgVars)
 {
+    HandleCommandLineArgs(ArgCount, ArgVars);
     std::cout << "Found some packages: " << Packages.size() << endl;
     return EXIT_SUCCESS;
 }
 
+
+namespace {
+    Boole WorkStationInstallation = false;
+    Boole LaunchMenu = true;
+}
+
+/// @brief Checks the command line options if the menu should be used
+/// @return A true or false
+Boole UseMenu()
+    { return LaunchMenu; }
+
+/// @brief Checks the command line options if the menu should be used
+/// @return A true or false
+Boole WorkStationInstall()
+    { return WorkStationInstallation; }
+
+
+void HandleCommandLineArgs(int ArgCount, char** ArgVars)
+{
+    CacheMainArgs(ArgCount, ArgVars);
+    try
+    {
+        TCLAP::CmdLine cmd("Jagati - Mezzanine installer", ' ', "July 27, 2015");
+        TCLAP::SwitchArg WorkStationInstallationSwitch("w","workstation","Enter interactive shell after other items are executed.", cmd, false);
+
+        cmd.parse(ArgCount, ArgVars);
+
+        WorkStationInstallation = WorkStationInstallationSwitch.getValue();
+
+
+
+    } catch (TCLAP::ArgException &e) {
+        cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
+    }
+    /*try
+    {
+        TCLAP::CmdLine cmd("EntreLua - Mezzanine Lua Shell", ' ', "0.01 with Lua5.1");
+
+        TCLAP::ValuesConstraint<Mezzanine::String> LibaryVals( Results.LibraryList );
+        TCLAP::MultiArg<string> OpenlibArg("o", "openlib", "Library to open before shell starts", false, &LibaryVals, cmd);
+        TCLAP::MultiArg<string> CloselibArg("c", "closelib", "Do not open a Library that might be opened before shell starts", false, &LibaryVals, cmd);
+
+        TCLAP::MultiArg<String> LoadArg("l", "load", "Requires/Loads a Module. Force opening of Package lib.", false, "filename", cmd);
+        TCLAP::ValueArg<std::string> StatementArg("e", "execute", "Execute a Lua script entered at the command line.", false, "", "Lua String", cmd);
+        TCLAP::SwitchArg InteractiveSwitch("i","interactive","Enter interactive shell after other items are executed.", cmd, false);
+        TCLAP::SwitchArg StdinSwitch(":","stdin","Read from the Standard Input and execute whatever is found there.", cmd, false);
+        TCLAP::SwitchArg SimpleSwitch("s","simple","Use a simpler shell input method with fewer features but that is compatible in more places.", cmd, false);
+        TCLAP::SwitchArg NoMezzanineSwitch("n", "no-mezzanine", "Do not load/open the Mezzanine by default.", cmd, false);
+        TCLAP::SwitchArg UnsafeSwitch("u", "unsafe", "Load the unrestricted Mezzanine library instead of MezzanineSafe.", cmd, false);
+        TCLAP::UnlabeledMultiArg<String> ScriptAndArgs( "script", "A script to execute instead of an interactive shell", false, "script [args]", cmd);
+        TCLAP::SwitchArg StackSwitch("S", "Stack", "Display stack counts after each command execution.", cmd, false);
+
+        cmd.parse(argc, argv);
+
+        Results.OpenList = OpenlibArg.getValue();
+        Results.CloseList = CloselibArg.getValue();
+        Results.LoadList = LoadArg.getValue();
+        Results.StatementToExecute = StatementArg.getValue();
+        Results.Interactive = InteractiveSwitch.getValue();
+        Results.ReadFromStdIn = StdinSwitch.getValue();
+        Results.SimpleShell = SimpleSwitch.getValue();
+        Results.NoMezzanine = NoMezzanineSwitch.getValue();
+        Results.LoadUnsafeMezzanine = UnsafeSwitch.getValue();
+        Results.ScriptFile = ScriptAndArgs.getValue();
+        Results.DisplayStackCounts = StackSwitch.getValue();
+    } catch (TCLAP::ArgException &e) {
+        cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
+    }*/
+}
+
+
 #endif
+
