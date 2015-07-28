@@ -45,6 +45,7 @@ set(SRC_LIST
     "src/githubmezzaninepackage.cpp"
     "src/insourcebinarypackage.cpp"
     "src/main.cpp"
+    "src/menu.cpp"
     "src/package.cpp"
     "src/resourceutilities.cpp"
     "src/stringtool.cpp"
