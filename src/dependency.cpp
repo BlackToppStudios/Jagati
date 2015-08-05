@@ -39,4 +39,28 @@
 */
 #ifndef _dependency_cpp
 #define _dependency_cpp
+
+#include "dependency.h"
+
+
+String Dependency::ToString() const
+{
+
+}
+
+std::ostream&operator<<(std::ostream& Out, const DependencyList& Displayable)
+{
+    return Out;
+}
+
+
+std::ostream&operator<<(std::ostream& Out, const Dependency& Displayable)
+{
+    return Out;
+
+}
+
+
+
+
 #endif

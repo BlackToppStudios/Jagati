@@ -100,7 +100,7 @@ class MEZZ_LIB BinaryBuffer
         /// @details If passed a pointer this assumes ownship of that pointer, otherwise this allocates the amount of space requested.
         /// @param BinaryPointer A pointer to the first byte in memory, if this is null the buffer is created. Ownership of this Pointer will be assumed.
         /// @param PredeterminedSize The size to set on creation.
-        BinaryBuffer(Byte* BinaryPointer, Integer PredeterminedSize) :
+        BinaryBuffer(Byte* BinaryPointer, Whole PredeterminedSize) :
             Size(PredeterminedSize),
             Binary(BinaryPointer ? BinaryPointer : new Byte[PredeterminedSize])
             {}

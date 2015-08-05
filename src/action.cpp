@@ -34,21 +34,16 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _Package_cpp
-#define _Package_cpp
+#ifndef _action_cpp
+#define _action_cpp
 
-#include "package.h"
+#include "action.h"
 
-using std::endl;
+Action::Action(StringVector Args) : Arguments(Args)
+    { }
 
-std::ostream& operator<<(std::ostream& Out, const Package& Displayable)
-{
-    Out << "Package: " << Displayable.Name() << endl
-        << "Version: " << Displayable.CurrentVersion() << endl
-        << "Dependencies: " << Displayable.DependsOn() << endl
-        << "Description: " << Displayable.BriefDescription() << endl;
-    return Out;
+void Action::AddArgument(String Arg)
+    { Arguments.push_back(Arg); }
 
-}
 
 #endif

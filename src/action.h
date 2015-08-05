@@ -34,21 +34,47 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _Package_cpp
-#define _Package_cpp
+#ifndef _action_h
+#define _action_h
 
-#include "package.h"
+#include <datatypes.h>
 
-using std::endl;
 
-std::ostream& operator<<(std::ostream& Out, const Package& Displayable)
+/// @brief Represents one action a menu can take.
+class Action
 {
-    Out << "Package: " << Displayable.Name() << endl
-        << "Version: " << Displayable.CurrentVersion() << endl
-        << "Dependencies: " << Displayable.DependsOn() << endl
-        << "Description: " << Displayable.BriefDescription() << endl;
-    return Out;
+    protected:
+        ///@brief Whatever has been jammed in here for things the action should take into account.
+        StringVector Arguments;
 
-}
+    public:
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Argument functionality
+
+        /// @brief Argument accepting constructor
+        /// @param Args A group of arguments to be used once the command is executed.
+        Action(StringVector Args);
+
+        /// @brief Adds an argument to the command
+        /// @param Arg
+        void AddArgument(String Arg);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Virtual functions
+
+        /// @brief Get the name of this action, could be use for display or internal tracking
+        /// @return A String that provides a brief one or two word description of this
+        virtual String Name() const = 0;
+
+        /// @brief Get what the menu will display.
+        /// @return A one sentence description
+        virtual String MenuEntry() const = 0;
+
+        /// @brief Do the command.
+        virtual void operator()() = 0;
+};
+
+
+
 
 #endif

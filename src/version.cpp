@@ -58,3 +58,10 @@ String Version::ToString() const
 }
 
 #endif
+
+
+std::ostream&operator<<(std::ostream& Out, const Version& Displayable)
+{
+    Out << Displayable.ToString();
+    return Out;
+}

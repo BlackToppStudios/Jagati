@@ -59,9 +59,17 @@ struct Dependency
         Version Required;       ///< The minumum version required.
         VersionScope CompareAt; ///< What level of comparison is to be used.
 
+        String ToString() const;
         //Boole operator>(const Dependency& Other);
 };
 
 typedef std::vector<Dependency> DependencyList;
+
+
+std::ostream& operator<<(std::ostream& Out, const DependencyList& Displayable);
+
+std::ostream& operator<<(std::ostream& Out, const Dependency& Displayable);
+
+
 
 #endif

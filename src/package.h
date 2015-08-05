@@ -54,6 +54,10 @@ class Package
         virtual void Install() const = 0;
 };
 
+/// @brief Display details about any package.
+/// @param The output stream to render characters to
+/// @param Displayable The package than can have its details displayed.
+std::ostream& operator<<(std::ostream& Out, const Package& Displayable);
 
 
 

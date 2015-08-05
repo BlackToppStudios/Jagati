@@ -55,4 +55,6 @@ class Version
         String ToString() const;
 };
 
+std::ostream& operator<<(std::ostream& Out, const Version& Displayable);
+
 #endif
