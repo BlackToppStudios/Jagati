@@ -37,5 +37,26 @@
 #ifndef _menu_cpp
 #define _menu_cpp
 
+#include "menu.h"
+
+#include <iostream>
+
+
+String Menu::GetInput() const
+{
+    String Entry;
+    while(!std::regex_match(Entry, AcceptableInput))
+    {
+        while(!(std::cin >> Entry))
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "hthgfd";
+        }
+    }
+     return Entry;
+}
+
+
 
 #endif

@@ -84,7 +84,7 @@ void HandleCommandLineArgs(int ArgCount, char** ArgVars)
         TCLAP::CmdLine cmd("Jagati - Mezzanine installer", ' ', "July 27, 2015");
         TCLAP::SwitchArg WorkStationInstallationSwitch("w","workstation","Prepare this machine for use as a workstation", cmd, false);
 
-        Action({});
+
 
         cmd.parse(ArgCount, ArgVars);
 

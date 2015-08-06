@@ -37,5 +37,18 @@
 #ifndef _menu_h
 #define _menu_h
 
+#include "action.h"
+
+#include <regex>
+
+class Menu
+{
+        std::vector<Action*> Actions;
+        std::regex AcceptableInput;
+    public:
+
+        String GetInput() const;
+};
+
 
 #endif

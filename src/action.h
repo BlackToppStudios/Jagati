@@ -56,7 +56,7 @@ class Action
         Action(StringVector Args);
 
         /// @brief Adds an argument to the command
-        /// @param Arg
+        /// @param Arg An argument to add to the list of args during the call.
         void AddArgument(String Arg);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +72,9 @@ class Action
 
         /// @brief Do the command.
         virtual void operator()() = 0;
+
+
+        virtual ~Action() = default;
 };
 
 
