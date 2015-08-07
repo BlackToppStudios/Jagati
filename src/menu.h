@@ -47,7 +47,14 @@ class Menu
         std::regex AcceptableInput;
     public:
 
+        void Display() const;
+        String Render() const;
+
         String GetInput() const;
+
+        void AddAction(Action* ToAdd);
+        void SetAcceptableInput();
+        ~Menu();
 };
 
 

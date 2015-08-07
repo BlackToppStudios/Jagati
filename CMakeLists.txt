@@ -62,6 +62,7 @@ set(HEADER_LIST
     "src/dependency.h"
     "src/githubmezzaninepackage.h"
     "src/insourcebinarypackage.h"
+    "src/indexer.h"
     "src/main.h"
     "src/package.h"
     "src/resourceutilities.h"
