@@ -41,23 +41,28 @@
 
 #include <iostream>
 #include <exception>
-#include <indexer.h>
+#include <iomanip>
+
+#include "indexer.h"
 
 using namespace std;
 
+Menu::Menu(String Name)
+    : MenuName(Name)
+{ }
+
 void Menu::Display() const
-{
-    std::cout << std::endl << Render() ;//<< std::endl;
-}
+    { std::cout << std::endl << Render() << std::endl; }
 
 String Menu::Render() const
 {
     StringStream DisplayRenderer;
-    DisplayRenderer << "Please Select From the Following:";
+    DisplayRenderer << internal << setw(60) << MenuName << endl
+                    << "Please Select From the Following:" << endl;
     for(auto option : WithIndex(Actions))
     {
-        DisplayRenderer << setw(4) << right << option.first << ") "
-                        << setw(24) << left << option.second->name();
+        DisplayRenderer << setw(10) << right << option.first << ") "
+                        << setw(48) << left << option.second->Name() << endl;
     }
 
     return DisplayRenderer.str();
@@ -68,11 +73,13 @@ String Menu::GetInput() const
     String Entry;
     while(!std::regex_match(Entry, AcceptableInput))
     {
-        while(!(std::cin >> Entry))
+        Display();
+        cout << "Choice " << AcceptableInput << " : ";
+
+        if(!(std::cin >> Entry))
         {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            Display();
         }
     }
     return Entry;

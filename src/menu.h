@@ -45,8 +45,9 @@ class Menu
 {
         std::vector<Action*> Actions;
         std::regex AcceptableInput;
+        String MenuName;
     public:
-
+        Menu(String Name);
         void Display() const;
         String Render() const;
 

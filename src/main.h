@@ -54,4 +54,7 @@ Boole UseMenu();
 Boole WorkStationInstall();
 
 
+void ShowMainMenu();
+
+
 #endif

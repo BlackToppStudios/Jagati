@@ -54,6 +54,14 @@
 #include <limits>
 #include <vector>
 
+
+template <typename T>
+struct iterator_extractor { typedef typename T::iterator type; };
+
+template <typename T>
+struct iterator_extractor<T const> { typedef typename T::const_iterator type; };
+
+
 template <typename T>
 class Indexer
 {

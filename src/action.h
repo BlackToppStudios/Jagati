@@ -73,10 +73,26 @@ class Action
         /// @brief Do the command.
         virtual void operator()() = 0;
 
-
+        Action() = default;
         virtual ~Action() = default;
 };
 
+#include <iostream>
+class TestAction : public Action
+{
+    public:
+        TestAction() = default;
+        virtual String Name() const
+            { return String("Foo"); }
+
+        virtual String MenuEntry() const
+            { return String("When Selected this will do foo"); }
+
+        virtual void operator()()
+            { std::cout << "FOO!" << std::endl; }
+
+        virtual ~TestAction() = default;
+};
 
 
 

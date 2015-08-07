@@ -44,6 +44,8 @@
 #include "autodetect.h"
 #include "resourceutilities.h"
 #include "action.h"
+#include "menu.h"
+
 #include <tclap/CmdLine.h>
 
 using namespace std;
@@ -55,6 +57,7 @@ using namespace std;
 int main (int ArgCount, char** ArgVars)
 {
     HandleCommandLineArgs(ArgCount, ArgVars);
+    ShowMainMenu();
     std::cout << "Found some packages: " << Packages.size() << endl;
     return EXIT_SUCCESS;
 }
@@ -134,3 +137,11 @@ void HandleCommandLineArgs(int ArgCount, char** ArgVars)
 
 #endif
 
+
+
+void ShowMainMenu()
+{
+    Menu Main("Main");
+    Main.AddAction(new TestAction);
+    Main.GetInput();
+}
