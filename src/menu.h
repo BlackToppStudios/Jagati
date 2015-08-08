@@ -39,22 +39,36 @@
 
 #include "action.h"
 
-#include <regex>
+#include <iostream>
 
 class Menu
 {
+        static const Whole MaxSize = 20;
         std::vector<Action*> Actions;
-        std::regex AcceptableInput;
         String MenuName;
+
     public:
-        Menu(String Name);
-        void Display() const;
+        /// @brief name accepting constructor
+        explicit Menu(String Name);
+
+        /// @brief Sends a rendered menu to an output stream
+        /// @param OutputStream The stream to display to
+        void Display(std::ostream& OutputStream = std::cout) const;
+
+        /// @brief Get a displayed menu based on the actions present.
+        /// @return A string ready for display.
         String Render() const;
 
-        String GetInput() const;
+        /// @brief Get a choice from the user about what to do next
+        /// @return A pointer to one of the internal actions.
+        Action* GetInput() const;
+
+        /// @brief Do some choice from the menu.
+        void DoInput() const;
 
         void AddAction(Action* ToAdd);
-        void SetAcceptableInput();
+        /// @brief Get the action associated with the input or nullptr
+        Action* VerifyEntry(const String& Entry) const;
         ~Menu();
 };
 

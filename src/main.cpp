@@ -57,7 +57,10 @@ using namespace std;
 int main (int ArgCount, char** ArgVars)
 {
     HandleCommandLineArgs(ArgCount, ArgVars);
-    ShowMainMenu();
+    if(UseMenu())
+        { ShowMainMenu(); }
+    else
+        {}
     std::cout << "Found some packages: " << Packages.size() << endl;
     return EXIT_SUCCESS;
 }
@@ -87,13 +90,9 @@ void HandleCommandLineArgs(int ArgCount, char** ArgVars)
         TCLAP::CmdLine cmd("Jagati - Mezzanine installer", ' ', "July 27, 2015");
         TCLAP::SwitchArg WorkStationInstallationSwitch("w","workstation","Prepare this machine for use as a workstation", cmd, false);
 
-
-
         cmd.parse(ArgCount, ArgVars);
 
         WorkStationInstallation = WorkStationInstallationSwitch.getValue();
-
-
 
     } catch (TCLAP::ArgException &e) {
         cerr << "error: " << e.error() << " for arg " << e.argId() << endl;
@@ -141,7 +140,32 @@ void HandleCommandLineArgs(int ArgCount, char** ArgVars)
 
 void ShowMainMenu()
 {
-    Menu Main("Main");
+    Menu Main("Main Menu");
     Main.AddAction(new TestAction);
-    Main.GetInput();
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+    Main.AddAction(new TestAction);
+
+    //Main.AddAction(new TestAction); // Crash here
+
+    Main.DoInput();
 }

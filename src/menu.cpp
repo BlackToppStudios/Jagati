@@ -41,6 +41,7 @@
 
 #include <iostream>
 #include <exception>
+#include <stdexcept>
 #include <iomanip>
 
 #include "indexer.h"
@@ -51,65 +52,62 @@ Menu::Menu(String Name)
     : MenuName(Name)
 { }
 
-void Menu::Display() const
-    { std::cout << std::endl << Render() << std::endl; }
+void Menu::Display(std::ostream& OutputStream) const
+    { OutputStream << std::endl << Render() << std::endl; }
 
 String Menu::Render() const
 {
     StringStream DisplayRenderer;
-    DisplayRenderer << internal << setw(60) << MenuName << endl
+    DisplayRenderer << right << setw(5 + MenuName.size()) << MenuName << endl << endl
                     << "Please Select From the Following:" << endl;
     for(auto option : WithIndex(Actions))
     {
-        DisplayRenderer << setw(10) << right << option.first << ") "
+        DisplayRenderer << setw(10) << right << option.first + 1 << ") "
                         << setw(48) << left << option.second->Name() << endl;
     }
 
     return DisplayRenderer.str();
 }
 
-String Menu::GetInput() const
+Action* Menu::GetInput() const
 {
     String Entry;
-    while(!std::regex_match(Entry, AcceptableInput))
+    Action* Results = nullptr;
+    while(! (Results = VerifyEntry(Entry)) )
     {
         Display();
-        cout << "Choice " << AcceptableInput << " : ";
-
+        cout << "Your choice: ";
         if(!(std::cin >> Entry))
         {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
-    return Entry;
+    return Results;
 }
+
+void Menu::DoInput() const
+    { (*GetInput())(); }
 
 void Menu::AddAction(Action* ToAdd)
 {
+    if(Actions.size()>=MaxSize)
+        { throw std::range_error(String("Too many menu entries added already.")); }
     Actions.push_back(ToAdd);
-    SetAcceptableInput();
 }
 
-void Menu::SetAcceptableInput()
+Action* Menu::VerifyEntry(const String& Entry) const
 {
-    StringStream RegexMaker;
-    RegexMaker << "[0";
-
-    if(Actions.size()==1)
-        { RegexMaker << Actions.size() << "]"; }
-
-    if(Actions.size()>1 && Actions.size() <10)
-        { RegexMaker << "-" << Actions.size() << "]"; }
-
-    if(Actions.size()>10 && Actions.size() < 20)
-        { RegexMaker << "][1-" << Actions.size()-10 << "]"; }
-
-    if(Actions.size()>20)
-        { throw std::invalid_argument("Menu cannot be more than 20 entries in size"); }
-
-    AcceptableInput = std::regex(RegexMaker.str());
+    StringStream Converter;
+    Converter << Entry;
+    Whole EntryNumber = 0;
+    Converter >> EntryNumber;
+    if(EntryNumber && EntryNumber <= Actions.size())
+        { return Actions.at(EntryNumber-1); }
+    else
+        { return nullptr; }
 }
+
 
 Menu::~Menu()
 {
