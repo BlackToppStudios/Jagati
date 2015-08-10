@@ -50,20 +50,25 @@ class Menu
 
     public:
         /// @brief name accepting constructor
-        explicit Menu(String Name);
+        explicit Menu(const String &Name);
+
+        template <typename ActionType, typename... ActionPack>
+        Menu(const String &Name, ActionType  ToAdd, ActionPack... RestToAdd)
+            : MenuName(Name)
+            { AddActions(ToAdd, RestToAdd...); }
 
         ~Menu();
 
 
         template <typename ActionType, typename... ActionPack>
-        void AddAction(ActionType* ToAdd, ActionPack... RestToAdd)
+        void AddActions(ActionType ToAdd, ActionPack... RestToAdd)
         {
             AddAction(ToAdd);
-            AddAction(RestToAdd...);
+            AddActions(RestToAdd...);
         }
 
         /// @brief A no-op to make the Variadic template mechanism happy.
-        void AddAction();
+        void AddActions();
         /// @brief A no-op to make the Variadic template mechanism happy.
         /// @param ToAdd A
         void AddAction(Action* ToAdd);

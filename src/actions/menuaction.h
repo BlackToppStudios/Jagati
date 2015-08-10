@@ -44,6 +44,12 @@ class MenuAction : public Menu, public Action
 {
     public:
         MenuAction(const String& Name);
+
+        template <typename ActionType, typename... ActionPack>
+        MenuAction(const String &Name, ActionType* ToAdd, ActionPack... RestToAdd)
+            : Menu(Name, ToAdd, RestToAdd...)
+            {}
+
         ~MenuAction() = default;
 
         virtual String Name() const override;

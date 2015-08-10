@@ -48,7 +48,7 @@
 
 using namespace std;
 
-Menu::Menu(String Name)
+Menu::Menu(const String& Name)
     : MenuName(Name)
 { }
 
@@ -58,7 +58,7 @@ Menu::~Menu()
     { delete OnePointer; }
 }
 
-void Menu::AddAction()
+void Menu::AddActions()
     {}
 
 void Menu::AddAction(Action* ToAdd)

@@ -143,9 +143,10 @@ void ShowMainMenu()
 {
     Menu Main("Main Menu");
 
-    Main.AddAction(new MenuAction("Packages Menu"),
+    Main.AddAction( new MenuAction("Packages Menu",
                     new TestAction,
-                    new TestAction);
+                    new TestAction)
+                  );
 
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
