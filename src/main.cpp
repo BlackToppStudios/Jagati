@@ -45,6 +45,7 @@
 #include "resourceutilities.h"
 #include "action.h"
 #include "menu.h"
+#include "actions/menuaction.h"
 
 #include <tclap/CmdLine.h>
 
@@ -141,11 +142,10 @@ void HandleCommandLineArgs(int ArgCount, char** ArgVars)
 void ShowMainMenu()
 {
     Menu Main("Main Menu");
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
+
+    Main.AddAction(new MenuAction("Packages Menu"),
+                    new TestAction,
+                    new TestAction);
 
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
@@ -153,17 +153,6 @@ void ShowMainMenu()
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
 
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
 
     //Main.AddAction(new TestAction); // Crash here
 

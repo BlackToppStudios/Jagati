@@ -52,6 +52,22 @@ Menu::Menu(String Name)
     : MenuName(Name)
 { }
 
+Menu::~Menu()
+{
+    for(Action* OnePointer : Actions)
+    { delete OnePointer; }
+}
+
+void Menu::AddAction()
+    {}
+
+void Menu::AddAction(Action* ToAdd)
+{
+    if(Actions.size()>=MaxSize)
+        { throw std::range_error(String("Too many menu entries added already.")); }
+    Actions.push_back(ToAdd);
+}
+
 void Menu::Display(std::ostream& OutputStream) const
     { OutputStream << std::endl << Render() << std::endl; }
 
@@ -89,13 +105,6 @@ Action* Menu::GetInput() const
 void Menu::DoInput() const
     { (*GetInput())(); }
 
-void Menu::AddAction(Action* ToAdd)
-{
-    if(Actions.size()>=MaxSize)
-        { throw std::range_error(String("Too many menu entries added already.")); }
-    Actions.push_back(ToAdd);
-}
-
 Action* Menu::VerifyEntry(const String& Entry) const
 {
     StringStream Converter;
@@ -109,11 +118,6 @@ Action* Menu::VerifyEntry(const String& Entry) const
 }
 
 
-Menu::~Menu()
-{
-    for(Action* OnePointer : Actions)
-        { delete OnePointer; }
-}
 
 
 

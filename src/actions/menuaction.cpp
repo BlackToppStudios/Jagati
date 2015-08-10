@@ -34,61 +34,25 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _menu_h
-#define _menu_h
+#ifndef _menuaction_cpp
+#define _menuaction_cpp
 
-#include "action.h"
-
-#include <iostream>
-
-class Menu
-{
-    protected:
-        static const Whole MaxSize = 20;
-        std::vector<Action*> Actions;
-        String MenuName;
-
-    public:
-        /// @brief name accepting constructor
-        explicit Menu(String Name);
-
-        ~Menu();
+#include "menuaction.h"
 
 
-        template <typename ActionType, typename... ActionPack>
-        void AddAction(ActionType* ToAdd, ActionPack... RestToAdd)
-        {
-            AddAction(ToAdd);
-            AddAction(RestToAdd...);
-        }
+MenuAction::MenuAction(const String& Name) :
+    Menu(Name)
+    {}
 
-        /// @brief A no-op to make the Variadic template mechanism happy.
-        void AddAction();
-        /// @brief A no-op to make the Variadic template mechanism happy.
-        /// @param ToAdd A
-        void AddAction(Action* ToAdd);
+String MenuAction::Name() const
+    { return MenuName; }
 
-        /// @brief Get the action associated with the input or nullptr
-        Action* VerifyEntry(const String& Entry) const;
+String MenuAction::MenuEntry() const
+    { return MenuName; }
 
+void MenuAction::operator()()
+    { DoInput(); }
 
-
-        /// @brief Sends a rendered menu to an output stream
-        /// @param OutputStream The stream to display to
-        void Display(std::ostream& OutputStream = std::cout) const;
-
-        /// @brief Get a displayed menu based on the actions present.
-        /// @return A string ready for display.
-        String Render() const;
-
-        /// @brief Get a choice from the user about what to do next
-        /// @return A pointer to one of the internal actions.
-        Action* GetInput() const;
-
-        /// @brief Do some choice from the menu.
-        void DoInput() const;
-
-};
 
 
 #endif

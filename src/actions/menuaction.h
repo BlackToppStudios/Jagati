@@ -34,61 +34,23 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _menu_h
-#define _menu_h
+#ifndef _menuaction_h
+#define _menuaction_h
 
 #include "action.h"
+#include "menu.h"
 
-#include <iostream>
-
-class Menu
+class MenuAction : public Menu, public Action
 {
-    protected:
-        static const Whole MaxSize = 20;
-        std::vector<Action*> Actions;
-        String MenuName;
-
     public:
-        /// @brief name accepting constructor
-        explicit Menu(String Name);
+        MenuAction(const String& Name);
+        ~MenuAction() = default;
 
-        ~Menu();
+        virtual String Name() const override;
 
+        virtual String MenuEntry() const override;
 
-        template <typename ActionType, typename... ActionPack>
-        void AddAction(ActionType* ToAdd, ActionPack... RestToAdd)
-        {
-            AddAction(ToAdd);
-            AddAction(RestToAdd...);
-        }
-
-        /// @brief A no-op to make the Variadic template mechanism happy.
-        void AddAction();
-        /// @brief A no-op to make the Variadic template mechanism happy.
-        /// @param ToAdd A
-        void AddAction(Action* ToAdd);
-
-        /// @brief Get the action associated with the input or nullptr
-        Action* VerifyEntry(const String& Entry) const;
-
-
-
-        /// @brief Sends a rendered menu to an output stream
-        /// @param OutputStream The stream to display to
-        void Display(std::ostream& OutputStream = std::cout) const;
-
-        /// @brief Get a displayed menu based on the actions present.
-        /// @return A string ready for display.
-        String Render() const;
-
-        /// @brief Get a choice from the user about what to do next
-        /// @return A pointer to one of the internal actions.
-        Action* GetInput() const;
-
-        /// @brief Do some choice from the menu.
-        void DoInput() const;
-
+        virtual void operator()() override;
 };
-
 
 #endif

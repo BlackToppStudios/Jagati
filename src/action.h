@@ -48,12 +48,16 @@ class Action
         StringVector Arguments;
 
     public:
+
+        Action() = default;
+        virtual ~Action() = default;
+
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Argument functionality
 
         /// @brief Argument accepting constructor
         /// @param Args A group of arguments to be used once the command is executed.
-        Action(StringVector Args);
+        explicit Action(StringVector Args);
 
         /// @brief Adds an argument to the command
         /// @param Arg An argument to add to the list of args during the call.
@@ -73,8 +77,6 @@ class Action
         /// @brief Do the command.
         virtual void operator()() = 0;
 
-        Action() = default;
-        virtual ~Action() = default;
 };
 
 #include <iostream>
