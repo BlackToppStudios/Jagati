@@ -34,18 +34,18 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _noaction_h
-#define _noaction_h
+#ifndef _exitaction_h
+#define _exitaction_h
 
 #include "action.h"
 
-class NoAction : public Action
+class ExitAction : public Action
 {
         String Display;
     public:
-        NoAction(const String& Name);
+        ExitAction(const String& Name);
 
-        ~NoAction() = default;
+        ~ExitAction() = default;
 
         virtual String Name() const override;
 

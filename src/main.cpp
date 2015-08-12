@@ -46,7 +46,7 @@
 #include "action.h"
 #include "menu.h"
 #include "actions/menuaction.h"
-#include "actions/noaction.h"
+#include "actions/exitaction.h"
 
 #include <tclap/CmdLine.h>
 
@@ -145,19 +145,20 @@ void ShowMainMenu()
     Menu Main("Main Menu");
 
     Main.AddAction( new MenuAction("Packages Menu",
-                    new TestAction,
-                    new TestAction,
-                    new NoAction("Exit"))
+                                    new TestAction,
+                                    new TestAction,
+                                    new ExitAction("Back")
+                                    )
                   );
 
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
-    Main.AddAction(new TestAction);
+    Main.AddAction(new ExitAction("Exit"));
 
 
     //Main.AddAction(new TestAction); // Crash here
 
-    Main.DoInput();
+    Main.DoMenuUntilExit();
 }

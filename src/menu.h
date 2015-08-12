@@ -91,7 +91,12 @@ class Menu
         Action* GetInput() const;
 
         /// @brief Do some choice from the menu.
-        void DoInput() const;
+        /// @return true if this action should leave the menu or loop in it.
+        Boole DoInput() const;
+
+        /// @brief loop the menu's inputs until an entry returns false.
+        void DoMenuUntilExit() const;
+
 
 };
 

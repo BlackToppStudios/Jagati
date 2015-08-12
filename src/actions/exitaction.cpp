@@ -34,23 +34,23 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _noaction_cpp
-#define _noaction_cpp
+#ifndef _exitaction_cpp
+#define _exitaction_cpp
 
-#include "noaction.h"
+#include "exitaction.h"
 
 
-NoAction::NoAction(const String& Name) :
+ExitAction::ExitAction(const String& Name) :
     Display(Name)
     {}
 
-String NoAction::Name() const
+String ExitAction::Name() const
     { return Display; }
 
-String NoAction::MenuEntry() const
+String ExitAction::MenuEntry() const
     { return Display; }
 
-Boole NoAction::operator()()
+Boole ExitAction::operator()()
     { return false; }
 
 

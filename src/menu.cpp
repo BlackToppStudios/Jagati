@@ -68,6 +68,19 @@ void Menu::AddAction(Action* ToAdd)
     Actions.push_back(ToAdd);
 }
 
+Action* Menu::VerifyEntry(const String& Entry) const
+{
+    StringStream Converter;
+    Converter << Entry;
+    Whole EntryNumber = 0;
+    Converter >> EntryNumber;
+    if(EntryNumber && EntryNumber <= Actions.size())
+        { return Actions.at(EntryNumber-1); }
+    else
+        { return nullptr; }
+}
+
+
 void Menu::Display(std::ostream& OutputStream) const
     { OutputStream << std::endl << Render() << std::endl; }
 
@@ -102,22 +115,15 @@ Action* Menu::GetInput() const
     return Results;
 }
 
-void Menu::DoInput() const
+
+Boole Menu::DoInput() const
     { (*GetInput())(); }
 
-Action* Menu::VerifyEntry(const String& Entry) const
+
+void Menu::DoMenuUntilExit() const
 {
-    StringStream Converter;
-    Converter << Entry;
-    Whole EntryNumber = 0;
-    Converter >> EntryNumber;
-    if(EntryNumber && EntryNumber <= Actions.size())
-        { return Actions.at(EntryNumber-1); }
-    else
-        { return nullptr; }
+    while(DoInput()){}
 }
-
-
 
 
 

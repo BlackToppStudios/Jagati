@@ -41,7 +41,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -std=c++11")
 set(SRC_LIST
     "src/action.cpp"
     "src/actions/menuaction.cpp"
-    "src/actions/noaction.cpp"
+    "src/actions/exitaction.cpp"
     "src/binarybuffer.cpp"
     "src/datatypes.cpp"
     "src/dependency.cpp"
@@ -59,7 +59,7 @@ set(SRC_LIST
 set(HEADER_LIST
     "src/action.h"
     "src/actions/menuaction.h"
-    "src/actions/noaction.h"
+    "src/actions/exitaction.h"
     "src/binarybuffer.h"
     "src/crossplatformexport.h"
     "src/datatypes.h"
