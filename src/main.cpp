@@ -46,6 +46,7 @@
 #include "action.h"
 #include "menu.h"
 #include "actions/menuaction.h"
+#include "actions/noaction.h"
 
 #include <tclap/CmdLine.h>
 
@@ -145,7 +146,8 @@ void ShowMainMenu()
 
     Main.AddAction( new MenuAction("Packages Menu",
                     new TestAction,
-                    new TestAction)
+                    new TestAction,
+                    new NoAction("Exit"))
                   );
 
     Main.AddAction(new TestAction);

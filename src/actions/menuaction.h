@@ -56,7 +56,7 @@ class MenuAction : public Menu, public Action
 
         virtual String MenuEntry() const override;
 
-        virtual void operator()() override;
+        virtual Boole operator()() override;
 };
 
 #endif

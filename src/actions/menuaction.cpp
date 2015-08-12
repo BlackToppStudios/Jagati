@@ -50,8 +50,11 @@ String MenuAction::Name() const
 String MenuAction::MenuEntry() const
     { return MenuName; }
 
-void MenuAction::operator()()
-    { DoInput(); }
+Boole MenuAction::operator()()
+{
+    DoInput();
+    return true;
+}
 
 
 

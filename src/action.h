@@ -75,7 +75,8 @@ class Action
         virtual String MenuEntry() const = 0;
 
         /// @brief Do the command.
-        virtual void operator()() = 0;
+        /// @return True if the menu should look or false otherwise.
+        virtual Boole operator()() = 0;
 
 };
 
@@ -90,8 +91,11 @@ class TestAction : public Action
         virtual String MenuEntry() const
             { return String("When Selected this will do foo"); }
 
-        virtual void operator()()
-            { std::cout << "FOO!" << std::endl; }
+        virtual Boole operator()()
+        {
+            std::cout << "FOO!" << std::endl;
+            return true;
+        }
 
         virtual ~TestAction() = default;
 };
