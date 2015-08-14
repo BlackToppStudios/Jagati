@@ -47,6 +47,9 @@
 #include "menu.h"
 #include "actions/menuaction.h"
 #include "actions/exitaction.h"
+#include "actions/viewpackage.h"
+
+#include "autodetect.h"
 
 #include <tclap/CmdLine.h>
 
@@ -145,7 +148,7 @@ void ShowMainMenu()
     Menu Main("Main Menu");
 
     Main.AddAction( new MenuAction("Packages Menu",
-                                    new TestAction,
+                                    new ViewPackage(new foundation),
                                     new TestAction,
                                     new ExitAction("Back")
                                     )

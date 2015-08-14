@@ -117,14 +117,13 @@ Action* Menu::GetInput() const
 
 
 Boole Menu::DoInput() const
-    { (*GetInput())(); }
+    { return (*GetInput())(); }
 
 
 void Menu::DoMenuUntilExit() const
 {
     while(DoInput()){}
 }
-
 
 
 #endif
