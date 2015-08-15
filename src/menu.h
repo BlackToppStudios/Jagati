@@ -76,8 +76,6 @@ class Menu
         /// @brief Get the action associated with the input or nullptr
         Action* VerifyEntry(const String& Entry) const;
 
-
-
         /// @brief Sends a rendered menu to an output stream
         /// @param OutputStream The stream to display to
         void Display(std::ostream& OutputStream = std::cout) const;
@@ -88,16 +86,18 @@ class Menu
 
         /// @brief Get a choice from the user about what to do next
         /// @return A pointer to one of the internal actions.
-        Action* GetInput() const;
+        Action* GetMenuChoice() const;
 
         /// @brief Do some choice from the menu.
         /// @return true if this action should leave the menu or loop in it.
-        Boole DoInput() const;
+        Boole DoMenuChoice() const;
 
         /// @brief loop the menu's inputs until an entry returns false.
         void DoMenuUntilExit() const;
 
+        static String GetInput();
 
+        static void EnterToContinue();
 };
 
 

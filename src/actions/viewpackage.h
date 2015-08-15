@@ -40,6 +40,8 @@
 #include "action.h"
 #include "package.h"
 
+#include "menuaction.h"
+
 class ViewPackage :  public Action
 {
         // Non-owning pointer

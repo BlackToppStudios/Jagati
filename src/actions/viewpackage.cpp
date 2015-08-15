@@ -40,6 +40,7 @@
 #include "viewpackage.h"
 
 #include <iostream>
+#include <cstdio>
 
 ViewPackage::ViewPackage(Package* target)
     : Target(target)
@@ -54,6 +55,7 @@ String ViewPackage::MenuEntry() const
 Boole ViewPackage::operator()()
 {
     std::cout << *Target;
+    Menu::EnterToContinue();
     return true;
 }
 

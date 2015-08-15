@@ -52,7 +52,7 @@ String MenuAction::MenuEntry() const
 
 Boole MenuAction::operator()()
 {
-    DoInput();
+    DoMenuChoice();
     return true;
 }
 

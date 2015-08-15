@@ -98,7 +98,7 @@ String Menu::Render() const
     return DisplayRenderer.str();
 }
 
-Action* Menu::GetInput() const
+Action* Menu::GetMenuChoice() const
 {
     String Entry;
     Action* Results = nullptr;
@@ -106,23 +106,38 @@ Action* Menu::GetInput() const
     {
         Display();
         cout << "Your choice: ";
-        if(!(std::cin >> Entry))
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+        Entry = GetInput();
     }
     return Results;
 }
 
 
-Boole Menu::DoInput() const
-    { return (*GetInput())(); }
+Boole Menu::DoMenuChoice() const
+    { return (*GetMenuChoice())(); }
 
 
 void Menu::DoMenuUntilExit() const
 {
-    while(DoInput()){}
+    while(DoMenuChoice()){}
+}
+
+String Menu::GetInput()
+{
+    String Entry;
+    if(!(std::cin >> Entry))
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    return Entry;
+}
+
+void Menu::EnterToContinue()
+{
+    std::cout <<std::endl << std::endl
+              << "Press Enter/Return to continue..."
+              << std::endl << std::endl;
+    GetInput();
 }
 
 
