@@ -38,13 +38,19 @@
 #define _viewpackage_cpp
 
 #include "viewpackage.h"
+#include "exitaction.h"
 
 #include <iostream>
 #include <cstdio>
 
 ViewPackage::ViewPackage(Package* target)
-    : Target(target)
-{}
+    : MenuAction(target->Name() + " Menu"), Target(target)
+{
+    AddAction(new TestAction);
+    AddAction(new TestAction);
+    AddAction(new TestAction);
+    AddAction(new ExitAction("Back"));
+}
 
 String ViewPackage::Name() const
     { return Target->Name(); }
@@ -55,7 +61,7 @@ String ViewPackage::MenuEntry() const
 Boole ViewPackage::operator()()
 {
     std::cout << *Target;
-    Menu::EnterToContinue();
+    DoMenuUntilExit();
     return true;
 }
 

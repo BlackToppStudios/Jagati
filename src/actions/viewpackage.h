@@ -42,7 +42,7 @@
 
 #include "menuaction.h"
 
-class ViewPackage :  public Action
+class ViewPackage :  public MenuAction
 {
         // Non-owning pointer
         Package* Target;

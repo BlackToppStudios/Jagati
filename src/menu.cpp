@@ -132,13 +132,6 @@ String Menu::GetInput()
     return Entry;
 }
 
-void Menu::EnterToContinue()
-{
-    std::cout <<std::endl << std::endl
-              << "Press Enter/Return to continue..."
-              << std::endl << std::endl;
-    GetInput();
-}
 
 
 #endif
