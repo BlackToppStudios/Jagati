@@ -52,6 +52,7 @@ class Package
         virtual DependencyList DependsOn() const = 0;
         virtual Version CurrentVersion() const = 0;
         virtual void Install() const = 0;
+        virtual Boole IsInstalled() const = 0;
 };
 
 /// @brief Display details about any package.

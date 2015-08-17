@@ -34,43 +34,47 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _Foundation_h
-#define _Foundation_h
+#ifndef _viewpackage_h
+#define _viewpackage_h
 
-#include "githubmezzaninepackage.h"
+#include "action.h"
+#include "package.h"
 
-class foundation : public GithubMezzaninePackage
+#include <iostream>
+
+#include "menuaction.h"
+#include "packageinstallaction.h"
+
+
+
+template<typename PackageType>
+class PackageRootAction :  public MenuAction
 {
+        PackageType Target;
     public:
+        PackageRootAction() : MenuAction(Target.Name() + " Menu")
+        {
+            AddAction(new TestAction); // Few package details
+            AddAction(new PackageInstallAction(Target));
+            AddAction(new TestAction);
+            AddAction(new ExitAction("Back"));
+        }
+
+        virtual ~PackageRootAction() = default;
+
         virtual String Name() const override
+            { return Target.Name(); }
+
+        virtual String MenuEntry() const override
+            { return Name(); }
+
+        virtual Boole operator()() override
         {
-            return String("Foundation");
+            std::cout << Target;
+            DoMenuUntilExit();
+            return true;
         }
 
-        virtual String BriefDescription() const override
-        {
-            return String("Provides basic header files for universal datatypes and library exports.");
-        }
-
-        virtual String GitURL() const override
-        {
-            return String("git@github.com:BlackToppStudios/Mezz_Foundation.git");
-        }
-
-        virtual DependencyList DependsOn() const override
-        {
-            return DependencyList();
-        }
-
-        virtual Version CurrentVersion() const override
-        {
-            return Version(0,9,0);
-        }
-
-        virtual Boole IsInstalled() const override
-        {
-            return false;
-        }
 };
 
 #endif

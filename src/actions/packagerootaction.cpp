@@ -34,36 +34,11 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _viewpackage_cpp
-#define _viewpackage_cpp
+#ifndef _packagerootaction_cpp
+#define _packagerootaction_cpp
 
-#include "viewpackage.h"
-#include "exitaction.h"
+#include "packageinstallaction.h"
 
-#include <iostream>
-#include <cstdio>
-
-ViewPackage::ViewPackage(Package* target)
-    : MenuAction(target->Name() + " Menu"), Target(target)
-{
-    AddAction(new TestAction);
-    AddAction(new TestAction);
-    AddAction(new TestAction);
-    AddAction(new ExitAction("Back"));
-}
-
-String ViewPackage::Name() const
-    { return Target->Name(); }
-
-String ViewPackage::MenuEntry() const
-    { return Target->Name(); }
-
-Boole ViewPackage::operator()()
-{
-    std::cout << *Target;
-    DoMenuUntilExit();
-    return true;
-}
 
 
 

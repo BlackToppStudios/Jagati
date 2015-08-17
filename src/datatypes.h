@@ -111,17 +111,14 @@ typedef float Real;
 /// @brief A Real number that is at least as precise as the Real and could be considerabll moreso
 typedef double PreciseReal;
 
-/// @typedef Whole
 /// @brief Whole is an unsigned integer, it will be at least 32bits in size.
 /// @details This is a typedef to unsigned Long. but could be smaller in some situations.  In
 /// general it will be the most efficient unsigned type for math.
 typedef unsigned long Whole;
-/// @typedef Integer
 /// @brief A datatype used to represent any integer close to.
 /// @details This is a typedef to int, but could int16 or smaller to improve performance in some situtations, In general it will be the most efficient signed type for math.
 typedef int Integer;
 
-/// @typedef Boole
 /// @brief Generally acts a single bit, true or false
 /// @details Normally just a bool, but on some platform alignment matters more than size, so this could be as large as one cpu word in size.
 typedef bool Boole;

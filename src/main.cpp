@@ -47,7 +47,7 @@
 #include "menu.h"
 #include "actions/menuaction.h"
 #include "actions/exitaction.h"
-#include "actions/viewpackage.h"
+#include "actions/packagerootaction.h"
 
 #include "autodetect.h"
 
@@ -148,7 +148,7 @@ void ShowMainMenu()
     Menu Main("Main Menu");
 
     Main.AddAction( new MenuAction("Packages Menu",
-                                    new ViewPackage(new foundation),
+                                    new PackageRootAction<foundation>(),
                                     new TestAction,
                                     new ExitAction("Back")
                                     )

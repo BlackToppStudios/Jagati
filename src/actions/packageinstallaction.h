@@ -34,29 +34,25 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _viewpackage_h
-#define _viewpackage_h
+#ifndef _packageinstallaction_h
+#define _packageinstallaction_h
 
 #include "action.h"
 #include "package.h"
 
-#include "menuaction.h"
-
-class ViewPackage :  public MenuAction
+class PackageInstallAction : public Action
 {
-        // Non-owning pointer
-        Package* Target;
-
+    Package& Target;
     public:
-        ViewPackage(Package* target);
-        virtual ~ViewPackage() = default;
+        PackageInstallAction(Package& PackageToInstall);
+
+        ~PackageInstallAction() = default;
 
         virtual String Name() const override;
 
         virtual String MenuEntry() const override;
 
         virtual Boole operator()() override;
-
 };
 
 #endif

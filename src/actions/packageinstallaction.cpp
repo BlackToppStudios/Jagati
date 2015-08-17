@@ -34,43 +34,27 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _Foundation_h
-#define _Foundation_h
+#ifndef _packageinstallaction_cpp
+#define _packageinstallaction_cpp
 
-#include "githubmezzaninepackage.h"
+#include "packageinstallaction.h"
 
-class foundation : public GithubMezzaninePackage
-{
-    public:
-        virtual String Name() const override
-        {
-            return String("Foundation");
-        }
 
-        virtual String BriefDescription() const override
-        {
-            return String("Provides basic header files for universal datatypes and library exports.");
-        }
 
-        virtual String GitURL() const override
-        {
-            return String("git@github.com:BlackToppStudios/Mezz_Foundation.git");
-        }
+PackageInstallAction::PackageInstallAction(Package& PackageToInstall)
+    : Target(PackageToInstall)
+{}
 
-        virtual DependencyList DependsOn() const override
-        {
-            return DependencyList();
-        }
+String PackageInstallAction::Name() const
+    { return String("Install ") + Target.Name(); }
 
-        virtual Version CurrentVersion() const override
-        {
-            return Version(0,9,0);
-        }
+String PackageInstallAction::MenuEntry() const
+    { return Name() + (Target.IsInstalled()?"":" (Already Installed)"); }
 
-        virtual Boole IsInstalled() const override
-        {
-            return false;
-        }
-};
+Boole PackageInstallAction::operator()()
+    { return false; }
+
+
 
 #endif
+
