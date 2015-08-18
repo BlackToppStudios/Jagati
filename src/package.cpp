@@ -48,7 +48,10 @@ std::ostream& operator<<(std::ostream& Out, const Package& Displayable)
         << "Dependencies: " << Displayable.DependsOn() << endl
         << "Description: " << Displayable.BriefDescription() << endl;
     return Out;
-
 }
+
+
+String Package::GetPackageDir()
+    { return "./Packages/"; }
 
 #endif

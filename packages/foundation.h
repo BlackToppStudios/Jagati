@@ -69,7 +69,7 @@ class foundation : public GithubMezzaninePackage
 
         virtual Boole IsInstalled() const override
         {
-            return false;
+            return DoesDirectoryExist(GetPackageDir() + "Mezz_Foundation");
         }
 };
 

@@ -39,6 +39,7 @@
 
 #include "datatypes.h"
 #include "dependency.h"
+#include "resourceutilities.h"
 
 const String Placeholder("Not Setup Yet");
 
@@ -53,6 +54,8 @@ class Package
         virtual Version CurrentVersion() const = 0;
         virtual void Install() const = 0;
         virtual Boole IsInstalled() const = 0;
+
+        static String GetPackageDir();
 };
 
 /// @brief Display details about any package.
