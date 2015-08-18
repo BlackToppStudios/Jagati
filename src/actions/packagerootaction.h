@@ -40,11 +40,10 @@
 #include "action.h"
 #include "package.h"
 
-#include <iostream>
-
 #include "menuaction.h"
 #include "packageinstallaction.h"
-
+#include "packageviewaction.h"
+#include "exitaction.h"
 
 
 template<typename PackageType>
@@ -54,9 +53,8 @@ class PackageRootAction :  public MenuAction
     public:
         PackageRootAction() : MenuAction(Target.Name() + " Menu")
         {
-            AddAction(new TestAction); // Few package details
+            AddAction(new PackageViewAction(Target));
             AddAction(new PackageInstallAction(Target));
-            AddAction(new TestAction);
             AddAction(new ExitAction("Back"));
         }
 
@@ -70,7 +68,6 @@ class PackageRootAction :  public MenuAction
 
         virtual Boole operator()() override
         {
-            std::cout << Target;
             DoMenuUntilExit();
             return true;
         }

@@ -52,7 +52,7 @@ String MenuAction::MenuEntry() const
 
 Boole MenuAction::operator()()
 {
-    DoMenuChoice();
+    DoMenuUntilExit();
     return true;
 }
 
