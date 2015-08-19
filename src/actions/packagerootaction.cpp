@@ -37,9 +37,28 @@
 #ifndef _packagerootaction_cpp
 #define _packagerootaction_cpp
 
-#include "packageinstallaction.h"
+#include "packagerootaction.h"
 
+PackageRootAction::PackageRootAction(Package& TargetPackage)
+    :   MenuAction(TargetPackage.Name() + " Menu"),
+        Target(TargetPackage)
+{
+    AddAction(new PackageViewAction(Target));
+    AddAction(new PackageInstallAction(Target));
+    AddAction(new ExitAction("Back"));
+}
 
+String PackageRootAction::Name() const
+    { return Target.Name(); }
+
+String PackageRootAction::MenuEntry() const
+    { return Name(); }
+
+Boole PackageRootAction::operator()()
+{
+    DoMenuUntilExit();
+    return true;
+}
 
 
 #endif

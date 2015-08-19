@@ -148,7 +148,7 @@ void ShowMainMenu()
     Menu Main("Main Menu");
 
     Main.AddAction( new MenuAction("Packages Menu",
-                                    new PackageRootAction<foundation>(),
+                                    new PackageRootAction(foundationImplementation),
                                     new TestAction,
                                     new ExitAction("Back")
                                     )

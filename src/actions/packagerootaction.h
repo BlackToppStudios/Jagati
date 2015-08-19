@@ -46,32 +46,19 @@
 #include "exitaction.h"
 
 
-template<typename PackageType>
 class PackageRootAction :  public MenuAction
 {
-        PackageType Target;
+        Package& Target;
     public:
-        PackageRootAction() : MenuAction(Target.Name() + " Menu")
-        {
-            AddAction(new PackageViewAction(Target));
-            AddAction(new PackageInstallAction(Target));
-            AddAction(new ExitAction("Back"));
-        }
+        PackageRootAction(Package& TargetPackage);
 
         virtual ~PackageRootAction() = default;
 
-        virtual String Name() const override
-            { return Target.Name(); }
+        virtual String Name() const override;
 
-        virtual String MenuEntry() const override
-            { return Name(); }
+        virtual String MenuEntry() const override;
 
-        virtual Boole operator()() override
-        {
-            DoMenuUntilExit();
-            return true;
-        }
-
+        virtual Boole operator()() override;
 };
 
 #endif
