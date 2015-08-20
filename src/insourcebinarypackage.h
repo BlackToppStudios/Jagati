@@ -45,8 +45,7 @@
 class InSourceBinaryPackage : public Package
 {
     public:
-        virtual String Git() const = 0;
-        virtual void Install() const;
+        virtual ~InSourceBinaryPackage() = default;
 };
 
 

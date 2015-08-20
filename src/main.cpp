@@ -147,12 +147,13 @@ void ShowMainMenu()
 {
     Menu Main("Main Menu");
 
-    Main.AddAction( new MenuAction("Packages Menu",
-                                    new PackageRootAction(foundationImplementation),
-                                    new TestAction,
-                                    new ExitAction("Back")
-                                    )
-                  );
+    MenuAction* PackageMenu = new MenuAction("Packages Menu");
+
+    for(Package* package : Packages )
+        { PackageMenu->AddAction(new PackageRootAction(*package)); }
+    PackageMenu->AddAction(new ExitAction("Back"));
+
+    Main.AddAction(PackageMenu);
 
     Main.AddAction(new TestAction);
     Main.AddAction(new TestAction);
