@@ -52,7 +52,7 @@ String PackageRootAction::Name() const
     { return Target.Name(); }
 
 String PackageRootAction::MenuEntry() const
-    { return Name(); }
+    { return Name() + String(35-Name().size(),' ') + "[" + (Target.IsInstalled()?"X":" ") + "]"; }
 
 Boole PackageRootAction::operator()()
 {

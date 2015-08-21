@@ -92,7 +92,7 @@ String Menu::Render() const
     for(auto option : WithIndex(Actions))
     {
         DisplayRenderer << setw(10) << right << option.first + 1 << ") "
-                        << setw(48) << left << option.second->Name() << endl;
+                        << setw(48) << left << option.second->MenuEntry() << endl;
     }
 
     return DisplayRenderer.str();
