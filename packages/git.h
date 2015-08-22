@@ -69,7 +69,16 @@ class git : public InSourceBinaryPackage
 
         void Install() const
         {
+            if(Which("apt-get").size() > 0)
+            {
 
+                #ifdef LINUX
+                //
+                #endif
+                #ifdef WINDOWS
+                //
+                #endif
+            }//else if
         }
 };
 
