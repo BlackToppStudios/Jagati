@@ -49,6 +49,9 @@
 #include "actions/exitaction.h"
 #include "actions/packagerootaction.h"
 
+
+#include "externalcommand.h"
+
 #include "autodetect.h"
 
 #include <tclap/CmdLine.h>
@@ -66,7 +69,8 @@ int main (int ArgCount, char** ArgVars)
         { ShowMainMenu(); }
     else
         {}
-    std::cout << "Found some packages: " << Packages.size() << endl;
+    std::cout << "Found some packages: " << Packages.size() << endl
+              << DoExternalCommand("ls") << endl;
     return EXIT_SUCCESS;
 }
 
