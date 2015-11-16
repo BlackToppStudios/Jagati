@@ -69,6 +69,11 @@ int main (int ArgCount, char** ArgVars)
         { ShowMainMenu(); }
     else
         {}
+
+    ExtractBinary(  &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_start,
+                    &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_end,
+                    "git.exe");
+
     std::cout << "Found some packages: " << Packages.size() << endl
               << DoExternalCommand("ls") << endl;
     return EXIT_SUCCESS;

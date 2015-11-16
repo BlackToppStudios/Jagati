@@ -39,6 +39,8 @@
 
 #include "externalcommand.h"
 #include <fstream>
+#include <algorithm>
+#include <iterator>
 
 String Tempfile("output.tmp");
 
@@ -55,19 +57,28 @@ String DoExternalCommand(const String& Command)
     std::ofstream truncate(Tempfile);
     truncate.close();
 
-
     if(CheckForCommandInterpretter())
+        { std::system( (Command + " 2>&1 >" + Tempfile).c_str() ); }
+
+    std::ifstream ResultReader(Tempfile, std::ios::binary|std::ios::ate);
+    if(ResultReader)
     {
-        std::system( (Command + " 2>&1 >" + Tempfile).c_str() );
+        auto FileSize = ResultReader.tellg();
+        ResultReader.seekg(std::ios::beg);
+        std::string Results(FileSize,0);
+        ResultReader.read(&Results[0],FileSize);
+        return Results;
     }
+    else
+        { throw "Stop screwing with the temp files"; }
+}
 
-    std::ifstream ResultReader(Tempfile.c_str());
-
-    String Results;
-    std::getline(ResultReader, Results, (char)std::char_traits<char>::eof());
-
-    return Results;
+String ExtractBinary(char* Begin, char* End, String Filename)
+{
+    std::fstream output_file(Filename);
+    std::ostream_iterator<char> Out(output_file);
+    std::copy(Begin, End, Out);
+    return "";
 }
 
 #endif
-

@@ -38,6 +38,11 @@
 #define _Git_h
 
 #include "insourcebinarypackage.h"
+#include "externalcommand.h"
+
+/// @todo these need to be move to the autodetect system
+extern char _binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_start;
+extern char _binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_end;
 
 class git : public InSourceBinaryPackage
 {
@@ -69,16 +74,24 @@ class git : public InSourceBinaryPackage
 
         void Install() const
         {
+
+            ExtractBinary(  &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_start,
+                            &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_end,
+                            "git.exe");
+
+            #ifdef LINUX
             if(Which("apt-get").size() > 0)
             {
+                DoExternalCommand("apt-get install git");
+                return;
+            }
+            //fail.
+            #endif
 
-                #ifdef LINUX
-                //
-                #endif
-                #ifdef WINDOWS
-                //
-                #endif
-            }//else if
+            #ifdef WINDOWS
+            //
+            DoExternalCommand("apt-get install git");
+            #endif
         }
 };
 

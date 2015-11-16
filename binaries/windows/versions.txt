@@ -1,0 +1,7 @@
+cmake-3.3.1-win32-x86.exe
+doxygen-1.8.10-setup.exe
+Git-2.5.2.2-64-bit.exe
+graphviz-2.38.msi
+swigwin-3.0.7.zip
+tdm64-gcc-5.1.0-2.exe
+versions.txt

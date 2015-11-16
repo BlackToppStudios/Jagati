@@ -33,6 +33,11 @@ Message(STATUS "Using Source From: ${ProjectRootDir}")
 set(ProjectBinaryDir ${${PROJECT_NAME}_BINARY_DIR}/)
 Message(STATUS "Putting all major output in: ${ProjectBinaryDir}")
 
+# Binary Subfolders
+set(BinaryObjectsDirectory ${ProjectBinaryDir}ExtraObjects/)
+Message(STATUS "Creating BinaryJar Files in: ${BinaryObjectsDirectory}")
+
+
 ##############################################################################
 # Source Files
 
@@ -83,6 +88,21 @@ set(HEADER_LIST
     "src/version.h"
 )
 
+set(WINDOWS_BINARIES
+    "${ProjectRootDir}binaries/windows/cmake.exe"
+    "${ProjectRootDir}binaries/windows/doxygen.exe"
+    "${ProjectRootDir}binaries/windows/git.exe"
+    "${ProjectRootDir}binaries/windows/graphviz.msi"
+    "${ProjectRootDir}binaries/windows/swig.exe"
+    "${ProjectRootDir}binaries/windows/tdm64-gcc.exe"
+)
+
+set(LINUX_BINARIES
+)
+
+set(MACOSX_BINARIES
+)
+
 ##############################################################################
 # Find Mezzanine Packages
 
@@ -91,12 +111,12 @@ File(GLOB Packages "packages/"  "packages/*.h")
 message(STATUS "Looking for Packages")
 foreach(CurrentFileName ${Packages})
     message(STATUS "   Found - ${CurrentFileName}")
-    String(REGEX MATCH "/([^/]*)\\.h$" DirtyName "${CurrentFileName}")
-    String(LENGTH ${DirtyName} DirtyNameLength)
-    MATH(EXPR TargetLength "${DirtyNameLength} - 3")
-    String(SUBSTRING "${DirtyName}" "1" "${TargetLength}" TargetName)
-    #message (${TargetLength})
-    #message (${DirtyName})
+    string(REGEX MATCH "/([^/]*)\\.h$" DirtyName "${CurrentFileName}")
+    string(LENGTH ${DirtyName} DirtyNameLength)
+    math(EXPR TargetLength "${DirtyNameLength} - 3")
+    string(SUBSTRING "${DirtyName}" "1" "${TargetLength}" TargetName)
+    #message(${TargetLength})
+    #message(${DirtyName})
     #message("${TargetName}")
     list(APPEND FoundPackages ${TargetName})
 endforeach(CurrentFileName ${Packages})
@@ -115,15 +135,16 @@ foreach(CurrentTest ${FoundPackages})
     ${CurrentTest} ${CurrentTest}Implementation;")
 
     set(CppNameRegistration "${CppNameRegistration}
-            Packages.push_back(&${CurrentTest}Implementation);")
+        Packages.push_back(&${CurrentTest}Implementation);")
 endforeach(CurrentTest ${FoundTests})
 
-configure_file( "${ProjectRootDir}/input/autodetect.h.in"  "${ProjectBinaryDir}/GeneratedHeaders/autodetect.h")
+configure_file( "${ProjectRootDir}/input/autodetect.h.in"
+                "${ProjectBinaryDir}/GeneratedHeaders/autodetect.h")
 include_directories(
-  "${ProjectBinaryDir}/GeneratedHeaders"
-  "src/"
-  "packages/"
-  "src/tclap-1.2.1/include"
+    "${ProjectBinaryDir}/GeneratedHeaders"
+    "src/"
+    "packages/"
+    "src/tclap-1.2.1/include"
 )
 
 ##############################################################################
@@ -131,17 +152,57 @@ include_directories(
 
 if(${WIN32})
     add_definitions( -DWINDOWS )
+    set(IncludeBinaries WINDOWS_BINARIES)
+    set(LinkBinaryString "-Wl,${ProjectRootDir}binaries/windows/cmake.exe -Wl,${ProjectRootDir}binaries/windows/doxygen.exe -Wl,${ProjectRootDir}binaries/windows/git.exe -Wl,${ProjectRootDir}binaries/windows/graphviz.msi -Wl,${ProjectRootDir}binaries/windows/swig.exe -Wl,${ProjectRootDir}binaries/windows/tdm64-gcc.exe")
 endif(${WIN32})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_definitions( -DLINUX )
+    set(IncludeBinaries LINUX_BINARIES)
+    #set(LinkBinaryString "")
+    set(LinkBinaryString "-Wl,${ProjectRootDir}binaries/windows/cmake.exe -Wl,${ProjectRootDir}binaries/windows/doxygen.exe -Wl,${ProjectRootDir}binaries/windows/git.exe -Wl,${ProjectRootDir}binaries/windows/graphviz.msi -Wl,${ProjectRootDir}binaries/windows/swig.exe -Wl,${ProjectRootDir}binaries/windows/tdm64-gcc.exe")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_definitions( -DMACOSX )
+    message(ERROR "ObjPlatform is not configured for Mac OS X")
+    set(LinkBinaryString "")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+
+##############################################################################
+# Add list of binaries to build
+
+set(PrepareBinaryObjectFiles PrepareBinaryObjectFiles_${PROJECT_NAME})
+set(PrepareBinaryObjectDirectory PrepareJarDirectory_${PROJECT_NAME})
+
+add_custom_target(
+    ${PrepareBinaryObjectFiles} ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Preparing native installers for development dependencies"
+    WORKING_DIRECTORY ${ProjectRootDir}
+    VERBATIM
+)
+
+add_custom_target(
+    ${PrepareBinaryObjectDirectory} ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Cleaning and Preparing Installer Object creation directory"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BinaryObjectsDirectory}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${BinaryObjectsDirectory}
+)
+
+set(BinaryLinkerOptions "")
+foreach(FileToInsorb IncludeBinaries)
+
+endforeach(FileToInsorb IncludeBinaries)
 
 ##############################################################################
 # Defining the one and only Executable
 
-add_executable(${PROJECT_NAME} ${SRC_LIST} ${HEADER_LIST} ${Packages} "${ProjectBinaryDir}/GeneratedHeaders/autodetect.h")
+add_executable( ${PROJECT_NAME}
+                ${SRC_LIST}
+                ${HEADER_LIST}
+                ${Packages}
+                "${ProjectBinaryDir}/GeneratedHeaders/autodetect.h"
+)
+
+target_link_libraries(${PROJECT_NAME} -Wl,--format=binary ${LinkBinaryString} -Wl,--format=default)
