@@ -40,6 +40,8 @@
 #include "insourcebinarypackage.h"
 #include "externalcommand.h"
 
+#include <istream>
+
 /// @todo these need to be move to the autodetect system
 extern char _binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_start;
 extern char _binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_end;
@@ -74,7 +76,6 @@ class git : public InSourceBinaryPackage
 
         void Install() const
         {
-
             ExtractBinary(  &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_start,
                             &_binary__home_sqeaky_Code_Jagati_binaries_windows_git_exe_end,
                             "git.exe");

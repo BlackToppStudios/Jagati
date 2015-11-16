@@ -73,12 +73,11 @@ String DoExternalCommand(const String& Command)
         { throw "Stop screwing with the temp files"; }
 }
 
-String ExtractBinary(char* Begin, char* End, String Filename)
+void ExtractBinary(char* Begin, char* End, String Filename)
 {
-    std::fstream output_file(Filename);
+    std::fstream output_file(Filename, std::ios::binary | std::ios::out);
     std::ostream_iterator<char> Out(output_file);
     std::copy(Begin, End, Out);
-    return "";
 }
 
 #endif

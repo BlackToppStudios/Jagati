@@ -34,27 +34,34 @@
        Joseph Toppi - toppij@gmail.com
        John Blackwood - makoenergy02@gmail.com
     */
-    #ifndef _packageinstallaction_cpp
-    #define _packageinstallaction_cpp
+#ifndef _packageinstallaction_cpp
+#define _packageinstallaction_cpp
 
-    #include "packageinstallaction.h"
+#include "packageinstallaction.h"
+
+#include <iostream>
+
+using namespace std;
+
+PackageInstallAction::PackageInstallAction(Package& PackageToInstall)
+    : Target(PackageToInstall)
+{}
+
+String PackageInstallAction::Name() const
+    { return String("Install ") + Target.Name(); }
+
+String PackageInstallAction::MenuEntry() const
+    { return Name() + (Target.IsInstalled()?" (Already Installed)":""); }
+
+Boole PackageInstallAction::operator()()
+{
+    cout << "Installing '" << Target.Name() << "'." << endl;
+    Target.Install();
+    cout << "Installed." << endl;
+    return true;
+}
 
 
 
-    PackageInstallAction::PackageInstallAction(Package& PackageToInstall)
-        : Target(PackageToInstall)
-    {}
-
-    String PackageInstallAction::Name() const
-        { return String("Install ") + Target.Name(); }
-
-    String PackageInstallAction::MenuEntry() const
-        { return Name() + (Target.IsInstalled()?"":" (Already Installed)"); }
-
-    Boole PackageInstallAction::operator()()
-        { return false; }
-
-
-
-    #endif
+#endif
 

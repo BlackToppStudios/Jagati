@@ -53,7 +53,6 @@ String DoExternalCommand(const String& Command);
 /// @param Begin A pointer to the beginning of the binary.
 /// @param End A pointer to the end of the binary.
 /// @param Filename The desired local filename to write to.
-/// @return Te absolute filename created
-String ExtractBinary(char* Begin, char* End, String Filename);
+void ExtractBinary(char* Begin, char* End, String Filename);
 
 #endif
