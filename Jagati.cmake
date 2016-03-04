@@ -81,6 +81,7 @@ macro(ClaimParentProject)
     else(ParentProject)
         message(STATUS "Claiming '${PROJECT_NAME}' as the Parent Project.")
         set(ParentProject "${PROJECT_NAME}")
+        set(JagatiConfig "")
     endif(ParentProject)
 endmacro(ClaimParentProject)
 
@@ -435,16 +436,142 @@ endmacro(StandardJagatiSetup)
 
 macro(AddJagatiLibary FileName)
     set(${PROJECT_NAME}lib "${FileName}")
+    list(APPEND JagatiLibraryArray ${FileName})
+    set(${PROJECT_NAME}lib "${FileName}")
     if("${ParentProject}" STREQUAL "${FileName}")
-        list(APPEND JagatiPackageNameArray ${FileName})
     else("${ParentProject}" STREQUAL "${FileName}")
-        set(JagatiLibraryArray "${JagatiLibraryArray}")
-        list(APPEND JagatiLibraryArray ${FileName})
         set(JagatiLibraryArray "${JagatiLibraryArray}" PARENT_SCOPE)
         set(${PROJECT_NAME}lib "${FileName}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${FileName}")
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
 endmacro(AddJagatiLibary)
+
+####################################################################################################
+# Some projects have many files that are created at compile time. This can cause the build system to
+# as complex as the source code. Most software developers want to spend their reasoning about the
+# code and not the code that makes the code. In general the Jagati or a specific package should
+# handle meta-programming where possible.
+
+# Usage:
+#   # Call any time after the parent scope is claimed. The first parameter is the name of a
+#   # preprocessor to create, and the second is the value, "" for no value and the third argument
+#   # is for determining if the remark should be enabled(true) or remarked out(false).
+#       AddJagatiConfig("MEZZ_FOO" "BAR" ON)
+#       AddJagatiConfig("MEZZ_EmptyOption" "" ON)
+#       AddJagatiConfig("MEZZ_Remarked_FOO" "BAR" OFF)
+#       AddJagatiConfig("MEZZ_EmptyOption_nope" "" OFF)
+#
+# Result:
+#   Adds a preprocessor macro to string that config headers can directly include. Here is the
+#   output from the sample above:
+#       #define MEZZ_FOO BAR
+#       #define MEZZ_EmptyOption
+#       //#define MEZZ_Remarked_FOO BAR
+#       //#define MEZZ_EmptyOption_nope
+#
+#   The set variable will be ${PROJECT_NAME}JagatiConfig
+#
+#   This also writes to the variable "JagatiConfigRemarks" in the parentmost scope as a temporary.
+
+# This is an implementaion Detail of AddJagatiConfig, This is needed because macro parameters are
+# neither variables, nor constants and cannot be used in if statements checking implicit
+# truthiness.
+function(Internal_SetRemarks HowToSet)
+    if(HowToSet)
+        set(JagatiConfigRemarks "" PARENT_SCOPE)
+    else(HowToSet)
+        set(JagatiConfigRemarks "//" PARENT_SCOPE)
+    endif(HowToSet)
+endfunction(Internal_SetRemarks HowToSet)
+
+macro(AddJagatiConfig Name Value RemarkBool)
+    Internal_SetRemarks("${RemarkBool}")
+    set(${PROJECT_NAME}JagatiConfig
+        "${${PROJECT_NAME}JagatiConfig}\n${JagatiConfigRemarks}#define ${Name} ${Value}")
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(${PROJECT_NAME}JagatiConfig "${${PROJECT_NAME}JagatiConfig}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+endmacro(AddJagatiConfig Name Value RemarkBool)
+
+####################################################################################################
+# Emit a config file
+
+# Usage:
+#   # Call after 0 or more calls to AddJagatiConfig and the parentmost scope has been claimed.
+#   EmitConfig()
+#
+# Result:
+#   This will create a config file with all the config item added by AddJagatiConfig in this project
+#   and this will set two variables:
+#       ${PROJECT_NAME}ConfigFilename - The absolute path and filename of the file writtern, this
+#           derived from the variable ${PROJECT_NAME}GenHeadersDir and will contain the project name
+#       ${PROJECT_NAME}ConfigContent - The contents of what was emitted in the header file.
+#
+
+macro(EmitConfig)
+
+set(ConfigHeader
+"// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
+/* This file is part of The Mezzanine Engine.\n\
+\n\
+    The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
+    it under the terms of the GNU General Public License as published by\n\
+    the Free Software Foundation, either version 3 of the License, or\n\
+    (at your option) any later version.\n\
+\n\
+    The Mezzanine Engine is distributed in the hope that it will be useful,\n\
+    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+    GNU General Public License for more details.\n\
+\n\
+    You should have received a copy of the GNU General Public License\n\
+    along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.\n\
+*/\n\
+/* The original authors have included a copy of the license specified above in the\n\
+   'Docs' folder. See 'gpl.txt'\n\
+*/\n\
+/* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
+   Build professional software and charge for their product.\n\
+\n\
+   However there are some practical restrictions, so if your project involves\n\
+   any of the following you should contact us and we will try to work something\n\
+   out:\n\
+    - DRM or Copy Protection of any kind(except Copyrights)\n\
+    - Software Patents You Do Not Wish to Freely License\n\
+    - Any Kind of Linking to Non-GPL licensed Works\n\
+    - Are Currently In Violation of Another Copyright Holder's GPL License\n\
+    - If You want to change our code and not add a few hundred MB of stuff to\n\
+        your distribution\n\
+\n\
+   These and other limitations could cause serious legal problems if you ignore\n\
+   them, so it is best to simply contact us or the Free Software Foundation, if\n\
+   you have any questions.\n\
+\n\
+   Joseph Toppi - toppij@gmail.com\n\
+   John Blackwood - makoenergy02@gmail.com\n\
+*/\n\
+#ifndef Mezz_${PROJECT_NAME}_config_h\n\
+#define Mezz_${PROJECT_NAME}_config_h\n\
+\n\n")
+
+    set(ConfigFooter "\n\n#endif")
+
+    set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}GenHeadersDir}${PROJECT_NAME}Config.h")
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}ConfigFilename}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+
+    set(${PROJECT_NAME}ConfigContent "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}${ConfigFooter}")
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(${PROJECT_NAME}ConfigContent "${${PROJECT_NAME}ConfigContent}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+
+    file(WRITE "${${PROJECT_NAME}ConfigFilename}" "${${PROJECT_NAME}ConfigContent}")
+
+endmacro(EmitConfig)
 
 ####################################################################################################
 ####################################################################################################
@@ -458,7 +585,7 @@ endmacro(AddJagatiLibary)
 #
 # Results:
 #   The header and array will be printed. Each line except the header will be indented/preceeded
-# by whatever is in Tabbing.
+#   by whatever is in Tabbing.
 
 function(ShowList Header Tabbing ToPrint)
     message(STATUS "${Tabbing}${Header}")
@@ -466,6 +593,28 @@ function(ShowList Header Tabbing ToPrint)
         message(STATUS "${Tabbing}\t${ListItem}")
     endforeach(ListItem ${ToPrint})
 endfunction(ShowList)
+
+####################################################################################################
+# Basic Option Tools
+
+# Usage:
+#   # Call after project to insure PROJECT_NAME is set.
+#   AddJagatiCompileOption("Mezz_BuildDoxygen" "Create HTML documentation with Doxygen." ON)
+#   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
+#
+# Results:
+#   This will create a variable named after thee string in the first parameter. This var(iable will
+#   be added to the config file for the current project and as a CMake Option in the GUI (or command
+#   prompt).
+
+macro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
+    option(
+        ${VariableName}
+        "${HelpString}"
+        ${DefaultSetting}
+    )
+    AddJagatiConfig("${VariableName}" "" ${${VariableName}})
+endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
 ####################################################################################################
 ####################################################################################################
@@ -481,7 +630,7 @@ set(StaticFoundation_GitURL "git@github.com:BlackToppStudios/Mezz_StaticFoundati
 ####################################################################################################
 # Package Download experiment
 
-set(JagatiPackagerFolder "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+set(Mezz_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
 
 # To insure that all the packages are downloaded this can be added as a dependencies to any target.
 
@@ -504,7 +653,7 @@ function(IncludeJagatiPackage PackageName)
 
     ExternalProject_Add(
       "${PackageName}"
-      PREFIX "${JagatiPackagerFolder}/${PackageName}"
+      PREFIX "${Mezz_JagatiPackageDirectory}/${PackageName}"
       GIT_REPOSITORY "${GitURL}"
       GIT_TAG master
       CONFIGURE_COMMAND ""
@@ -515,3 +664,4 @@ function(IncludeJagatiPackage PackageName)
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
