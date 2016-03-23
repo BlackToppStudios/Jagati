@@ -337,7 +337,8 @@ macro(SetCommonCompilerFlags)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
         endif(CompilerIsGCC)
         if(CompilerIsClang)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
+                -Wno-documentation-unknown-command")
         endif(CompilerIsClang)
 
         # Removed -Winline it did not seem useful
@@ -604,7 +605,7 @@ set(ConfigHeader
 #define Mezz_${PROJECT_NAME}_config_h\n\
 \n\n")
 
-    set(ConfigFooter "\n\n#endif")
+    set(ConfigFooter "\n\n#endif\n")
 
     set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}GenHeadersDir}${PROJECT_NAME}Config.h")
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
