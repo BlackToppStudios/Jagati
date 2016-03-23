@@ -328,10 +328,17 @@ macro(SetCommonCompilerFlags)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         -std=c++11 -fno-strict-aliasing -pthread -m64 -fPIC\
         -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
-        -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations \
-        -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Wredundant-decls -Wshadow \
-        -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=2 -Wundef \
+        -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations \
+        -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow \
+        -Wsign-conversion -Wsign-promo -Wstrict-overflow=2 -Wundef \
         -Wno-unused -Wparentheses -Werror")
+
+        if(CompilerIsGCC)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
+        endif(CompilerIsGCC)
+        if(CompilerIsClang)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
+        endif(CompilerIsClang)
 
         # Removed -Winline it did not seem useful
         # He are some flags suggested for use an why they were not used:
