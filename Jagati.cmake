@@ -338,7 +338,7 @@ macro(SetCommonCompilerFlags)
         endif(CompilerIsGCC)
         if(CompilerIsClang)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
-                -Wno-documentation-unknown-command")
+                -Wno-documentation-unknown-command -Wno-c++98-compat")
         endif(CompilerIsClang)
 
         # Removed -Winline it did not seem useful
