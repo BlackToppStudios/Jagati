@@ -113,7 +113,6 @@ macro(CreateLocations)
     message(STATUS "Creating Location Variables for '${PROJECT_NAME}'")
     set(PROJECT_NAME "${PROJECT_NAME}")
 
-
     #######################################
     # Root
     set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}_SOURCE_DIR}/")
@@ -412,8 +411,36 @@ macro(StandardJagatiSetup)
         IdentifyCompiler()
         SetCommonCompilerFlags()
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-
 endmacro(StandardJagatiSetup)
+
+####################################################################################################
+# This set a single variable that all Mezzanine libraries will use when building libraries.
+
+# Usage:
+#   Don't. This can easily be controlled via the MEZZ_BuildStaticLibraries cache level option.
+#   ChooseLibraryType("ON")
+#   ChooseLibraryType("ON")
+#
+# Result:
+#   A variable called MEZZ_LibraryBuildType is set with either "STATIC" if true is passed or
+#   "SHARED" if false is passed.
+
+function(Internal_ChooseLibraryType TrueForStatic)
+    if(TrueForStatic)
+        set(MEZZ_LibraryBuildType "STATIC" PARENT_SCOPE)
+    else(TrueForStatic)
+        set(MEZZ_LibraryBuildType "SHARED" PARENT_SCOPE)
+    endif(TrueForStatic)
+endfunction(Internal_ChooseLibraryType HowToSet)
+
+macro(ChooseLibraryType TrueForStatic)
+    Internal_ChooseLibraryType(TrueForStatic)
+
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(MEZZ_LibraryBuildType "${MEZZ_LibraryBuildType}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+endmacro(ChooseLibraryType)
 
 ####################################################################################################
 ####################################################################################################
@@ -426,7 +453,7 @@ endmacro(StandardJagatiSetup)
 
 # Usage:
 #   # Be certain to call project before calling this.
-#   AddJagatiLibrary("filename.a")
+#   AddJagatiLibrary("LinkTarget")
 #
 # Result:
 #   The passed file weill  be added to a list of libaries. This list can be
@@ -434,17 +461,32 @@ endmacro(StandardJagatiSetup)
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename
 
-macro(AddJagatiLibary FileName)
-    set(${PROJECT_NAME}lib "${FileName}")
+macro(AddJagatiLibrary FileName)
+    set(${PROJECT_NAME}Lib "${FileName}")
     list(APPEND JagatiLibraryArray ${FileName})
-    set(${PROJECT_NAME}lib "${FileName}")
+    set(${PROJECT_NAME}Lib "${FileName}")
     if("${ParentProject}" STREQUAL "${FileName}")
     else("${ParentProject}" STREQUAL "${FileName}")
         set(JagatiLibraryArray "${JagatiLibraryArray}" PARENT_SCOPE)
-        set(${PROJECT_NAME}lib "${FileName}" PARENT_SCOPE)
+        set(${PROJECT_NAME}Lib "${FileName}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${FileName}")
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
-endmacro(AddJagatiLibary)
+endmacro(AddJagatiLibrary FileName)
+
+####################################################################################################
+
+
+macro(AddJagatiDoxInput FileName)
+    set(${PROJECT_NAME}Dox "${FileName}")
+    list(APPEND JagatiDoxArray ${FileName})
+    set(${PROJECT_NAME}Dox "${FileName}")
+    if("${ParentProject}" STREQUAL "${FileName}")
+    else("${ParentProject}" STREQUAL "${FileName}")
+        set(JagatiDoxArray "${JagatiDoxArray}" PARENT_SCOPE)
+        set(${PROJECT_NAME}Dox "${FileName}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${FileName}")
+    message(STATUS "Dox Input: '${PROJECT_NAME}Dox' - ${${PROJECT_NAME}Dox}")
+endmacro(AddJagatiDoxInput FileName)
 
 ####################################################################################################
 # Some projects have many files that are created at compile time. This can cause the build system to
@@ -487,7 +529,7 @@ endfunction(Internal_SetRemarks HowToSet)
 macro(AddJagatiConfig Name Value RemarkBool)
     Internal_SetRemarks("${RemarkBool}")
     set(${PROJECT_NAME}JagatiConfig
-        "${${PROJECT_NAME}JagatiConfig}\n${JagatiConfigRemarks}#define ${Name} ${Value}")
+        "${${PROJ${MEZZ_JagatiPackageDirectory}ECT_NAME}JagatiConfig}\n${JagatiConfigRemarks}#define ${Name} ${Value}")
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}JagatiConfig "${${PROJECT_NAME}JagatiConfig}" PARENT_SCOPE)
@@ -570,7 +612,6 @@ set(ConfigHeader
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
     file(WRITE "${${PROJECT_NAME}ConfigFilename}" "${${PROJECT_NAME}ConfigContent}")
-
 endmacro(EmitConfig)
 
 ####################################################################################################
@@ -630,7 +671,15 @@ set(StaticFoundation_GitURL "git@github.com:BlackToppStudios/Mezz_StaticFoundati
 ####################################################################################################
 # Package Download experiment
 
-set(Mezz_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+set(MEZZ_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+if(EXISTS "${MEZZ_JagatiPackageDirectory}")
+else(EXISTS "${MEZZ_JagatiPackageDirectory}")
+    message(WARNING " MEZZ_JagatiPackageDirectory is not set, this needs to be a vaild folder \
+where Mezzanine Libraries can be downloaded to. You set the Environment variable 'JAGATI_DIR' or \
+set it in CMake, if left unset this will create a folder in the output directory.")
+    set(MEZZ_JagatiPackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+        PATH "Folder for storing Jagati Packages.")
+endif(EXISTS "${MEZZ_JagatiPackageDirectory}")
 
 # To insure that all the packages are downloaded this can be added as a dependencies to any target.
 
@@ -640,7 +689,6 @@ if("${ParentProject}" STREQUAL "${FileName}")
         COMMENT "Checking for Jagati Packages to Download"
     )
 endif("${ParentProject}" STREQUAL "${FileName}")
-
 
 ####################################################################################################
 # Any package wanting to use another can include it with this function
@@ -664,4 +712,3 @@ function(IncludeJagatiPackage PackageName)
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
-
