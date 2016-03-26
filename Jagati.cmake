@@ -51,6 +51,8 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
                         " the Mezzanine source code and have cmake build from there.")
 endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
+cmake_policy(SET CMP0054 NEW)
+
 ####################################################################################################
 ####################################################################################################
 # From Here to the next thick banner exist macros to set variables in the scope of the calling
