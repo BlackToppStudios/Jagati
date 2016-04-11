@@ -15,7 +15,7 @@ Packages can change, they can be updated. Any package manager, packaging tool or
 To keep the Jagati as simple as possible it is a single CMakeLists.txt file that is intended to be downloaded dynamically as part of the software build process.
 
 1. Pick the version of the Jagati you want.
-2. Get its SHA1 checksum from its SHA1SUM.txt or calculate it yourself with a tool like `sha1sum`.
+2. Get its SHA512 checksum from its SHA1SUM.txt or calculate it yourself with a tool like `sha512sum`.
 3. Add something like the following to your CMakeLists.txt to download, verify and run it:
 
 ```CMake
