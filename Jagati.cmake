@@ -334,7 +334,7 @@ macro(SetCommonCompilerFlags)
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow \
         -Wsign-conversion -Wsign-promo -Wstrict-overflow=2 -Wundef \
         -Wno-unused -Wparentheses -Werror")
-        
+
         if(SystemIsLinux)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
         endif(SystemIsLinux)
@@ -526,6 +526,9 @@ endmacro(AddJagatiDoxInput FileName)
 #
 #   The set variable will be ${PROJECT_NAME}JagatiConfig
 #
+#   This sets the variables ${PROJECT_NAME}JagatiConfigRaw to similar contents to
+#   ${PROJECT_NAME}JagatiConfig, Except the Raw version has no remarks.
+#
 #   This also writes to the variable "JagatiConfigRemarks" in the parentmost scope as a temporary.
 
 # This is an implementaion Detail of AddJagatiConfig, This is needed because macro parameters are
@@ -542,10 +545,12 @@ endfunction(Internal_SetRemarks HowToSet)
 macro(AddJagatiConfig Name Value RemarkBool)
     Internal_SetRemarks("${RemarkBool}")
     set(${PROJECT_NAME}JagatiConfig
-        "${${PROJ${MEZZ_JagatiPackageDirectory}ECT_NAME}JagatiConfig}\n${JagatiConfigRemarks}#define ${Name} ${Value}")
+        "${${PROJECT_NAME}JagatiConfig}\n\t${JagatiConfigRemarks}#define ${Name} ${Value}")
+    set(${PROJECT_NAME}JagatiConfigRaw "${${PROJECT_NAME}JagatiConfigRaw}\n\t#define ${Name} ${Value}")
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}JagatiConfig "${${PROJECT_NAME}JagatiConfig}" PARENT_SCOPE)
+        set(${PROJECT_NAME}JagatiConfigRaw "${${PROJECT_NAME}JagatiConfigRaw}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiConfig Name Value RemarkBool)
 
@@ -608,9 +613,12 @@ set(ConfigHeader
 */\n\
 #ifndef Mezz_${PROJECT_NAME}_config_h\n\
 #define Mezz_${PROJECT_NAME}_config_h\n\
-\n\n")
+\n\
+#ifndef DOXYGEN\n")
 
-    set(ConfigFooter "\n\n#endif\n")
+
+    set(DoxygenElse "\n\n#else // DOXYGEN\n")
+    set(ConfigFooter "\n\n#endif // DOXYGEN\n\n#endif\n")
 
     set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}GenHeadersDir}${PROJECT_NAME}Config.h")
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -618,7 +626,8 @@ set(ConfigHeader
         set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}ConfigFilename}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
-    set(${PROJECT_NAME}ConfigContent "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}${ConfigFooter}")
+    set(${PROJECT_NAME}ConfigContent "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}\
+${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}")
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}ConfigContent "${${PROJECT_NAME}ConfigContent}" PARENT_SCOPE)
@@ -726,3 +735,4 @@ function(IncludeJagatiPackage PackageName)
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
