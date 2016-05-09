@@ -51,7 +51,13 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
                         " the Mezzanine source code and have cmake build from there.")
 endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
-cmake_policy(SET CMP0054 NEW)
+cmake_minimum_required(VERSION 3.0)
+if("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
+    message(STATUS "Setting comparison policy for newer versions of CMake. Using CMP0054.")
+    cmake_policy(SET CMP0054 NEW)
+else("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
+    message(STATUS "NOT setting comparison policy for newer versions of CMake. Not using CMP0054.")
+endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ####################################################################################################
 ####################################################################################################
