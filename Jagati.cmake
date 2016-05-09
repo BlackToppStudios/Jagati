@@ -330,16 +330,27 @@ endmacro(IdentifyCompiler)
 #           Turn off compiler logos.
 #           Enable Position independent code or otherwise fix linker issues.
 #           Turn on C++11.
+#
+#       Set a variable with extra items to link against for use target_link_libraries
+#           
 
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -std=c++11 -fno-strict-aliasing -pthread -m64\
+        -std=c++11 -fno-strict-aliasing -m64\
         -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
         -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow \
         -Wsign-conversion -Wsign-promo -Wstrict-overflow=2 -Wundef \
         -Wno-unused -Wparentheses -Werror")
+
+        find_package(Threads)
+
+        list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
+        if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+            set(JagatiLinkArray "${JagatiLinkArray}" PARENT_SCOPE)
+        endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
         if(SystemIsLinux)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
