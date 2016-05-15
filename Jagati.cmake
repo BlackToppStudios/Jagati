@@ -733,23 +733,32 @@ endif("${ParentProject}" STREQUAL "${FileName}")
 ####################################################################################################
 # Any package wanting to use another can include it with this function
 function(IncludeJagatiPackage PackageName)
+    include(ExternalProject)
+
     if("${PackageName}_GitURL" STREQUAL "")
         message(FATAL_ERROR "Could not find Package named ${PackageName}")
     else("${PackageName}_GitURL" STREQUAL "")
         set(GitURL "${PackageName}_GitURL")
     endif("${PackageName}_GitURL" STREQUAL "")
 
+    if("${Mezz_JagatiPackageDirectory}" STREQUAL "")
+        #message(FATAL_ERROR "Could not find Package named ${PackageName}")
+    endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
+
     ExternalProject_Add(
-      "${PackageName}"
-      PREFIX "${Mezz_JagatiPackageDirectory}/${PackageName}"
-      GIT_REPOSITORY "${GitURL}"
-      GIT_TAG master
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ""
-      TEST_COMMAND ""
-      INSTALL_COMMAND ""
+        "${PackageName}"
+        #PREFIX "${Mezz_JagatiPackageDirectory}/${PackageName}"
+        GIT_REPOSITORY "${GitURL}"
+        GIT_TAG master
+        SOURCE_DIR "${Mezz_JagatiPackageDirectory}/${PackageName}"
+        BINARY_DIR "${Mezz_JagatiPackageDirectory}/${PackageName}-build"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        TEST_COMMAND ""
+        INSTALL_COMMAND ""
     )
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
