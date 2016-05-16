@@ -332,7 +332,7 @@ endmacro(IdentifyCompiler)
 #           Turn on C++11.
 #
 #       Set a variable with extra items to link against for use target_link_libraries
-#           
+#
 
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
@@ -735,30 +735,34 @@ endif("${ParentProject}" STREQUAL "${FileName}")
 function(IncludeJagatiPackage PackageName)
     include(ExternalProject)
 
-    if("${PackageName}_GitURL" STREQUAL "")
+    set(GitURL "${${PackageName}_GitURL}")
+    if("${GitURL}" STREQUAL "")
         message(FATAL_ERROR "Could not find Package named ${PackageName}")
-    else("${PackageName}_GitURL" STREQUAL "")
-        set(GitURL "${PackageName}_GitURL")
-    endif("${PackageName}_GitURL" STREQUAL "")
+    endif("${GitURL}" STREQUAL "")
 
     if("${Mezz_JagatiPackageDirectory}" STREQUAL "")
         #message(FATAL_ERROR "Could not find Package named ${PackageName}")
+        set(Mezz_JagatiPackageDirectory "${${ParentProject}BinaryDir}/JagatiPackages/")
     endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
 
     ExternalProject_Add(
         "${PackageName}"
-        #PREFIX "${Mezz_JagatiPackageDirectory}/${PackageName}"
+        #PREFIX "${Mezz_JagatiPackageDirectory}/"
         GIT_REPOSITORY "${GitURL}"
         GIT_TAG master
-        SOURCE_DIR "${Mezz_JagatiPackageDirectory}/${PackageName}"
-        BINARY_DIR "${Mezz_JagatiPackageDirectory}/${PackageName}-build"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        TEST_COMMAND ""
-        INSTALL_COMMAND ""
+        DOWNLOAD_DIR "${Mezz_JagatiPackageDirectory}"
+        SOURCE_DIR "${Mezz_JagatiPackageDirectory}${PackageName}"
+        BINARY_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build"
+        STAMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/stamp"
+        TMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/temp"
+        CONFIGURE_COMMAND "echo Configuring"
+        BUILD_COMMAND "echo Building"
+        TEST_COMMAND "echo Testing"
+        INSTALL_COMMAND "Echo Installing"
     )
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
