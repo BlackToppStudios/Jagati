@@ -745,6 +745,9 @@ function(IncludeJagatiPackage PackageName)
         set(Mezz_JagatiPackageDirectory "${${ParentProject}BinaryDir}/JagatiPackages/")
     endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
 
+    set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}${PackageName}")
+    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}${PackageName}-build")
+
     ExternalProject_Add(
         "${PackageName}"
         #PREFIX "${Mezz_JagatiPackageDirectory}/"
@@ -755,14 +758,15 @@ function(IncludeJagatiPackage PackageName)
         BINARY_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build"
         STAMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/stamp"
         TMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/temp"
-        CONFIGURE_COMMAND "echo Configuring"
-        BUILD_COMMAND "echo Building"
-        TEST_COMMAND "echo Testing"
-        INSTALL_COMMAND "Echo Installing"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        TEST_COMMAND ""
+        INSTALL_COMMAND ""
     )
+
+    #add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
+
 
     add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
-
-
 
