@@ -748,25 +748,29 @@ function(IncludeJagatiPackage PackageName)
     set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}${PackageName}")
     set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}${PackageName}-build")
 
-    ExternalProject_Add(
-        "${PackageName}"
-        #PREFIX "${Mezz_JagatiPackageDirectory}/"
-        GIT_REPOSITORY "${GitURL}"
-        GIT_TAG master
-        DOWNLOAD_DIR "${Mezz_JagatiPackageDirectory}"
-        SOURCE_DIR "${Mezz_JagatiPackageDirectory}${PackageName}"
-        BINARY_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build"
-        STAMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/stamp"
-        TMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/temp"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        TEST_COMMAND ""
-        INSTALL_COMMAND ""
-    )
+    execute_process(
+        COMMAND git clone ${GitURL}
+        WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+   )
+#    ExternalProject_Add(
+#        "${PackageName}"
+#        #PREFIX "${Mezz_JagatiPackageDirectory}/"
+#        GIT_REPOSITORY "${GitURL}"
+#        GIT_TAG master
+#        DOWNLOAD_DIR "${Mezz_JagatiPackageDirectory}"
+#        SOURCE_DIR "${Mezz_JagatiPackageDirectory}${PackageName}"
+#        BINARY_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build"
+#        STAMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/stamp"
+#        TMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/temp"
+#        CONFIGURE_COMMAND ""
+#        BUILD_COMMAND ""
+#        TEST_COMMAND ""
+#        INSTALL_COMMAND ""
+#    )
 
     #add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
 
 
-    add_dependencies(Download "${PackageName}")
+    #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
 
