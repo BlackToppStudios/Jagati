@@ -742,16 +742,27 @@ function(IncludeJagatiPackage PackageName)
 
     if("${Mezz_JagatiPackageDirectory}" STREQUAL "")
         #message(FATAL_ERROR "Could not find Package named ${PackageName}")
-        set(Mezz_JagatiPackageDirectory "${${ParentProject}BinaryDir}/JagatiPackages/")
+        set(Mezz_JagatiPackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
     endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
 
-    set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}${PackageName}")
-    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}${PackageName}-build")
+    set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}Mezz_${PackageName}/")
+    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}${PackageName}-build/")
 
-    execute_process(
-        COMMAND git clone ${GitURL}
-        WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
-   )
+
+    message(STATUS "Loading files from: ${TargetPackageSourceDir}")
+    if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+        execute_process(
+            COMMAND git clone ${GitURL}
+            WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+        )
+    else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+        execute_process(
+            COMMAND git pull ${GitURL}
+            WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+        )
+    endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+
+
 #    ExternalProject_Add(
 #        "${PackageName}"
 #        #PREFIX "${Mezz_JagatiPackageDirectory}/"
@@ -768,7 +779,8 @@ function(IncludeJagatiPackage PackageName)
 #        INSTALL_COMMAND ""
 #    )
 
-    #add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
+
+    #add_subdirectory("${TargetPackageSourceDir}")
 
 
     #add_dependencies(Download "${PackageName}")
