@@ -141,8 +141,9 @@ macro(CreateLocations)
     set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}RootDir}test/")
 
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "This, ${PROJECT_NAME}, is the root project. Not setting PARENT_SCOPE vars.")
+        message(STATUS "This, ${PROJECT_NAME}, is the root project. NOT setting PARENT_SCOPE vars.")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        message(STATUS "This, ${PROJECT_NAME}, is a child project. Setting PARENT_SCOPE vars.")
         #######################################
         # Root as child
         set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}RootDir}" PARENT_SCOPE)
@@ -746,41 +747,26 @@ function(IncludeJagatiPackage PackageName)
     endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
 
     set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}Mezz_${PackageName}/")
-    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}${PackageName}-build/")
+    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}Mezz_${PackageName}-build/")
 
-
-    message(STATUS "Loading files from: ${TargetPackageSourceDir}")
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
-            COMMAND git clone ${GitURL}
-            WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+            WORKING_DIRECTORY ${TargetPackageSourceDir}
+            COMMAND git pull ${GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+        file(MAKE_DIRECTORY "${Mezz_JagatiPackageDirectory}")
         execute_process(
-            COMMAND git pull ${GitURL}
             WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+            COMMAND git clone ${GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
 
-
-#    ExternalProject_Add(
-#        "${PackageName}"
-#        #PREFIX "${Mezz_JagatiPackageDirectory}/"
-#        GIT_REPOSITORY "${GitURL}"
-#        GIT_TAG master
-#        DOWNLOAD_DIR "${Mezz_JagatiPackageDirectory}"
-#        SOURCE_DIR "${Mezz_JagatiPackageDirectory}${PackageName}"
-#        BINARY_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build"
-#        STAMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/stamp"
-#        TMP_DIR "${Mezz_JagatiPackageDirectory}${PackageName}-build/temp"
-#        CONFIGURE_COMMAND ""
-#        BUILD_COMMAND ""
-#        TEST_COMMAND ""
-#        INSTALL_COMMAND ""
-#    )
-
-
-    #add_subdirectory("${TargetPackageSourceDir}")
+    add_subdirectory(
+        "${TargetPackageSourceDir}"
+        "${TargetPackageBinaryDir}"
+        EXCLUDE_FROM_ALL
+    )
 
 
     #add_dependencies(Download "${PackageName}")
