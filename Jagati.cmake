@@ -123,46 +123,22 @@ macro(CreateLocations)
 
     #######################################
     # Root
-    set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}_SOURCE_DIR}/")
-    set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}_BINARY_DIR}/")
+    set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}_SOURCE_DIR}/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}_BINARY_DIR}/" CACHE INTERNAL "" FORCE)
 
     #######################################
     # Derived Output Folders
-    set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}BinaryDir}config/")
-    set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}BinaryDir}generated_source/")
+    set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}BinaryDir}config/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}BinaryDir}generated_source/" CACHE INTERNAL "" FORCE)
 
     #######################################
     # Derived Input Folders
-    set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}RootDir}dox/")
+    set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}RootDir}dox/" CACHE INTERNAL "" FORCE)
     set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}RootDir}include/" CACHE INTERNAL "" FORCE)
-    set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}RootDir}lib/")
-    set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}RootDir}src/")
-    set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}RootDir}swig/")
-    set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}RootDir}test/")
-
-    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "This, ${PROJECT_NAME}, is the root project. NOT setting PARENT_SCOPE vars.")
-    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "This, ${PROJECT_NAME}, is a child project. Setting PARENT_SCOPE vars.")
-        #######################################
-        # Root as child
-        set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}RootDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}BinaryDir}" CACHE INTERNAL "" FORCE)
-
-        #######################################
-        # Derived Output Folders as child
-        set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}GenHeadersDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}GenSourceFolder}" CACHE INTERNAL "" FORCE)
-
-        #######################################
-        # Derived Input Folders as child
-        set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}DoxDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}IncludeDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}LibDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}SourceDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}SwigDir}" CACHE INTERNAL "" FORCE)
-        set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}TestDir}" CACHE INTERNAL "" FORCE)
-    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}RootDir}lib/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}RootDir}src/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}RootDir}swig/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}RootDir}test/" CACHE INTERNAL "" FORCE)
 
     #######################################
     message(STATUS "\tVariables for '${PROJECT_NAME}'")
