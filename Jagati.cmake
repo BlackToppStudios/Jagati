@@ -134,7 +134,7 @@ macro(CreateLocations)
     #######################################
     # Derived Input Folders
     set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}RootDir}dox/")
-    set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}RootDir}include/")
+    set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}RootDir}include/" CACHE INTERNAL "" FORCE)
     set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}RootDir}lib/")
     set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}RootDir}src/")
     set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}RootDir}swig/")
@@ -146,22 +146,22 @@ macro(CreateLocations)
         message(STATUS "This, ${PROJECT_NAME}, is a child project. Setting PARENT_SCOPE vars.")
         #######################################
         # Root as child
-        set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}RootDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}BinaryDir}" PARENT_SCOPE)
+        set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}RootDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}BinaryDir}" CACHE INTERNAL "" FORCE)
 
         #######################################
         # Derived Output Folders as child
-        set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}GenHeadersDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}GenSourceFolder}" PARENT_SCOPE)
+        set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}GenHeadersDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}GenSourceFolder}" CACHE INTERNAL "" FORCE)
 
         #######################################
         # Derived Input Folders as child
-        set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}DoxDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}IncludeDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}LibDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}SourceDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}SwigDir}" PARENT_SCOPE)
-        set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}TestDir}" PARENT_SCOPE)
+        set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}DoxDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}IncludeDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}LibDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}SourceDir "${${PROJECT_NAME}SourceDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}SwigDir}" CACHE INTERNAL "" FORCE)
+        set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}TestDir}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
     #######################################
