@@ -324,10 +324,7 @@ macro(SetCommonCompilerFlags)
         find_package(Threads)
 
         list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
-        if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-            set(JagatiLinkArray "${JagatiLinkArray}" PARENT_SCOPE)
-        endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
 
         if(SystemIsLinux)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -388,11 +385,10 @@ endmacro(SetCommonCompilerFlags)
 
 macro(AddJagatiPackage)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        list(APPEND JagatiPackageNameArray ${PROJECT_NAME})
+        list(APPEND JagatiPackageNameArray ${PROJECT_NAME} CACHE INTERNAL "" FORCE)
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiPackageNameArray "${JagatiPackageNameArray}")
         list(APPEND JagatiPackageNameArray ${PROJECT_NAME})
-        set(JagatiPackageNameArray "${JagatiPackageNameArray}" PARENT_SCOPE)
+        set(JagatiPackageNameArray "${JagatiPackageNameArray}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiPackage)
 
@@ -426,26 +422,28 @@ endmacro(StandardJagatiSetup)
 # Usage:
 #   Don't. This can easily be controlled via the MEZZ_BuildStaticLibraries cache level option.
 #   ChooseLibraryType("ON")
-#   ChooseLibraryType("ON")
+#   ChooseLibraryType("OFF")
 #
 # Result:
 #   A variable called MEZZ_LibraryBuildType is set with either "STATIC" if true is passed or
 #   "SHARED" if false is passed.
+#
+# Notes:
+#   Forcing this into the effectively makes it global is that really what we want? For now it seems ok.
 
 function(Internal_ChooseLibraryType TrueForStatic)
     if(TrueForStatic)
-        set(MEZZ_LibraryBuildType "STATIC" PARENT_SCOPE)
+        set(MEZZ_LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
     else(TrueForStatic)
-        set(MEZZ_LibraryBuildType "SHARED" PARENT_SCOPE)
+        set(MEZZ_LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
     endif(TrueForStatic)
 endfunction(Internal_ChooseLibraryType HowToSet)
 
 macro(ChooseLibraryType TrueForStatic)
     Internal_ChooseLibraryType(TrueForStatic)
-
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(MEZZ_LibraryBuildType "${MEZZ_LibraryBuildType}" PARENT_SCOPE)
+        set(MEZZ_LibraryBuildType "${MEZZ_LibraryBuildType}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType)
 
@@ -471,12 +469,7 @@ endmacro(ChooseLibraryType)
 macro(AddJagatiLibrary FileName)
     set(${PROJECT_NAME}Lib "${FileName}")
     list(APPEND JagatiLibraryArray ${FileName})
-    set(${PROJECT_NAME}Lib "${FileName}")
-    if("${ParentProject}" STREQUAL "${FileName}")
-    else("${ParentProject}" STREQUAL "${FileName}")
-        set(JagatiLibraryArray "${JagatiLibraryArray}" PARENT_SCOPE)
-        set(${PROJECT_NAME}Lib "${FileName}" PARENT_SCOPE)
-    endif("${ParentProject}" STREQUAL "${FileName}")
+    set(${PROJECT_NAME}Lib "${FileName}" CACHE INTERNAL "" FORCE)
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
 endmacro(AddJagatiLibrary FileName)
 
@@ -484,14 +477,8 @@ endmacro(AddJagatiLibrary FileName)
 
 
 macro(AddJagatiDoxInput FileName)
-    set(${PROJECT_NAME}Dox "${FileName}")
     list(APPEND JagatiDoxArray ${FileName})
-    set(${PROJECT_NAME}Dox "${FileName}")
-    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiDoxArray "${JagatiDoxArray}" PARENT_SCOPE)
-        set(${PROJECT_NAME}Dox "${FileName}" PARENT_SCOPE)
-    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    set(${PROJECT_NAME}Dox "${FileName}" CACHE INTERNAL "" FORCE)
     message(STATUS "Dox Input: '${PROJECT_NAME}Dox' - ${${PROJECT_NAME}Dox}")
 endmacro(AddJagatiDoxInput FileName)
 
