@@ -165,7 +165,7 @@ endmacro(CreateLocations)
 # tools are not as well identified as the could be. Hopefully this overcomes these minor shortfalls.
 
 # Usage:
-#   # Be the parentmost cmake scope or this ihas no effect
+#   # Be the parentmost cmake scope or this has no effect.
 #   IdentifyOS()
 #
 # Result:
@@ -174,6 +174,9 @@ endmacro(CreateLocations)
 #       SystemIsLinux   - ON/OFF
 #       SystemIsWindows - ON/OFF
 #       SystemIsMacOSX  - ON/OFF
+#
+#       Platform32Bit - ON/OFF
+#       Platform64Bit - ON/OFF
 #
 #       CatCommand - Some command that can print files when supplied a filename as only argument.
 #       PlatformDefinition - LINUX/WINDOWS/MACOSX
@@ -222,6 +225,19 @@ macro(IdentifyOS)
             set(CatCommand "cat")
             set(PlatformDefinition "MACOSX")
         endif(SystemIsMacOSX)
+
+
+        set(Platform32Bit OFF)
+        set(Platform64Bit OFF)
+
+        if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+            message(STATUS "Detected a 64 bit platform.")
+            set(Platform64Bit ON)
+        else("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+            message(STATUS "Detected a 32 bit platform.")
+            set(Platform32Bit ON)
+        endif("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyOS)
 
@@ -575,6 +591,7 @@ set(ConfigHeader
 /* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
    Build professional software and charge for their product.\n\
 \n\
+I forked the static foundation to a personal repo to test the script I am trying to write.  All of it ought to be public if you want to look at it.  Still very WIP.
    However there are some practical restrictions, so if your project involves\n\
    any of the following you should contact us and we will try to work something\n\
    out:\n\
