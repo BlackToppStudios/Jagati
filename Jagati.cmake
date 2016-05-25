@@ -330,7 +330,7 @@ endmacro(IdentifyCompiler)
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -std=c++11 -fno-strict-aliasing\
+        -std=c++11 -fno-strict-aliasing \
         -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
         -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow \
