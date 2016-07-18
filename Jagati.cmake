@@ -594,7 +594,6 @@ set(ConfigHeader
 /* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
    Build professional software and charge for their product.\n\
 \n\
-I forked the static foundation to a personal repo to test the script I am trying to write.  All of it ought to be public if you want to look at it.  Still very WIP.
    However there are some practical restrictions, so if your project involves\n\
    any of the following you should contact us and we will try to work something\n\
    out:\n\
@@ -636,6 +635,152 @@ ${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}")
 
     file(WRITE "${${PROJECT_NAME}ConfigFilename}" "${${PROJECT_NAME}ConfigContent}")
 endmacro(EmitConfig)
+
+########################################################################################################################
+########################################################################################################################
+# Test Main creation
+########################################################################################################################
+########################################################################################################################
+
+# Usage:
+#   EmitTestCode()
+#
+# Results:
+#       A file called ${PROJECT_NAME}_tester.cpp is emitted int the build output directory. This can be used to generate
+#   a unit test executable
+
+macro(EmitTestCode)
+    set(TestsHeader
+"// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
+/* This file is part of The Mezzanine Engine.\n\
+\n\
+    The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
+    it under the terms of the GNU General Public License as published by\n\
+    the Free Software Foundation, either version 3 of the License, or\n\
+    (at your option) any later version.\n\
+\n\
+    The Mezzanine Engine is distributed in the hope that it will be useful,\n\
+    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+    GNU General Public License for more details.\n\
+\n\
+    You should have received a copy of the GNU General Public License\n\
+    along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.\n\
+*/\n\
+/* The original authors have included a copy of the license specified above in the\n\
+   'Docs' folder. See 'gpl.txt'\n\
+*/\n\
+/* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
+   Build professional software and charge for their product.\n\
+\n\
+   However there are some practical restrictions, so if your project involves\n\
+   any of the following you should contact us and we will try to work something\n\
+   out:\n\
+    - DRM or Copy Protection of any kind(except Copyrights)\n\
+    - Software Patents You Do Not Wish to Freely License\n\
+    - Any Kind of Linking to Non-GPL licensed Works\n\
+    - Are Currently In Violation of Another Copyright Holder's GPL License\n\
+    - If You want to change our code and not add a few hundred MB of stuff to\n\
+        your distribution\n\
+\n\
+   These and other limitations could cause serious legal problems if you ignore\n\
+   them, so it is best to simply contact us or the Free Software Foundation, if\n\
+   you have any questions.\n\
+\n\
+   Joseph Toppi - toppij@gmail.com\n\
+   John Blackwood - makoenergy02@gmail.com\n\
+*/\n\
+\n\
+#include \"mezztest.h\"\n\
+\n")
+
+    set(TestsIncludes "// Start Dynamically Included Headers\n")
+    foreach(TestName ${${PROJECT_NAME}TestList})
+        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestName}.h\"")
+    endforeach(TestName ${${PROJECT_NAME}TestList})
+    set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
+
+    set(TestsMainHeader
+"\n\n\
+int main (int argc, char** argv)\n\
+{\n\
+    Mezzanine::Testing::CoreTestGroup TestInstances;\n\n")
+
+    set(TestsInit "    // Start Dynamically Instanced Tests\n")
+    foreach(TestName ${${PROJECT_NAME}TestList})
+        set(TestsInit "${TestsInit}\n\
+        ${TestName}Tests ${TestName}Instance;\n\
+        TestInstances[\"${TestName}\"] = &${TestName}Instance;\n")
+    endforeach(TestName ${${PROJECT_NAME}TestList})
+    set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
+
+    set(TestsMainFooter "\
+    return Mezzanine::Testing::MainImplementation(argc, argv, TestInstances); \n\
+}\n\
+\n")
+
+    set(${PROJECT_NAME}TestsContent
+        "${TestsHeader}${TestsIncludes}${TestsMainHeader}${TestsInit}${TestsMainFooter}"
+    )
+
+    set(${PROJECT_NAME}TesterFilename "${${PROJECT_NAME}GenSourceFolder}${PROJECT_NAME}_tester.cpp")
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(${PROJECT_NAME}TesterFilename "${${PROJECT_NAME}TestFilename}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+
+    file(WRITE "${${PROJECT_NAME}TesterFilename}" "${${PROJECT_NAME}TestsContent}")
+endmacro(EmitTestCode)
+
+# Usage:
+#   AddTest("TestName")
+#
+# Results:
+#   This will create a list containing the names of all the tests added.
+#       ${PROJECT_NAME}TestList - This is created or appended too.
+#
+#   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp:
+#
+#       In the header section will be added:
+#           #include "${TestName}.h"
+#
+#       In the instantiation section will be added:
+#           ${TestName}Tests ${TestName}Instance;
+#           TestInstances["${TestName}"] = &${TestName}Instance;
+#
+#       If you called AddTest("Foo") you would get these lines:
+#           #include "Foo.h"
+#
+#           FooTests FooInstance;
+#           TestInstances["Foo"] = &FooInstance;
+#
+#   You should have a header in your test directory (or other included directory) named exacly what was passed in
+#   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
+#   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
+
+macro(AddTest TestName)
+    list(APPEND ${PROJECT_NAME}TestList ${TestName})
+    set(${PROJECT_NAME}TestList "${${PROJECT_NAME}TestList}" PARENT_SCOPE)
+    message(STATUS "  Adding Test: '${TestName}'")
+endmacro(AddTest TestName)
+
+# Usage:
+#   AddTestDirectory("TestDirectory")
+#
+# Results:
+#   This call add test for each header in the passed directory
+
+macro(AddTestDirectory TestDir)
+    include_directories(${TestDir})
+    message(STATUS "Adding all tests in: '${TestDir}'")
+    file(GLOB TestFileList "${TestDir}*.h")
+    foreach(TestFilename ${TestFileList})
+        message(STATUS "  Adding test File: '${TestFilename}'")
+        get_filename_component(TestName "${TestFilename}" NAME_WE)
+        AddTest("${TestName}")
+    endforeach(TestFilename ${TestFileList})
+endmacro(AddTestDirectory)
+
 
 ####################################################################################################
 ####################################################################################################
@@ -680,6 +825,11 @@ macro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
     AddJagatiConfig("${VariableName}" "" ${${VariableName}})
 endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
+
+
+
+
+
 ####################################################################################################
 ####################################################################################################
 # Getting Jagati packages, What URLs and functions can we use to get Jagati Packages and know what
@@ -698,7 +848,7 @@ set(Test_GitURL "git@github.com:BlackToppStudios/Mezz_Test.git")
 set(MEZZ_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
 if(EXISTS "${MEZZ_JagatiPackageDirectory}")
 else(EXISTS "${MEZZ_JagatiPackageDirectory}")
-    message(WARNING " MEZZ_JagatiPackageDirectory is not set, this needs to be a vaild folder \
+    message(WARNING " MEZZ_JagatiPackageDirectory is not set, this needs to be a valid folder \
 where Mezzanine Libraries can be downloaded to. You set the Environment variable 'JAGATI_DIR' or \
 set it in CMake, if left unset this will create a folder in the output directory.")
     set(MEZZ_JagatiPackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
