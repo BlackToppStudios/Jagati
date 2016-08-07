@@ -752,6 +752,7 @@ macro(AddTestTarget ExtraSourceFiles)
         "${ExtraSourceFiles}"
         "${HeaderFilesWithTests}"
     )
+
     target_link_libraries(${TestLib} ${StaticFoundationLib})
     add_executable(Test_Tester ${HeaderFiles} ${TestSourceFiles} ${${PROJECT_NAME}TesterFilename})
     target_link_libraries(Test_Tester ${StaticFoundationLib} ${TestLib})
@@ -930,6 +931,4 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
-
-
 
