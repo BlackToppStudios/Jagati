@@ -59,14 +59,14 @@ else("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
     message(STATUS "NOT setting comparison policy for newer versions of CMake. Not using CMP0054.")
 endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # From Here to the next thick banner exist macros to set variables in the scope of the calling
 # CmakeList Project that all Jagati packages should set. The idea is that every variable needed to
 # link or inspect the source will be cleanly set and easily inspectable, from just the output of
 # cmake and a sample CMakeLists.txt.
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # This is used to determine what the parentmost project is. Whichever project calls this first will
 # be the only one that doesn't set all of it's variables in its parent's scope.
 
@@ -93,7 +93,7 @@ macro(ClaimParentProject)
     endif(ParentProject)
 endmacro(ClaimParentProject)
 
-####################################################################################################
+########################################################################################################################
 # This will create a number of variables in the Scope of the calling script that correspond to the
 # name of the Project so that they can readily be referenced from other project including the caller
 # as a a subproject.
@@ -160,7 +160,7 @@ macro(CreateLocations)
     message(STATUS "\t\t\t'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
 endmacro(CreateLocations)
 
-####################################################################################################
+########################################################################################################################
 # Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin
 # tools are not as well identified as the could be. Hopefully this overcomes these minor shortfalls.
 
@@ -241,7 +241,7 @@ macro(IdentifyOS)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyOS)
 
-####################################################################################################
+########################################################################################################################
 # Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes
 # of the mezzanine there are really two categories of compiler: visual studio and good compilers.
 # this can roughly identify those.
@@ -307,7 +307,7 @@ macro(IdentifyCompiler)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyCompiler)
 
-####################################################################################################
+########################################################################################################################
 # This is one of those things that CMake is simultaneously great and terrible at. It provides like
 # a trillion ways to do this and about a billion of them are wrong. Here is one way that seems to
 # work most of the time when we do it:
@@ -391,7 +391,7 @@ macro(SetCommonCompilerFlags)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(SetCommonCompilerFlags)
 
-####################################################################################################
+########################################################################################################################
 # A variable that contains an array of all the Jagati Packages
 
 # Usage:
@@ -412,7 +412,7 @@ macro(AddJagatiPackage)
 endmacro(AddJagatiPackage)
 
 
-####################################################################################################
+########################################################################################################################
 # This does what the above macros do, but this does it all together.
 
 # Usage:
@@ -435,7 +435,7 @@ macro(StandardJagatiSetup)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(StandardJagatiSetup)
 
-####################################################################################################
+########################################################################################################################
 # This set a single variable that all Mezzanine libraries will use when building libraries.
 
 # Usage:
@@ -466,12 +466,12 @@ macro(ChooseLibraryType TrueForStatic)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType)
 
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # Optional Macros that not all Jagati packages will set, but culd be important for link or other
 # build time activities.
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # A variable that contains an array of all the Jagati Linkable Libraries provided by loaded
 # packages
 
@@ -492,7 +492,7 @@ macro(AddJagatiLibrary FileName)
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
 endmacro(AddJagatiLibrary FileName)
 
-####################################################################################################
+########################################################################################################################
 
 
 macro(AddJagatiDoxInput FileName)
@@ -501,7 +501,7 @@ macro(AddJagatiDoxInput FileName)
     message(STATUS "Dox Input: '${PROJECT_NAME}Dox' - ${${PROJECT_NAME}Dox}")
 endmacro(AddJagatiDoxInput FileName)
 
-####################################################################################################
+########################################################################################################################
 # Some projects have many files that are created at compile time. This can cause the build system to
 # as complex as the source code. Most software developers want to spend their reasoning about the
 # code and not the code that makes the code. In general the Jagati or a specific package should
@@ -554,7 +554,7 @@ macro(AddJagatiConfig Name Value RemarkBool)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiConfig Name Value RemarkBool)
 
-####################################################################################################
+########################################################################################################################
 # Emit a config file
 
 # Usage:
@@ -648,7 +648,6 @@ endmacro(EmitConfig)
 # Results:
 #       A file called ${PROJECT_NAME}_tester.cpp is emitted int the build output directory. This can be used to generate
 #   a unit test executable
-
 macro(EmitTestCode)
     set(TestsHeader
 "// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
@@ -696,7 +695,8 @@ macro(EmitTestCode)
 
     set(TestsIncludes "// Start Dynamically Included Headers\n")
     foreach(TestName ${${PROJECT_NAME}TestList})
-        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestName}.h\"")
+        set(TestFile "${TestName}.h")
+        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestFile}\"")
     endforeach(TestName ${${PROJECT_NAME}TestList})
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
@@ -732,6 +732,32 @@ int main (int argc, char** argv)\n\
     file(WRITE "${${PROJECT_NAME}TesterFilename}" "${${PROJECT_NAME}TestsContent}")
 endmacro(EmitTestCode)
 
+########################################################################################################################
+
+# Not added to API yet, do not use
+macro(AddTestTarget ExtraSourceFiles)
+    include_directories("${TestTestDir}")
+
+    set(HeaderFilesWithTests "")
+    foreach(TestName ${${PROJECT_NAME}TestList})
+        set(TestFile "${TestName}.h")
+        list(APPEND HeaderFilesWithTests "${TestTestDir}/${TestFile}")
+    endforeach(TestName ${${PROJECT_NAME}TestList})
+
+    add_library(
+        ${TestLib}
+        ${MEZZ_LibraryBuildType}
+        "${TesterHeaderFiles}"
+        "${TesterSourceFiles}"
+        "${ExtraSourceFiles}"
+        "${HeaderFilesWithTests}"
+    )
+    target_link_libraries(${TestLib} ${StaticFoundationLib})
+    add_executable(Test_Tester ${HeaderFiles} ${TestSourceFiles} ${${PROJECT_NAME}TesterFilename})
+    target_link_libraries(Test_Tester ${StaticFoundationLib} ${TestLib})
+endmacro(AddTestTarget ExtraSourceFiles)
+
+########################################################################################################################
 # Usage:
 #   AddTest("TestName")
 #
@@ -757,13 +783,13 @@ endmacro(EmitTestCode)
 #   You should have a header in your test directory (or other included directory) named exacly what was passed in
 #   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
 #   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
-
 macro(AddTest TestName)
     list(APPEND ${PROJECT_NAME}TestList ${TestName})
-    set(${PROJECT_NAME}TestList "${${PROJECT_NAME}TestList}" PARENT_SCOPE)
+    set(${PROJECT_NAME}TestList "${${PROJECT_NAME}TestList}")
     message(STATUS "  Adding Test: '${TestName}'")
 endmacro(AddTest TestName)
 
+########################################################################################################################
 # Usage:
 #   AddTestDirectory("TestDirectory")
 #
@@ -782,11 +808,11 @@ macro(AddTestDirectory TestDir)
 endmacro(AddTestDirectory)
 
 
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # Basic Display Functionality
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # Tabbed list Printing
 
 # Usage:
@@ -803,7 +829,7 @@ function(ShowList Header Tabbing ToPrint)
     endforeach(ListItem ${ToPrint})
 endfunction(ShowList)
 
-####################################################################################################
+########################################################################################################################
 # Basic Option Tools
 
 # Usage:
@@ -830,19 +856,19 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
 
 
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 # Getting Jagati packages, What URLs and functions can we use to get Jagati Packages and know what
 # Exists?
-####################################################################################################
-####################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 # Package URLs
 
 set(StaticFoundation_GitURL "git@github.com:BlackToppStudios/Mezz_StaticFoundation.git")
 set(Test_GitURL "git@github.com:BlackToppStudios/Mezz_Test.git")
 
-####################################################################################################
+########################################################################################################################
 # Package Download experiment
 
 set(MEZZ_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
@@ -864,7 +890,7 @@ if("${ParentProject}" STREQUAL "${FileName}")
     )
 endif("${ParentProject}" STREQUAL "${FileName}")
 
-####################################################################################################
+########################################################################################################################
 # Any package wanting to use another can include it with this function
 function(IncludeJagatiPackage PackageName)
     include(ExternalProject)
@@ -904,4 +930,6 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
+
 
