@@ -866,8 +866,8 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
 # Package URLs
 
-set(StaticFoundation_GitURL "git@github.com:BlackToppStudios/Mezz_StaticFoundation.git")
-set(Test_GitURL "git@github.com:BlackToppStudios/Mezz_Test.git")
+set(StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
+set(Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
 
 ########################################################################################################################
 # Package Download experiment
