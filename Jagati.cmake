@@ -264,6 +264,7 @@ endmacro(IdentifyOS)
 macro(IdentifyCompiler)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         message(STATUS "\tDetecting Compiler:")
+        message(STATUS "\t\tCMAKE_CXX_COMPILER_ID: '${CMAKE_CXX_COMPILER_ID}'")
 
         set(CompilerIsGCC OFF)
         set(CompilerIsClang OFF)
@@ -273,28 +274,41 @@ macro(IdentifyCompiler)
         set(CompilerDesignNix OFF)
         set(CompilerDesignMS OFF)
 
+        set(CompilerDetected OFF)
+
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
             message(STATUS "\t\tDetected compiler as 'GCC'.")
             set(CompilerIsGCC ON)
             set(CompilerDesignNix ON)
+            set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+            message(STATUS "\t\tDetected compiler as 'AppleClang' using Clang settings.")
+            set(CompilerIsClang ON)
+            set(CompilerDesignNix ON)
+            set(CompilerDetected ON)
+        endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             message(STATUS "\t\tDetected compiler as 'Clang'.")
             set(CompilerIsClang ON)
             set(CompilerDesignNix ON)
+            set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
             message(STATUS "\t\tDetected compiler as 'Intel'.")
             set(CompilerIsIntel ON)
             set(CompilerDesignNix ON)
+            set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
             message(STATUS "\t\tDetected compiler as 'MSVC'.")
             set(CompilerIsMsvc ON)
             set(CompilerDesignMS ON)
+            set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
         if(CompilerDesignNix)
@@ -304,6 +318,11 @@ macro(IdentifyCompiler)
         if(CompilerDesignMS)
             message(STATUS "\t\tPresuming ms style compiler.")
         endif(CompilerDesignMS)
+
+        if(CompilerDetected)
+            message(ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the Jagati macro IdentifyCompiler.")
+        endif(CompilerDetected)
+
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyCompiler)
 
@@ -931,5 +950,6 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
