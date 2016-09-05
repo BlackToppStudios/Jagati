@@ -747,10 +747,10 @@ macro(AddTestTarget ExtraSourceFiles)
     add_library(
         ${TestLib}
         ${MEZZ_LibraryBuildType}
-        "${TesterHeaderFiles}"
-        "${TesterSourceFiles}"
-        "${ExtraSourceFiles}"
-        "${HeaderFilesWithTests}"
+        ${TesterHeaderFiles}
+        ${TesterSourceFiles}
+        ${ExtraSourceFiles}
+        ${HeaderFilesWithTests}
     )
 
     target_link_libraries(${TestLib} ${StaticFoundationLib})
@@ -931,4 +931,5 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
