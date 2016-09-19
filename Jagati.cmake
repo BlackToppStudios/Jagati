@@ -387,7 +387,7 @@ macro(SetCommonCompilerFlags)
         # -DDEBUG_DIRECTOR_EXCEPTION  # Used to make swig emit more
     else(CompilerDesignNix)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
-            /wd4710 /wd4514 /wd4251 /wd4820"
+            /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4221 /wd4711"
         )
 
         # Used:
@@ -946,7 +946,6 @@ function(IncludeJagatiPackage PackageName)
         "${TargetPackageBinaryDir}"
         EXCLUDE_FROM_ALL
     )
-
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
