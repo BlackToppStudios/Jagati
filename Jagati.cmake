@@ -319,9 +319,10 @@ macro(IdentifyCompiler)
             message(STATUS "\t\tPresuming ms style compiler.")
         endif(CompilerDesignMS)
 
-        if(CompilerDetected)
-            message(ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the Jagati macro IdentifyCompiler.")
-        endif(CompilerDetected)
+        if(NOT CompilerDetected)
+            message(ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the Jagati\
+            macro IdentifyCompiler.")
+        endif(NOT CompilerDetected)
 
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyCompiler)
