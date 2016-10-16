@@ -243,12 +243,12 @@ endmacro(IdentifyOS)
 
 ########################################################################################################################
 # Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes
-# of the mezzanine there are really two categories of compiler: visual studio and good compilers.
-# this can roughly identify those.
+# of the Mezzanine there are really two categories of compiler: visual studio and good compilers.
+# This can roughly identify those categories.
 
 # Usage:
-#   # Be the parentmost cmake scope or this ihas no effect
-#   IdentifyOS()
+#   # Be the parentmost cmake scope or this has no effect
+#   IdentifyCompiler()
 #
 # Result:
 #   Details about compiler are displayed and the following variables are set:
@@ -258,8 +258,10 @@ endmacro(IdentifyOS)
 #       CompilerIsIntel - ON/OFF
 #       CompilerIsMsvc  - ON/OFF
 #
-#       CompilerDesignNix   - ON/OFF
-#       CompilerDesignMS    - ON/OFF
+#       CompilerDesignNix - ON/OFF
+#       CompilerDesignMS  - ON/OFF
+#
+#       CompilerDetected - ON/OFF
 
 macro(IdentifyCompiler)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -273,6 +275,8 @@ macro(IdentifyCompiler)
 
         set(CompilerDesignNix OFF)
         set(CompilerDesignMS OFF)
+
+        set(CompilerDebug OFF)
 
         set(CompilerDetected OFF)
 
@@ -311,6 +315,13 @@ macro(IdentifyCompiler)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
+        if("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+            message(STATUS "\t\tDetected compiler as creating debug data.")
+            set(CompilerDebug ON)
+        else("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+            message(STATUS "\t\tDetected compiler as skipping debug data.")
+        endif("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+
         if(CompilerDesignNix)
             message(STATUS "\t\tPresuming *nix style compiler.")
         endif(CompilerDesignNix)
@@ -326,6 +337,38 @@ macro(IdentifyCompiler)
 
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyCompiler)
+
+########################################################################################################################
+# Again, CMake knows all about the debug state. It also does this in hyper precise detail, and does it implicitly with
+# the Build Type. For purposes of the Mezzanine we really want a single boolean yes or no for debugging, it also doesn't
+# help that compilers have like 50 different ways to check this each with their own possible ways to fail. Even if half
+# of those are great and never fail descending 
+
+# Usage:
+#   # Be the parentmost cmake scope or this has no effect
+#   IdentifyDebug()
+#
+# Result:
+#   Details about compiler debug symbol generation state are displayed and the following variables are set:
+#
+#       CompilerDebug    - ON/OFF
+
+macro(IdentifyDebug)
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        message(STATUS "\tDetecting Debug:")
+        message(STATUS "\t\tCMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
+
+        set(CompilerDebug OFF)
+
+        if("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+            message(STATUS "\t\tDetected compiler as creating debug data.")
+            set(CompilerDebug ON)
+        else("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+            message(STATUS "\t\tDetected compiler as skipping debug data.")
+        endif("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
+
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+endmacro(IdentifyDebug)
 
 ########################################################################################################################
 # This is one of those things that CMake is simultaneously great and terrible at. It provides like
@@ -440,7 +483,7 @@ endmacro(AddJagatiPackage)
 #   StandardJagatiSetup()
 #
 # Result:
-#       The Parent scope will attempt to be claimed, many variables for compiler, OS and locations
+#       The Parent scope will attempt to be claimed, many variables for compiler, OS, Debug and locations
 #       will be set, see above. Compiler Flags will be set.
 
 macro(StandardJagatiSetup)
@@ -451,6 +494,7 @@ macro(StandardJagatiSetup)
         message(STATUS "Determining platform specific details.")
         IdentifyOS()
         IdentifyCompiler()
+        IdentifyDebug()
         SetCommonCompilerFlags()
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(StandardJagatiSetup)
@@ -459,7 +503,8 @@ endmacro(StandardJagatiSetup)
 # This set a single variable that all Mezzanine libraries will use when building libraries.
 
 # Usage:
-#   Don't. This can easily be controlled via the MEZZ_BuildStaticLibraries cache level option.
+#   Don't. This can easily be controlled via the MEZZ_BuildStaticLibraries cache level option. When used as part any
+#   Mezzanine package.
 #   ChooseLibraryType("ON")
 #   ChooseLibraryType("OFF")
 #
@@ -859,7 +904,7 @@ endfunction(ShowList)
 #   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
 #
 # Results:
-#   This will create a variable named after thee string in the first parameter. This var(iable will
+#   This will create a variable named after thee string in the first parameter. This variable will
 #   be added to the config file for the current project and as a CMake Option in the GUI (or command
 #   prompt).
 
