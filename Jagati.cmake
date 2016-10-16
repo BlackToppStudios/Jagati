@@ -961,6 +961,11 @@ endif("${ParentProject}" STREQUAL "${FileName}")
 function(IncludeJagatiPackage PackageName)
     include(ExternalProject)
 
+    find_program (GitExecutable git DOC "The git executable the Jagati will use to download packages." )
+    if(NOT EXISTS "${GitExecutable}")
+        message(FATAL_ERROR "Git was not found or specified wrong currently GitExecutable is: ${GitExecutable}")
+    endif(NOT EXISTS "${GitExecutable}")
+
     set(GitURL "${${PackageName}_GitURL}")
     if("${GitURL}" STREQUAL "")
         message(FATAL_ERROR "Could not find Package named ${PackageName}")
@@ -977,13 +982,13 @@ function(IncludeJagatiPackage PackageName)
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
-            COMMAND git pull ${GitURL}
+            COMMAND ${GitExecutable} pull ${GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         file(MAKE_DIRECTORY "${Mezz_JagatiPackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
-            COMMAND git clone ${GitURL}
+            COMMAND ${GitExecutable} clone ${GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
 
