@@ -503,13 +503,13 @@ endmacro(StandardJagatiSetup)
 # This set a single variable that all Mezzanine libraries will use when building libraries.
 
 # Usage:
-#   Don't. This can easily be controlled via the MEZZ_BuildStaticLibraries cache level option. When used as part any
+#   Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
 #   Mezzanine package.
 #   ChooseLibraryType("ON")
 #   ChooseLibraryType("OFF")
 #
 # Result:
-#   A variable called MEZZ_LibraryBuildType is set with either "STATIC" if true is passed or
+#   A variable called LibraryBuildType is set with either "STATIC" if true is passed or
 #   "SHARED" if false is passed.
 #
 # Notes:
@@ -517,19 +517,56 @@ endmacro(StandardJagatiSetup)
 
 function(Internal_ChooseLibraryType TrueForStatic)
     if(TrueForStatic)
-        set(MEZZ_LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
+        set(LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
     else(TrueForStatic)
-        set(MEZZ_LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
+        set(LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
     endif(TrueForStatic)
-endfunction(Internal_ChooseLibraryType HowToSet)
+endfunction(Internal_ChooseLibraryType TrueForStatic)
 
 macro(ChooseLibraryType TrueForStatic)
     Internal_ChooseLibraryType(TrueForStatic)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(MEZZ_LibraryBuildType "${MEZZ_LibraryBuildType}" CACHE INTERNAL "" FORCE)
+        set(LibraryBuildType "${LibraryBuildType}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType)
+
+
+########################################################################################################################
+# Attempt to set code coverage flags.
+#
+# Usage:
+#   Don't. This can easily be controlled via the CodeCoverage cache level option. When used as part any
+#   Mezzanine package.
+#   ChooseCodeCoverage("ON")
+#   ChooseCodeCoverage("OFF")
+#
+# Result:
+#   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed. 
+#   Additionally a variable named CompilerCodeCoverage
+
+macro(ChooseCodeCoverage TrueForEnabled)
+    if(TrueForEnabled)
+        if(CompilerDesignNix)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+            if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+                set(CompilerCodeCoverage "ON" CACHE INTERNAL "" FORCE)
+            else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+            endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        else(CompilerDesignNix)
+            message(WARNING "Code coverage not supported on this compiler.")
+            if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+                set(CompilerCodeCoverage "OFF" CACHE INTERNAL "" FORCE)
+            else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+            endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        endif(CompilerDesignNix)
+    else(TrueForEnabled)
+        if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+            set(CompilerCodeCoverage "OFF" CACHE INTERNAL "" FORCE)
+        else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    endif(TrueForEnabled)
+endmacro(ChooseCodeCoverage TrueForEnabled)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -576,18 +613,18 @@ endmacro(AddJagatiDoxInput FileName)
 #   # Call any time after the parent scope is claimed. The first parameter is the name of a
 #   # preprocessor to create, and the second is the value, "" for no value and the third argument
 #   # is for determining if the remark should be enabled(true) or remarked out(false).
-#       AddJagatiConfig("MEZZ_FOO" "BAR" ON)
-#       AddJagatiConfig("MEZZ_EmptyOption" "" ON)
-#       AddJagatiConfig("MEZZ_Remarked_FOO" "BAR" OFF)
-#       AddJagatiConfig("MEZZ_EmptyOption_nope" "" OFF)
+#       AddJagatiConfig("FOO" "BAR" ON)
+#       AddJagatiConfig("EmptyOption" "" ON)
+#       AddJagatiConfig("Remarked_FOO" "BAR" OFF)
+#       AddJagatiConfig("EmptyOption_nope" "" OFF)
 #
 # Result:
 #   Adds a preprocessor macro to string that config headers can directly include. Here is the
 #   output from the sample above:
-#       #define MEZZ_FOO BAR
-#       #define MEZZ_EmptyOption
-#       //#define MEZZ_Remarked_FOO BAR
-#       //#define MEZZ_EmptyOption_nope
+#       #define FOO BAR
+#       #define EmptyOption
+#       //#define Remarked_FOO BAR
+#       //#define EmptyOption_nope
 #
 #   The set variable will be ${PROJECT_NAME}JagatiConfig
 #
@@ -676,8 +713,8 @@ set(ConfigHeader
    Joseph Toppi - toppij@gmail.com\n\
    John Blackwood - makoenergy02@gmail.com\n\
 */\n\
-#ifndef Mezz_${PROJECT_NAME}_config_h\n\
-#define Mezz_${PROJECT_NAME}_config_h\n\
+#ifndef ${PROJECT_NAME}_config_h\n\
+#define ${PROJECT_NAME}_config_h\n\
 \n\
 #ifndef DOXYGEN\n")
 
@@ -811,7 +848,7 @@ macro(AddTestTarget ExtraSourceFiles)
 
     add_library(
         ${TestLib}
-        ${MEZZ_LibraryBuildType}
+        ${LibraryBuildType}
         ${TesterHeaderFiles}
         ${TesterSourceFiles}
         ${ExtraSourceFiles}
@@ -900,7 +937,7 @@ endfunction(ShowList)
 
 # Usage:
 #   # Call after project to insure PROJECT_NAME is set.
-#   AddJagatiCompileOption("Mezz_BuildDoxygen" "Create HTML documentation with Doxygen." ON)
+#   AddJagatiCompileOption("BuildDoxygen" "Create HTML documentation with Doxygen." ON)
 #   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
 #
 # Results:
@@ -917,11 +954,6 @@ macro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
     AddJagatiConfig("${VariableName}" "" ${${VariableName}})
 endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
-
-
-
-
-
 ########################################################################################################################
 ########################################################################################################################
 # Getting Jagati packages, What URLs and functions can we use to get Jagati Packages and know what
@@ -931,21 +963,21 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
 # Package URLs
 
-set(StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
-set(Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
+set(StaticFoundation_GitURL "https://github.com/BlackToppStudios/StaticFoundation.git")
+set(Test_GitURL "https://github.com/BlackToppStudios/Test.git")
 
 ########################################################################################################################
 # Package Download experiment
 
-set(MEZZ_JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
-if(EXISTS "${MEZZ_JagatiPackageDirectory}")
-else(EXISTS "${MEZZ_JagatiPackageDirectory}")
-    message(WARNING " MEZZ_JagatiPackageDirectory is not set, this needs to be a valid folder \
+set(JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+if(EXISTS "${JagatiPackageDirectory}")
+else(EXISTS "${JagatiPackageDirectory}")
+    message(WARNING " JagatiPackageDirectory is not set, this needs to be a valid folder \
 where Mezzanine Libraries can be downloaded to. You set the Environment variable 'JAGATI_DIR' or \
 set it in CMake, if left unset this will create a folder in the output directory.")
-    set(MEZZ_JagatiPackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+    set(JagatiPackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
         PATH "Folder for storing Jagati Packages.")
-endif(EXISTS "${MEZZ_JagatiPackageDirectory}")
+endif(EXISTS "${JagatiPackageDirectory}")
 
 # To insure that all the packages are downloaded this can be added as a dependencies to any target.
 
@@ -971,13 +1003,13 @@ function(IncludeJagatiPackage PackageName)
         message(FATAL_ERROR "Could not find Package named ${PackageName}")
     endif("${GitURL}" STREQUAL "")
 
-    if("${Mezz_JagatiPackageDirectory}" STREQUAL "")
+    if("${JagatiPackageDirectory}" STREQUAL "")
         #message(FATAL_ERROR "Could not find Package named ${PackageName}")
-        set(Mezz_JagatiPackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
-    endif("${Mezz_JagatiPackageDirectory}" STREQUAL "")
+        set(JagatiPackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
+    endif("${JagatiPackageDirectory}" STREQUAL "")
 
-    set(TargetPackageSourceDir "${Mezz_JagatiPackageDirectory}Mezz_${PackageName}/")
-    set(TargetPackageBinaryDir "${Mezz_JagatiPackageDirectory}Mezz_${PackageName}-build/")
+    set(TargetPackageSourceDir "${JagatiPackageDirectory}${PackageName}/")
+    set(TargetPackageBinaryDir "${JagatiPackageDirectory}${PackageName}-build/")
 
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
@@ -985,9 +1017,9 @@ function(IncludeJagatiPackage PackageName)
             COMMAND ${GitExecutable} pull ${GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-        file(MAKE_DIRECTORY "${Mezz_JagatiPackageDirectory}")
+        file(MAKE_DIRECTORY "${JagatiPackageDirectory}")
         execute_process(
-            WORKING_DIRECTORY ${Mezz_JagatiPackageDirectory}
+            WORKING_DIRECTORY ${JagatiPackageDirectory}
             COMMAND ${GitExecutable} clone ${GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
@@ -1000,6 +1032,4 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
-
-
 
