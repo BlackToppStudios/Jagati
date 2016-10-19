@@ -342,7 +342,7 @@ endmacro(IdentifyCompiler)
 # Again, CMake knows all about the debug state. It also does this in hyper precise detail, and does it implicitly with
 # the Build Type. For purposes of the Mezzanine we really want a single boolean yes or no for debugging, it also doesn't
 # help that compilers have like 50 different ways to check this each with their own possible ways to fail. Even if half
-# of those are great and never fail descending 
+# of those are great and never fail descending
 
 # Usage:
 #   # Be the parentmost cmake scope or this has no effect
@@ -531,7 +531,10 @@ macro(ChooseLibraryType TrueForStatic)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType)
 
-
+########################################################################################################################
+########################################################################################################################
+# Coverage Macros some tools that can be used to get code coverage numbers.
+########################################################################################################################
 ########################################################################################################################
 # Attempt to set code coverage flags.
 #
@@ -542,11 +545,12 @@ endmacro(ChooseLibraryType)
 #   ChooseCodeCoverage("OFF")
 #
 # Result:
-#   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed. 
+#   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed.
 #   Additionally a variable named CompilerCodeCoverage
+#
 
 macro(ChooseCodeCoverage TrueForEnabled)
-    if(TrueForEnabled)
+    if(${TrueForEnabled})
         if(CompilerDesignNix)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
             if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -565,8 +569,38 @@ macro(ChooseCodeCoverage TrueForEnabled)
             set(CompilerCodeCoverage "OFF" CACHE INTERNAL "" FORCE)
         else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    endif(TrueForEnabled)
+    endif(${TrueForEnabled})
 endmacro(ChooseCodeCoverage TrueForEnabled)
+
+########################################################################################################################
+# Attempt to create a target that builds code coverage metadata.
+#
+# Usage:
+#   # Call it and pass the name of the executable and the list of source to be checked.
+#   CreateCoverageTarget("ExecutableName" ${SourceList})
+#
+# Result:
+#   A new build target called ${ExecutableName}Coverage will be added that will run copy source files where needed and
+#   run gcov to generate profile and coverage notes and data that .
+#
+
+macro(CreateCoverageTarget ExecutableName SourceList)
+    set(SingleTargetDir "${${PROJECT_NAME}BinaryDir}CMakeFiles/${ExecutableName}.dir/src/")
+    set(CoveredTargetInputFiles "")
+    foreach(SingleSourceFile ${SourceList})
+        get_filename_component(SingleSourceFileExtension ${SingleSourceFile} EXT)
+        get_filename_component(SingleSourceFileName ${SingleSourceFile} NAME)
+        set(SingleTarget "${SingleTargetDir}${SingleSourceFileName}${SingleSourceFileExtension}")
+        list(APPEND CoveredTargetInputFiles ${SingleTarget})
+        add_custom_command(
+            OUTPUT ${SingleTarget}
+            COMMAND ${CMAKE_COMMAND} -E copy ${SingleSourceFile} ${SingleTarget}
+            COMMAND gcov ${SingleTarget}
+            DEPENDS ${SingleSourceFile}
+        )
+    endforeach(SingleSourceFile ${SourceList})
+    add_custom_target(${ExecutableName}Coverage DEPENDS ${CoveredTargetInputFiles} )
+endmacro(CreateCoverageTarget SourceList)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -1032,4 +1066,5 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
