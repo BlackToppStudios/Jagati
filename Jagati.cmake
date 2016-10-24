@@ -997,8 +997,8 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 
 # Package URLs
 
-set(StaticFoundation_GitURL "https://github.com/BlackToppStudios/StaticFoundation.git")
-set(Test_GitURL "https://github.com/BlackToppStudios/Test.git")
+set(Mezz_StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
+set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
 
 ########################################################################################################################
 # Package Download experiment
@@ -1026,6 +1026,11 @@ endif("${ParentProject}" STREQUAL "${FileName}")
 # Any package wanting to use another can include it with this function
 function(IncludeJagatiPackage PackageName)
     include(ExternalProject)
+
+    if("${PackageName}" MATCHES "MEZZ_.*")
+    else("${PackageName}" MATCHES "MEZZ_.*")
+        set(PackageName "Mezz_${PackageName}")
+    endif("${PackageName}" MATCHES "MEZZ_.*")
 
     find_program (GitExecutable git DOC "The git executable the Jagati will use to download packages." )
     if(NOT EXISTS "${GitExecutable}")
