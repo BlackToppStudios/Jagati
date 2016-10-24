@@ -1005,11 +1005,11 @@ set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
 
 set(JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
 if(EXISTS "${JagatiPackageDirectory}")
-        if("${JagatiPackageDirectory}" MATCHES ".*/")
-        else("${JagatiPackageDirectory}" MATCHES ".*/")
-            message("Jagati Package Directory should end in '/'.")
-            set(JagatiPackageDirectory "${JagatiPackageDirectory}/")
-        endif("${JagatiPackageDirectory}" MATCHES ".*/")
+    if("${JagatiPackageDirectory}" MATCHES "^.*/$")
+    else("${JagatiPackageDirectory}" MATCHES "^.*/$")
+        message(WARNING "Jagati Package Directory (${JagatiPackageDirectory}) should end in '/', appending slash.")
+        set(JagatiPackageDirectory "${JagatiPackageDirectory}/")
+    endif("${JagatiPackageDirectory}" MATCHES "^.*/$")
 else(EXISTS "${JagatiPackageDirectory}")
     message(WARNING " JagatiPackageDirectory is not set, this needs to be a valid folder \
 where Mezzanine Libraries can be downloaded to. You set the Environment variable 'JAGATI_DIR' or \
@@ -1076,6 +1076,7 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
 
