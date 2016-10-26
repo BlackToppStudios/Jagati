@@ -529,15 +529,15 @@ macro(ChooseLibraryType TrueForStatic)
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(LibraryBuildType "${LibraryBuildType}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-endmacro(ChooseLibraryType)
+endmacro(ChooseLibraryType TrueForStatic)
 
 ########################################################################################################################
 ########################################################################################################################
-# Coverage Macros some tools that can be used to get code coverage numbers.
+# Coverage Control Macros some tools that can be used to get code coverage numbers.
 ########################################################################################################################
 ########################################################################################################################
 # Attempt to set code coverage flags.
-#
+
 # Usage:
 #   Don't. This can easily be controlled via the CodeCoverage cache level option. When used as part any
 #   Mezzanine package.
@@ -549,35 +549,58 @@ endmacro(ChooseLibraryType)
 #   Additionally a variable named CompilerCodeCoverage
 #
 
-macro(ChooseCodeCoverage TrueForEnabled)
-    if(${TrueForEnabled})
+function(Internal_ChooseCodeCoverage TrueForEnabled)
+    if("${TrueForEnabled}")
         if(CompilerDesignNix)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage" PARENT_SCOPE)
             if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
                 set(CompilerCodeCoverage "ON" CACHE INTERNAL "" FORCE)
             else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
             endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         else(CompilerDesignNix)
             message(WARNING "Code coverage not supported on this compiler.")
-            if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-                set(CompilerCodeCoverage "OFF" CACHE INTERNAL "" FORCE)
-            else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-            endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         endif(CompilerDesignNix)
     else(TrueForEnabled)
-        if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-            set(CompilerCodeCoverage "OFF" CACHE INTERNAL "" FORCE)
-        else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    endif(${TrueForEnabled})
+    endif("${TrueForEnabled}")
+endfunction(Internal_ChooseCodeCoverage TrueForEnabled)
+
+macro(ChooseCodeCoverage TrueForEnabled)
+    Internal_ChooseCodeCoverage(${TrueForEnabled})
+    if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
+    endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseCodeCoverage TrueForEnabled)
+
+########################################################################################################################
+# Coverage Control Macros some tools that can be used to get code coverage numbers.
+########################################################################################################################
+# When you want to support code coverage but already include a project that asks the dev if it is turned on this build
+# you should use this.
+#
+# Todo: Fix the use of StaticFoundation variable in Jagati, This needs to be set in a more project agnostic way.
+
+# Usage:
+#   # When called after all targets are set up this will add code coverage support to the build targets.
+#   SetCodeCoverage()
+#
+# Result:
+#   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed.
+#   Additionally a variable named CompilerCodeCoverage
+#
+
+macro(SetCodeCoverage)
+    Internal_ChooseCodeCoverage("${MEZZ_CodeCoverage}")
+endmacro(SetCodeCoverage)
+
 
 ########################################################################################################################
 # Attempt to create a target that builds code coverage metadata.
 #
 # Usage:
 #   # Call it and pass the name of the executable and the list of source to be checked.
-#   CreateCoverageTarget("ExecutableName" ${SourceList})
+#   CreateCoverageTarget("ExecutableName" "${SourceList}")
+#   CreateCoverageTarget(${TestLib} "${TesterSourceFiles}")
 #
 # Result:
 #   A new build target called ${ExecutableName}Coverage will be added that will run copy source files where needed and
@@ -610,13 +633,13 @@ endmacro(CreateCoverageTarget SourceList)
 ########################################################################################################################
 # A variable that contains an array of all the Jagati Linkable Libraries provided by loaded
 # packages
-
+#
 # Usage:
 #   # Be certain to call project before calling this.
 #   AddJagatiLibrary("LinkTarget")
 #
 # Result:
-#   The passed file weill  be added to a list of libaries. This list can be
+#   The passed file will be added to a list of libaries. This list can be
 #   Accessed through the variable: JagatiLibraryArray
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename
@@ -629,7 +652,15 @@ macro(AddJagatiLibrary FileName)
 endmacro(AddJagatiLibrary FileName)
 
 ########################################################################################################################
+# Add input files to list of all files doxygen will scan.
 
+#
+# Usage:
+#   # Call any time after the parent scope is claimed and when the project is built if doxygen is installed
+#   # and the option is chosen then html docs will be generated from all past files.
+#   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
+#   AddJagatiDoxInput("${DoxFiles}")
+#   AddJagatiDoxInput("foo.h")
 
 macro(AddJagatiDoxInput FileName)
     list(APPEND JagatiDoxArray ${FileName})
@@ -830,10 +861,10 @@ macro(EmitTestCode)
 \n")
 
     set(TestsIncludes "// Start Dynamically Included Headers\n")
-    foreach(TestName ${${PROJECT_NAME}TestList})
+    foreach(TestName ${${PROJECT_NAME}TestClassList})
         set(TestFile "${TestName}.h")
         set(TestsIncludes "${TestsIncludes}\n    #include \"${TestFile}\"")
-    endforeach(TestName ${${PROJECT_NAME}TestList})
+    endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
     set(TestsMainHeader
@@ -843,11 +874,11 @@ int main (int argc, char** argv)\n\
     Mezzanine::Testing::CoreTestGroup TestInstances;\n\n")
 
     set(TestsInit "    // Start Dynamically Instanced Tests\n")
-    foreach(TestName ${${PROJECT_NAME}TestList})
+    foreach(TestName ${${PROJECT_NAME}TestClassList})
         set(TestsInit "${TestsInit}\n\
         ${TestName}Tests ${TestName}Instance;\n\
         TestInstances[\"${TestName}\"] = &${TestName}Instance;\n")
-    endforeach(TestName ${${PROJECT_NAME}TestList})
+    endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
     set(TestsMainFooter "\
@@ -875,10 +906,10 @@ macro(AddTestTarget ExtraSourceFiles)
     include_directories("${TestTestDir}")
 
     set(HeaderFilesWithTests "")
-    foreach(TestName ${${PROJECT_NAME}TestList})
+    foreach(TestName ${${PROJECT_NAME}TestClassList})
         set(TestFile "${TestName}.h")
         list(APPEND HeaderFilesWithTests "${TestTestDir}/${TestFile}")
-    endforeach(TestName ${${PROJECT_NAME}TestList})
+    endforeach(TestName ${${PROJECT_NAME}TestClassList})
 
     add_library(
         ${TestLib}
@@ -895,12 +926,14 @@ macro(AddTestTarget ExtraSourceFiles)
 endmacro(AddTestTarget ExtraSourceFiles)
 
 ########################################################################################################################
+# Use this to add test classes to be run with the Mezz_Test Package.
+
 # Usage:
-#   AddTest("TestName")
+#   AddTestClass("TestName")
 #
 # Results:
 #   This will create a list containing the names of all the tests added.
-#       ${PROJECT_NAME}TestList - This is created or appended too.
+#       ${PROJECT_NAME}TestClassList - This is created or appended too.
 #
 #   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp:
 #
@@ -920,11 +953,11 @@ endmacro(AddTestTarget ExtraSourceFiles)
 #   You should have a header in your test directory (or other included directory) named exacly what was passed in
 #   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
 #   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
-macro(AddTest TestName)
-    list(APPEND ${PROJECT_NAME}TestList ${TestName})
-    set(${PROJECT_NAME}TestList "${${PROJECT_NAME}TestList}")
+macro(AddTestClass TestName)
+    list(APPEND ${PROJECT_NAME}TestClassList ${TestName})
+    set(${PROJECT_NAME}TestClassList "${${PROJECT_NAME}TestClassList}")
     message(STATUS "  Adding Test: '${TestName}'")
-endmacro(AddTest TestName)
+endmacro(AddTestClass TestName)
 
 ########################################################################################################################
 # Usage:
@@ -940,7 +973,7 @@ macro(AddTestDirectory TestDir)
     foreach(TestFilename ${TestFileList})
         message(STATUS "  Adding test File: '${TestFilename}'")
         get_filename_component(TestName "${TestFilename}" NAME_WE)
-        AddTest("${TestName}")
+        AddTestClass("${TestName}")
     endforeach(TestFilename ${TestFileList})
 endmacro(AddTestDirectory)
 
@@ -1037,10 +1070,10 @@ function(IncludeJagatiPackage PackageName)
         set(PackageName "Mezz_${PackageName}")
     endif("${PackageName}" MATCHES "MEZZ_.*")
 
-    find_program (GitExecutable git DOC "The git executable the Jagati will use to download packages." )
-    if(NOT EXISTS "${GitExecutable}")
-        message(FATAL_ERROR "Git was not found or specified wrong currently GitExecutable is: ${GitExecutable}")
-    endif(NOT EXISTS "${GitExecutable}")
+    find_program (Mezz_GitExecutable git DOC "The git executable the Jagati will use to download packages." )
+    if(NOT EXISTS "${Mezz_GitExecutable}")
+        message(FATAL_ERROR "Git was not found or specified wrong currently Mezz_GitExecutable is: ${Mezz_GitExecutable}")
+    endif(NOT EXISTS "${Mezz_GitExecutable}")
 
     set(GitURL "${${PackageName}_GitURL}")
     if("${GitURL}" STREQUAL "")
@@ -1058,13 +1091,13 @@ function(IncludeJagatiPackage PackageName)
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
-            COMMAND ${GitExecutable} pull ${GitURL}
+            COMMAND ${Mezz_GitExecutable} pull ${GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         file(MAKE_DIRECTORY "${JagatiPackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${JagatiPackageDirectory}
-            COMMAND ${GitExecutable} clone ${GitURL}
+            COMMAND ${Mezz_GitExecutable} clone ${GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
 
@@ -1076,7 +1109,4 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
-
-
-
 
