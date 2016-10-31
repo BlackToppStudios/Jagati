@@ -1037,20 +1037,20 @@ set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
 ########################################################################################################################
 # Enviroment Variable management for package downloads
 
-set(JagatiPackageDirectory "$ENV{JAGATI_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
-if(EXISTS "${JagatiPackageDirectory}")
-    if("${JagatiPackageDirectory}" MATCHES "^.*/$")
-    else("${JagatiPackageDirectory}" MATCHES "^.*/$")
-        message(WARNING "Jagati Package Directory (${JagatiPackageDirectory}) should end in '/', appending slash.")
-        set(JagatiPackageDirectory "${JagatiPackageDirectory}/")
-    endif("${JagatiPackageDirectory}" MATCHES "^.*/$")
-else(EXISTS "${JagatiPackageDirectory}")
-    message(WARNING " JagatiPackageDirectory is not set, this needs to be a valid folder \
-where Mezzanine Libraries can be downloaded to. You set the Environment variable 'JAGATI_DIR' or \
+set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+if(EXISTS "${MEZZ_PackageDirectory}")
+    if("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+    else("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+        message(WARNING "Jagati Package Directory (${MEZZ_PackageDirectory}) should end in '/', appending slash.")
+        set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
+    endif("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+else(EXISTS "${MEZZ_PackageDirectory}")
+    message(WARNING " MEZZ_PackageDirectory is not set, this needs to be a valid folder \
+where Mezzanine Libraries can be downloaded to. You set the Environment variable 'MEZZ_PACKAGE_DIR' or \
 set it in CMake, if left unset this will create a folder in the output directory.")
-    set(JagatiPackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+    set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
         PATH "Folder for storing Jagati Packages.")
-endif(EXISTS "${JagatiPackageDirectory}")
+endif(EXISTS "${MEZZ_PackageDirectory}")
 
 # To insure that all the packages are downloaded this can be added as a dependencies to any target.
 
@@ -1071,34 +1071,34 @@ function(IncludeJagatiPackage PackageName)
         set(PackageName "Mezz_${PackageName}")
     endif("${PackageName}" MATCHES "MEZZ_.*")
 
-    find_program (Mezz_GitExecutable git DOC "The git executable the Jagati will use to download packages." )
-    if(NOT EXISTS "${Mezz_GitExecutable}")
-        message(FATAL_ERROR "Git was not found or specified wrong currently Mezz_GitExecutable is: ${Mezz_GitExecutable}")
-    endif(NOT EXISTS "${Mezz_GitExecutable}")
+    find_program (MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages." )
+    if(NOT EXISTS "${MEZZ_GitExecutable}")
+        message(FATAL_ERROR "Git was not found or specified wrong currently MEZZ_GitExecutable is: ${MEZZ_GitExecutable}")
+    endif(NOT EXISTS "${MEZZ_GitExecutable}")
 
     set(GitURL "${${PackageName}_GitURL}")
     if("${GitURL}" STREQUAL "")
         message(FATAL_ERROR "Could not find Package named ${PackageName}")
     endif("${GitURL}" STREQUAL "")
 
-    if("${JagatiPackageDirectory}" STREQUAL "")
+    if("${MEZZ_PackageDirectory}" STREQUAL "")
         #message(FATAL_ERROR "Could not find Package named ${PackageName}")
-        set(JagatiPackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
-    endif("${JagatiPackageDirectory}" STREQUAL "")
+        set(MEZZ_PackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
+    endif("${MEZZ_PackageDirectory}" STREQUAL "")
 
-    set(TargetPackageSourceDir "${JagatiPackageDirectory}${PackageName}/")
-    set(TargetPackageBinaryDir "${JagatiPackageDirectory}${PackageName}-build/")
+    set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
+    set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
 
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
-            COMMAND ${Mezz_GitExecutable} pull ${GitURL}
+            COMMAND ${MEZZ_GitExecutable} pull ${GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-        file(MAKE_DIRECTORY "${JagatiPackageDirectory}")
+        file(MAKE_DIRECTORY "${MEZZ_PackageDirectory}")
         execute_process(
-            WORKING_DIRECTORY ${JagatiPackageDirectory}
-            COMMAND ${Mezz_GitExecutable} clone ${GitURL}
+            WORKING_DIRECTORY ${MEZZ_PackageDirectory}
+            COMMAND ${MEZZ_GitExecutable} clone ${GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
 
@@ -1110,5 +1110,6 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
