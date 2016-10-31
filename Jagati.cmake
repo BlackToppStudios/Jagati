@@ -857,7 +857,7 @@ macro(EmitTestCode)
    John Blackwood - makoenergy02@gmail.com\n\
 */\n\
 \n\
-#include \"mezztest.h\"\n\
+#include \"MezzTest.h\"\n\
 \n")
 
     set(TestsIncludes "// Start Dynamically Included Headers\n")
@@ -1110,6 +1110,7 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
 
