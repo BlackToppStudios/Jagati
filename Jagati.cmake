@@ -875,9 +875,10 @@ int main (int argc, char** argv)\n\
 
     set(TestsInit "    // Start Dynamically Instanced Tests\n")
     foreach(TestName ${${PROJECT_NAME}TestClassList})
+        string(TOLOWER "${TestName}" TestLowerName)
         set(TestsInit "${TestsInit}\n\
         ${TestName}Tests ${TestName}Instance;\n\
-        TestInstances[\"${TestName}\"] = &${TestName}Instance;\n")
+        TestInstances[\"${TestLowerName}\"] = &${TestName}Instance;\n")
     endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
@@ -1109,4 +1110,5 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
