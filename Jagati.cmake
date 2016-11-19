@@ -266,12 +266,22 @@ endmacro(IdentifyOS)
 macro(IdentifyCompiler)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         message(STATUS "\tDetecting Compiler:")
+
+        # If compiler ID is unset set try to guess it
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "")
+            if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+                set(CMAKE_CXX_COMPILER_ID "Emscripten")
+            endif(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+        endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "")
+
         message(STATUS "\t\tCMAKE_CXX_COMPILER_ID: '${CMAKE_CXX_COMPILER_ID}'")
 
         set(CompilerIsGCC OFF)
         set(CompilerIsClang OFF)
         set(CompilerIsIntel OFF)
         set(CompilerIsMsvc OFF)
+        set(CompilerIsMsvc OFF)
+        set(CompilerIsEmscripten OFF)
 
         set(CompilerDesignNix OFF)
         set(CompilerDesignMS OFF)
@@ -308,6 +318,13 @@ macro(IdentifyCompiler)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Emscripten")
+            message(STATUS "\t\tDetected compiler as 'Emscripten'.")
+            set(CompilerIsEmscripten ON)
+            set(CompilerDesignNix ON)
+            set(CompilerDetected ON)
+        endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Emscripten")
+
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
             message(STATUS "\t\tDetected compiler as 'MSVC'.")
             set(CompilerIsMsvc ON)
@@ -331,8 +348,8 @@ macro(IdentifyCompiler)
         endif(CompilerDesignMS)
 
         if(NOT CompilerDetected)
-            message(ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the Jagati\
-            macro IdentifyCompiler.")
+            message(FATAL_ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the\
+            Jagati macro IdentifyCompiler.")
         endif(NOT CompilerDetected)
 
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -392,6 +409,8 @@ endmacro(IdentifyDebug)
 
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
+
+        # These warnings work will all nix style compilers.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         -std=c++11 -fno-strict-aliasing \
         -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
@@ -400,25 +419,41 @@ macro(SetCommonCompilerFlags)
         -Wsign-conversion -Wsign-promo -Wstrict-overflow=2 -Wundef \
         -Wno-unused -Wparentheses -Werror")
 
-        find_package(Threads)
+        # Emscripten is a unique beast
+        if(CompilerIsEmscripten)
 
-        list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
-        set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
+            # Prepare an empty link array
+            set(JagatiLinkArray ""  CACHE INTERNAL "" FORCE)
 
-        if(Platform64Bit)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
-        endif(Platform64Bit)
-        if(SystemIsLinux)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-        endif(SystemIsLinux)
-        if(CompilerIsGCC)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
-        endif(CompilerIsGCC)
-        if(CompilerIsClang)
+            # The same warnings as clang.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
                 -Wno-documentation-unknown-command -Wno-c++98-compat")
-        endif(CompilerIsClang)
 
+            set(CMAKE_EXECUTABLE_SUFFIX ".js")
+
+        else(CompilerIsEmscripten)
+
+            # Store thread library link information for later.
+            find_package(Threads)
+            list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
+            set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
+
+            # A few checks that are very specific
+            if(Platform64Bit)
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+            endif(Platform64Bit)
+            if(SystemIsLinux)
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+            endif(SystemIsLinux)
+            if(CompilerIsGCC)
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
+            endif(CompilerIsGCC)
+            if(CompilerIsClang)
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
+                    -Wno-documentation-unknown-command -Wno-c++98-compat")
+            endif(CompilerIsClang)
+
+        endif(CompilerIsEmscripten)
         # Removed -Winline it did not seem useful
         # He are some flags suggested for use an why they were not used:
         # -Werror - this is used to force others to resolve errors, when they wouldn't normally, I
@@ -1110,6 +1145,7 @@ function(IncludeJagatiPackage PackageName)
 
     #add_dependencies(Download "${PackageName}")
 endfunction(IncludeJagatiPackage PackageName)
+
 
 
 
