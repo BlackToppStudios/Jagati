@@ -1080,9 +1080,9 @@ if(EXISTS "${MEZZ_PackageDirectory}")
         set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
     endif("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
 else(EXISTS "${MEZZ_PackageDirectory}")
-    message(WARNING " MEZZ_PackageDirectory is not set, this needs to be a valid folder \
-where Mezzanine Libraries can be downloaded to. You set the Environment variable 'MEZZ_PACKAGE_DIR' or \
-set it in CMake, if left unset this will create a folder in the output directory.")
+    message(WARNING " MEZZ_PackageDirectory is not set, this needs to be a valid folder where Mezzanine Libraries \
+can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' or set MEZZ_PackageDirectory in CMake, \
+if left unset this will create a folder in the output directory.")
     set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
         PATH "Folder for storing Jagati Packages.")
 endif(EXISTS "${MEZZ_PackageDirectory}")
