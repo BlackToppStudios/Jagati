@@ -37,20 +37,21 @@
 #   Joseph Toppi - toppij@gmail.com
 #   John Blackwood - makoenergy02@gmail.com
 
-# This will be the basic package manager for the Mezzanine, the Jagati. This will track and download
-# packages from git repositories. This will handle centrally locating Mezzanine packages and provide
-# tools for finding and linking against them appropriately.
+# This will be the basic package manager for the Mezzanine, called the Jagati. This will track and download packages 
+# from git repositories. This will handle centrally locating Mezzanine packages and provide tools for finding and 
+# linking against them appropriately. This will not be included directly in git repos, but rather a small download 
+# snippet with ensure this stays up to date.
 
-# This will not be included directly in git repos, but rather a small download snippet with ensure
-# this stays up to date.
-
-
+########################################################################################################################
 # Basic Sanity Checks the Jagati enforces
+
+# Break if some fool tries to build in his source directory.
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     message(FATAL_ERROR "Prevented in source tree build. Please create a build directory outside of"
                         " the Mezzanine source code and have cmake build from there.")
 endif("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 
+# Allow using versions of CMake back to 3.0 even with policy changes.
 cmake_minimum_required(VERSION 3.0)
 if("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
     message(STATUS "Setting comparison policy for newer versions of CMake. Using CMP0054.")
@@ -61,17 +62,20 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ########################################################################################################################
 ########################################################################################################################
-# From Here to the next thick banner exist macros to set variables in the scope of the calling
-# CmakeList Project that all Jagati packages should set. The idea is that every variable needed to
-# link or inspect the source will be cleanly set and easily inspectable, from just the output of
-# cmake and a sample CMakeLists.txt.
+# From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that 
+# all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
+# set and easily inspectable, from just the output of cmake and a sample CMakeLists.txt.
 ########################################################################################################################
 ########################################################################################################################
+
+########################################################################################################################
+# ClaimParentProject
+#
 # This is used to determine what the parentmost project is. Whichever project calls this first will
 # be the only one that doesn't set all of it's variables in its parent's scope.
-
+#
 # Usage:
-#   # Be certain to call project before calling this.
+#   # Be certain to call project() before calling this.
 #   # Call this from the main project before calling anything else to insure your project is root.
 #   ClaimParentProject()
 #
@@ -79,6 +83,7 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 #   The following variables will all be set, made available and printed and other Jagati projects
 #   will know to pollute your namespace:
 #       ParentProject
+#
 
 macro(ClaimParentProject)
     if(ParentProject)
@@ -94,10 +99,11 @@ macro(ClaimParentProject)
 endmacro(ClaimParentProject)
 
 ########################################################################################################################
-# This will create a number of variables in the Scope of the calling script that correspond to the
-# name of the Project so that they can readily be referenced from other project including the caller
-# as a a subproject.
-
+# CreateLocations
+#
+# This will create a number of variables in the Scope of the calling script that correspond to the name of the Project 
+# so that they can readily be referenced from other project including the caller as a subproject.
+#
 # Usage:
 #   # Be certain to call project before calling this.
 #   CreateLocations()
@@ -116,6 +122,7 @@ endmacro(ClaimParentProject)
 #       ${PROJECT_NAME}SourceDir
 #       ${PROJECT_NAME}SwigDir
 #       ${PROJECT_NAME}TestDir
+#
 
 macro(CreateLocations)
     message(STATUS "Creating Location Variables for '${PROJECT_NAME}'")
@@ -161,9 +168,11 @@ macro(CreateLocations)
 endmacro(CreateLocations)
 
 ########################################################################################################################
-# Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin
-# tools are not as well identified as the could be. Hopefully this overcomes these minor shortfalls.
-
+# IdentifyOS
+# Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin tools are not as well 
+# identified as the could be. Hopefully this overcomes these minor shortfalls and provide a single source of truth for
+# build time platform determination in the Jagati/Mezzanine.
+#
 # Usage:
 #   # Be the parentmost cmake scope or this has no effect.
 #   IdentifyOS()
@@ -180,6 +189,7 @@ endmacro(CreateLocations)
 #
 #       CatCommand - Some command that can print files when supplied a filename as only argument.
 #       PlatformDefinition - LINUX/WINDOWS/MACOSX
+#
 
 macro(IdentifyOS)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -242,10 +252,14 @@ macro(IdentifyOS)
 endmacro(IdentifyOS)
 
 ########################################################################################################################
-# Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes
-# of the Mezzanine there are really two categories of compiler: visual studio and good compilers.
-# This can roughly identify those categories.
-
+# IdentifyCompiler
+#
+# Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes of the Mezzanine 
+# there are really two categories of compiler: visual studio and good compilers. This can roughly identify those 
+# categories and provide a single source of truth for each of the 5 supported compilers.
+#
+# If this fails to detect the compiler this reports a message with status of FATAL_ERROR which may terminate CMake.
+#
 # Usage:
 #   # Be the parentmost cmake scope or this has no effect
 #   IdentifyCompiler()
@@ -253,15 +267,17 @@ endmacro(IdentifyOS)
 # Result:
 #   Details about compiler are displayed and the following variables are set:
 #
-#       CompilerIsGCC   - ON/OFF
-#       CompilerIsClang - ON/OFF
-#       CompilerIsIntel - ON/OFF
-#       CompilerIsMsvc  - ON/OFF
+#       CompilerIsClang      - ON/OFF
+#       CompilerIsEmscripten - ON/OFF
+#       CompilerIsGCC        - ON/OFF
+#       CompilerIsIntel      - ON/OFF
+#       CompilerIsMsvc       - ON/OFF
 #
 #       CompilerDesignNix - ON/OFF
 #       CompilerDesignMS  - ON/OFF
 #
-#       CompilerDetected - ON/OFF
+#       CompilerDetected - ON/OFF (FATAL_ERROR when OFF)
+#
 
 macro(IdentifyCompiler)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -356,11 +372,13 @@ macro(IdentifyCompiler)
 endmacro(IdentifyCompiler)
 
 ########################################################################################################################
+# IdentifyDebug
+#
 # Again, CMake knows all about the debug state. It also does this in hyper precise detail, and does it implicitly with
 # the Build Type. For purposes of the Mezzanine we really want a single boolean yes or no for debugging, it also doesn't
 # help that compilers have like 50 different ways to check this each with their own possible ways to fail. Even if half
-# of those are great and never fail descending
-
+# of those are great and never fail a single source of truth is still requried and this should be it for the Jagati.
+#
 # Usage:
 #   # Be the parentmost cmake scope or this has no effect
 #   IdentifyDebug()
@@ -369,6 +387,7 @@ endmacro(IdentifyCompiler)
 #   Details about compiler debug symbol generation state are displayed and the following variables are set:
 #
 #       CompilerDebug    - ON/OFF
+#
 
 macro(IdentifyDebug)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -388,29 +407,32 @@ macro(IdentifyDebug)
 endmacro(IdentifyDebug)
 
 ########################################################################################################################
-# This is one of those things that CMake is simultaneously great and terrible at. It provides like
-# a trillion ways to do this and about a billion of them are wrong. Here is one way that seems to
-# work most of the time when we do it:
-
+# SetCommonCompilerFlags
+#
+# This is one of those things that CMake is simultaneously great and terrible at. It provides over 9000 ways to do this
+# and many of them are wrong. Here is one way that seems to work most of the time when we do it:
+#
 #   Usage:
-#       # Be sure the variable CompilerDesignNix is set to "ON" or "OFF"
+#       # Be sure the variable CompilerDesignNix is set to "ON" or "OFF".
+#       # Be sure that all the CompilerIsXXXX variables are set correctly.
+#       # The easiest way to do both of those is to use IdentifyCompiler().
 #       SetCommonCompilerFlags()
 #
 #   Results:
-#       Compiler flags are set that:
+#       Compiler flags are set that do the following:
 #           Enable a ton of warnings.
 #           Treat warnings as errors are set.
 #           Turn off compiler logos.
 #           Enable Position independent code or otherwise fix linker issues.
 #           Turn on C++11.
 #
-#       Set a variable with extra items to link against for use target_link_libraries
-#
+#       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries
+#           
 
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
 
-        # These warnings work will all nix style compilers.
+        # These warnings work will work on all nix style compilers.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         -std=c++11 -fno-strict-aliasing \
         -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
@@ -426,9 +448,9 @@ macro(SetCommonCompilerFlags)
             set(JagatiLinkArray ""  CACHE INTERNAL "" FORCE)
 
             # The same warnings as clang.
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
-                -Wno-documentation-unknown-command -Wno-c++98-compat")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-documentation-unknown-command -Wno-c++98-compat")
 
+            # This is exe on windows and nothing on most platforms, but without this emscripten output is wierd.
             set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
         else(CompilerIsEmscripten)
@@ -460,7 +482,7 @@ macro(SetCommonCompilerFlags)
         #           am resolving them as I go, but I want to option to run unit tests with warnings
         #           in place.
         # -Woverloaded-virtual - What did the author of this think virtual methods were for if not
-        #                      - to be overloaded. This disagrees with explicit design decisions.
+        #                        to be overloaded. This disagrees with explicit design decisions.
         # -Wmisleading-indentation - Help find errors revolving around tabs and control flow. I
         #                            want to enable this, but not until GCC 6.
         # -DDEBUG_DIRECTOR_EXCEPTION  # Used to make swig emit more
@@ -477,8 +499,7 @@ macro(SetCommonCompilerFlags)
 
         # Ignoring:
         # C4710 - Failing to inline things in std::string, well that is STL's fault, not mine.
-        # C4514 - An unused function was optimized out. Why is the optimizer doing its job a
-        # warning?!
+        # C4514 - An unused function was optimized out. Why is the optimizer doing its job a warning?!
         # C4251 - Is safe to ignore per STL
 # http://stackoverflow.com/questions/24511376/how-to-dllexport-a-class-derived-from-stdruntime-error
         # C4820 - When padding is added for performance reasons.
@@ -490,8 +511,10 @@ macro(SetCommonCompilerFlags)
 endmacro(SetCommonCompilerFlags)
 
 ########################################################################################################################
-# A variable that contains an array of all the Jagati Packages
-
+# AddJagatiPackage
+#
+# Add to a variable that contains an array of all the Jagati Packages.
+#
 # Usage:
 #   # Be certain to call project before calling this.
 #   AddJagatiPackage()
@@ -499,6 +522,7 @@ endmacro(SetCommonCompilerFlags)
 # Result:
 #   This package's name will be added to a list of packages currently loaded. This list can be
 #   Accessed through the variable: JagatiPackageNameArray
+#
 
 macro(AddJagatiPackage)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -511,15 +535,19 @@ endmacro(AddJagatiPackage)
 
 
 ########################################################################################################################
-# This does what the above macros do, but this does it all together.
-
+# StandardJagatiSetup
+# 
+# This does what the above macros (ClaimParentProject, CreateLocations, IdentifyOS, IdentifyCompiler, IdentifyDebug
+# SetCommonCompilerFlags and AddJagatiPackage) do, but this does it all together.
+#
 # Usage:
 #   # Be certain to call project before calling this.
 #   StandardJagatiSetup()
 #
 # Result:
-#       The Parent scope will attempt to be claimed, many variables for compiler, OS, Debug and locations
-#       will be set, see above. Compiler Flags will be set.
+#   The Parent scope will attempt to be claimed, many variables for compiler, OS, Debug and locations will be set, see 
+#   above. Compiler Flags will be set.
+#
 
 macro(StandardJagatiSetup)
     ClaimParentProject()
@@ -535,8 +563,10 @@ macro(StandardJagatiSetup)
 endmacro(StandardJagatiSetup)
 
 ########################################################################################################################
-# This set a single variable that all Mezzanine libraries will use when building libraries.
-
+# ChooseLibraryType and Internal_ChooseLibraryType
+#
+# This sets a single variable that all Mezzanine libraries will use when building libraries.
+#
 # Usage:
 #   Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
 #   Mezzanine package.
@@ -544,11 +574,10 @@ endmacro(StandardJagatiSetup)
 #   ChooseLibraryType("OFF")
 #
 # Result:
-#   A variable called LibraryBuildType is set with either "STATIC" if true is passed or
-#   "SHARED" if false is passed.
+#   A variable called LibraryBuildType is set with either "STATIC" if true is passed or "SHARED" if false is passed.
 #
 # Notes:
-#   Forcing this into the effectively makes it global is that really what we want? For now it seems ok.
+#   Forcing this into the cache effectively makes it global is that really what we want? For now it seems ok.
 
 function(Internal_ChooseLibraryType TrueForStatic)
     if(TrueForStatic)
@@ -565,6 +594,8 @@ macro(ChooseLibraryType TrueForStatic)
         set(LibraryBuildType "${LibraryBuildType}" CACHE INTERNAL "" FORCE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType TrueForStatic)
+
+# The end of the 
 
 ########################################################################################################################
 ########################################################################################################################
@@ -662,22 +693,26 @@ endmacro(CreateCoverageTarget SourceList)
 
 ########################################################################################################################
 ########################################################################################################################
-# Optional Macros that not all Jagati packages will set, but culd be important for link or other
-# build time activities.
+# Optional Macros that not all Jagati packages will set, but could be important for link or other build time activities.
 ########################################################################################################################
 ########################################################################################################################
-# A variable that contains an array of all the Jagati Linkable Libraries provided by loaded
-# packages
+
+########################################################################################################################
+# AddJagatiLibrary
+#
+# A variable that contains an array of all the Jagati Linkable Libraries provided by loaded packages.
 #
 # Usage:
 #   # Be certain to call project before calling this.
 #   AddJagatiLibrary("LinkTarget")
 #
 # Result:
-#   The passed file will be added to a list of libaries. This list can be
-#   Accessed through the variable: JagatiLibraryArray
+#   The passed file will be added to a list of libaries. This list can be Accessed through the variable: 
+#       JagatiLibraryArray
 #
-#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename
+#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per 
+#   Jagati package can be shared this way.
+#
 
 macro(AddJagatiLibrary FileName)
     set(${PROJECT_NAME}Lib "${FileName}")
@@ -687,12 +722,13 @@ macro(AddJagatiLibrary FileName)
 endmacro(AddJagatiLibrary FileName)
 
 ########################################################################################################################
+# AddJagatiDoxInput
+#
 # Add input files to list of all files doxygen will scan.
-
 #
 # Usage:
-#   # Call any time after the parent scope is claimed and when the project is built if doxygen is installed
-#   # and the option is chosen then html docs will be generated from all past files.
+#   # Call any time after the parent scope is claimed and when the project is built if doxygen is installed and the 
+#   # option is chosen then html docs will be generated from all past files.
 #   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
 #   AddJagatiDoxInput("${DoxFiles}")
 #   AddJagatiDoxInput("foo.h")
@@ -704,38 +740,45 @@ macro(AddJagatiDoxInput FileName)
 endmacro(AddJagatiDoxInput FileName)
 
 ########################################################################################################################
-# Some projects have many files that are created at compile time. This can cause the build system to
-# as complex as the source code. Most software developers want to spend their reasoning about the
-# code and not the code that makes the code. In general the Jagati or a specific package should
-# handle meta-programming where possible.
-
+# AddJagatiConfig and Internal_SetRemarks
+#
+# Some projects have many files that are created at compile time. This can cause issues in the build system as it has to
+# manage complexities in the source code. Most software developers want to spend their reasoning about the code and not
+# the code that makes or manages the code. In general the Jagati or a specific package should handle meta-programming 
+# where possible.
+#
+# A good Jagati config file is simple header containing nothing but literal values in preprocessor macros. Every 
+# possible variable is included in the config file, but ones that need to be excluded from the build should be remarked 
+# out. This allows someone inspecting just that file to know what the options could be without needing to inspect the
+# CMakeLists.txt for the package. This CMake macro adds one line to the config file for a specific package.
+#
 # Usage:
-#   # Call any time after the parent scope is claimed. The first parameter is the name of a
-#   # preprocessor to create, and the second is the value, "" for no value and the third argument
-#   # is for determining if the remark should be enabled(true) or remarked out(false).
+#   # Call any time after the parent scope is claimed. The first parameter is the name of a preprocessor macro to 
+#   # create. The second is the value, "" for no value. The third argument is for determining if the remark should be 
+#   # enabled(true) or remarked out(false).
 #       AddJagatiConfig("FOO" "BAR" ON)
 #       AddJagatiConfig("EmptyOption" "" ON)
 #       AddJagatiConfig("Remarked_FOO" "BAR" OFF)
 #       AddJagatiConfig("EmptyOption_nope" "" OFF)
 #
 # Result:
-#   Adds a preprocessor macro to string that config headers can directly include. Here is the
-#   output from the sample above:
+#   Adds a preprocessor macro to string that config headers can directly include. Here is the output from the sample 
+#   above:
 #       #define FOO BAR
 #       #define EmptyOption
 #       //#define Remarked_FOO BAR
 #       //#define EmptyOption_nope
 #
-#   The set variable will be ${PROJECT_NAME}JagatiConfig
+#   The set variable will be ${PROJECT_NAME}JagatiConfig.
 #
-#   This sets the variables ${PROJECT_NAME}JagatiConfigRaw to similar contents to
-#   ${PROJECT_NAME}JagatiConfig, Except the Raw version has no remarks.
+#   This sets the variables ${PROJECT_NAME}JagatiConfigRaw to similar contents to ${PROJECT_NAME}JagatiConfig, except 
+#   the Raw version has no remarks.
 #
 #   This also writes to the variable "JagatiConfigRemarks" in the parentmost scope as a temporary.
+#
 
-# This is an implementaion Detail of AddJagatiConfig, This is needed because macro parameters are
-# neither variables, nor constants and cannot be used in if statements checking implicit
-# truthiness.
+# This is an implementaion Detail of AddJagatiConfig, This is needed because macro parameters are neither variables, nor
+# constants and cannot be used in if statements checking implicit truthiness.
 function(Internal_SetRemarks HowToSet)
     if(HowToSet)
         set(JagatiConfigRemarks "" PARENT_SCOPE)
@@ -757,20 +800,23 @@ macro(AddJagatiConfig Name Value RemarkBool)
 endmacro(AddJagatiConfig Name Value RemarkBool)
 
 ########################################################################################################################
-# Emit a config file
-
+# EmitConfig
+#
+# Emit a config file as constructed by AddJagatiConfig.
+#
 # Usage:
 #   # Call after 0 or more calls to AddJagatiConfig and the parentmost scope has been claimed.
 #   EmitConfig()
 #
 # Result:
-#   This will create a config file with all the config item added by AddJagatiConfig in this project
-#   and this will set two variables:
+#   This will create a config file with all the config item added by AddJagatiConfig in this project and this will set
+#   two variables:
 #       ${PROJECT_NAME}ConfigFilename - The absolute path and filename of the file writtern, this
 #           derived from the variable ${PROJECT_NAME}GenHeadersDir and will contain the project name
 #       ${PROJECT_NAME}ConfigContent - The contents of what was emitted in the header file.
 #
 
+# I apologize for the formatting here, but the CMake parser is unforgiving on multiline strings.
 macro(EmitConfig)
 
 set(ConfigHeader
@@ -818,7 +864,6 @@ set(ConfigHeader
 \n\
 #ifndef DOXYGEN\n")
 
-
     set(DoxygenElse "\n\n#else // DOXYGEN\n")
     set(ConfigFooter "\n\n#endif // DOXYGEN\n\n#endif\n")
 
@@ -844,12 +889,16 @@ endmacro(EmitConfig)
 ########################################################################################################################
 ########################################################################################################################
 
+########################################################################################################################
+# EmitTestCode
+#
 # Usage:
 #   EmitTestCode()
 #
 # Results:
 #       A file called ${PROJECT_NAME}_tester.cpp is emitted int the build output directory. This can be used to generate
 #   a unit test executable
+#
 macro(EmitTestCode)
     set(TestsHeader
 "// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
@@ -952,7 +1001,7 @@ macro(AddTestTarget ExtraSourceFiles)
         ${LibraryBuildType}
         ${TesterHeaderFiles}
         ${TesterSourceFiles}
-        ${ExtraSourceFiles}
+        ${${PROJECT_NAME}TestClassList}
         ${HeaderFilesWithTests}
     )
 
