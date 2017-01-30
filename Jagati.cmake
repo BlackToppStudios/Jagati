@@ -61,6 +61,75 @@ else("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ########################################################################################################################
+# Package Information Management
+
+# Package URLs
+set(Mezz_StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
+set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
+set(Mezz_Foundation_GitURL "https://github.com/BlackToppStudios/Mezz_Foundation.git")
+
+# Enviroment Variable management
+set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+if(EXISTS "${MEZZ_PackageDirectory}")
+    if("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+    else("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+        message(WARNING "Jagati Package Directory (${MEZZ_PackageDirectory}) should end in '/', appending slash.")
+        set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
+    endif("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+else(EXISTS "${MEZZ_PackageDirectory}")
+    message(WARNING " MEZZ_PackageDirectory is not set, this needs to be a valid folder where Mezzanine Libraries \
+can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' or set MEZZ_PackageDirectory in CMake, \
+if left unset this will create a folder in the output directory.")
+    set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+        PATH "Folder for storing Jagati Packages.")
+endif(EXISTS "${MEZZ_PackageDirectory}")
+
+########################################################################################################################
+# Other Variables
+
+set(MEZZ_Copyright
+"// © Copyright 2010 - 2017 BlackTopp Studios Inc.\n\
+/* This file is part of The Mezzanine Engine.\n\
+\n\
+    The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
+    it under the terms of the GNU General Public License as published by\n\
+    the Free Software Foundation, either version 3 of the License, or\n\
+    (at your option) any later version.\n\
+\n\
+    The Mezzanine Engine is distributed in the hope that it will be useful,\n\
+    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+    GNU General Public License for more details.\n\
+\n\
+    You should have received a copy of the GNU General Public License\n\
+    along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.\n\
+*/\n\
+/* The original authors have included a copy of the license specified above in the\n\
+   'Docs' folder. See 'gpl.txt'\n\
+*/\n\
+/* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
+   Build professional software and charge for their product.\n\
+\n\
+   However there are some practical restrictions, so if your project involves\n\
+   any of the following you should contact us and we will try to work something\n\
+   out:\n\
+    - DRM or Copy Protection of any kind(except Copyrights)\n\
+    - Software Patents You Do Not Wish to Freely License\n\
+    - Any Kind of Linking to Non-GPL licensed Works\n\
+    - Are Currently In Violation of Another Copyright Holder's GPL License\n\
+    - If You want to change our code and not add a few hundred MB of stuff to\n\
+        your distribution\n\
+\n\
+   These and other limitations could cause serious legal problems if you ignore\n\
+   them, so it is best to simply contact us or the Free Software Foundation, if\n\
+   you have any questions.\n\
+\n\
+   Joseph Toppi - toppij@gmail.com\n\
+   John Blackwood - makoenergy02@gmail.com\n\
+*/\n\n"
+)
+
+########################################################################################################################
 ########################################################################################################################
 # From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that 
 # all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
@@ -165,7 +234,48 @@ macro(CreateLocations)
     message(STATUS "\t\t\t'${PROJECT_NAME}SourceDir' - ${${PROJECT_NAME}SourceDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}SwigDir' - ${${PROJECT_NAME}SwigDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
+    
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}GenHeadersDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}GenSourceFolder})
+    
+    include_directories(${${PROJECT_NAME}IncludeDir} ${${PROJECT_NAME}GenHeadersDir})
 endmacro(CreateLocations)
+
+########################################################################################################################
+# DecideOutputNames
+#
+# This will create a number of variables in the Scope of the calling script that correspond to the name of the Project 
+# so that they can readily be referenced from other project including the caller as a subproject.
+#
+# Usage:
+#   # Be certain to call project before calling this.
+#   DecideOutputNames()
+#
+# Result:
+#   The following variables will all be set to some valid folder, made available and printed:
+#       ${PROJECT_NAME}RootDir
+#       ${PROJECT_NAME}BinaryDir
+#
+#       ${PROJECT_NAME}GenHeadersDir
+#       ${PROJECT_NAME}GenSourceFolder
+#
+#       ${PROJECT_NAME}DoxDir
+#       ${PROJECT_NAME}IncludeDir
+#       ${PROJECT_NAME}LibDir
+#       ${PROJECT_NAME}SourceDir
+#       ${PROJECT_NAME}SwigDir
+#       ${PROJECT_NAME}TestDir
+#
+
+macro(DecideOutputNames)
+    message(STATUS "Creating Output Executable Variables for '${PROJECT_NAME}'")
+    set(${PROJECT_NAME}BinTarget "${PROJECT_NAME}" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}LibTarget "${PROJECT_NAME}Lib" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}TestTarget "${PROJECT_NAME}_Tester" CACHE INTERNAL "" FORCE)
+    message(STATUS "\t'${PROJECT_NAME}BinTarget' - ${${PROJECT_NAME}BinTarget}")
+    message(STATUS "\t'${PROJECT_NAME}LibTarget' - ${${PROJECT_NAME}LibTarget}")
+    message(STATUS "\t'${PROJECT_NAME}TestTarget' - ${${PROJECT_NAME}TestTarget}")
+endmacro(DecideOutputNames)
 
 ########################################################################################################################
 # IdentifyOS
@@ -276,6 +386,8 @@ endmacro(IdentifyOS)
 #       CompilerDesignNix - ON/OFF
 #       CompilerDesignMS  - ON/OFF
 #
+#       CompilerSupportsCoverage - ON/OFF
+#
 #       CompilerDetected - ON/OFF (FATAL_ERROR when OFF)
 #
 
@@ -303,6 +415,8 @@ macro(IdentifyCompiler)
         set(CompilerDesignMS OFF)
 
         set(CompilerDebug OFF)
+        
+        set(CompilerSupportsCoverage OFF)
 
         set(CompilerDetected OFF)
 
@@ -310,7 +424,8 @@ macro(IdentifyCompiler)
             message(STATUS "\t\tDetected compiler as 'GCC'.")
             set(CompilerIsGCC ON)
             set(CompilerDesignNix ON)
-            set(CompilerDetected ON)
+            set(CompilerDetected ON)        
+            set(CompilerSupportsCoverage ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
@@ -432,14 +547,34 @@ endmacro(IdentifyDebug)
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
 
-        # These warnings work will work on all nix style compilers.
+        # These warnings work will work on all nix style compilers. Here are the most important flags:
+        # -std=c++11 - Set the C++ standard to C++11, might update all the Jagati Packages to 14 soon.
+        # -fno-strict-aliasing - Required for linking some of the Mezzanine dependencies correctly.
+        # -Wall - Enables "all" compiler warnings, actually abour 2/3rds, including common stuff like bad inits.
+        # -Wextra - Enable the rest of the warnings except some sketchy ones.
+        # -Werror - Turn all warnings into errors.
+        # -pedantic-errors - Warn for accidental use of compiler extensions or undefined behavior.
+        #
+        # These exist to prevent issues well before they become issues:
+        # -Wcast-align - When a cast changes alignment to a larger boundary, added because theorhetical performance.
+        # -Wcast-qual - When CV qualifiers are changed, these are almost always bugs.
+        # -Wctor-dtor-privacy - All private constructors when they probably ought to be deleted.
+        # -Wdisabled-optimization - Code to complex to be optimized, also means code is too complex to be maintained.
+        # -Wformat=2 - Adds extra checks for security and y2k and other easily static checkable things.
+        # -Wmissing-declarations - Mandate function prototypes.
+        # -Wmissing-include-dirs - Directory passed on command line does not exist.
+        # -Wold-style-cast - C-style casts are errors, which they should be because they are crazy.
+        # -Wredundant-decls - This stops, if you read the name you can probpably guess it, redudant declarations.
+        # -Wshadow - A variable in a more local scope has teh same name as one is a larger/higher scope.
+        # -Wconversion - Sign conversions and stuff that cause data loss, used to be -Wsign-conversion.
+        # -Wsign-promo - Prevent issues with enums and ints choosing a signed version of a datatype when using unsigned.
+        # -Wstrict-overflow=2 - When the compiler re-arranges some math that might cause an integer overflow.
+        # -Wundef - Fail when undeclared preprocessor macros are used, almost always a bug/platform error.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -std=c++11 -fno-strict-aliasing \
-        -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy \
-        -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations \
-        -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow \
-        -Wsign-conversion -Wsign-promo -Wstrict-overflow=2 -Wundef \
-        -Wno-unused -Wparentheses -Werror")
+        -std=c++11  -pedantic -Wall -Wextra -Werror -pedantic-errors \
+        -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wmissing-declarations \
+        -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
+        -Wstrict-overflow=2 -Wundef")
 
         # Emscripten is a unique beast
         if(CompilerIsEmscripten)
@@ -478,9 +613,6 @@ macro(SetCommonCompilerFlags)
         endif(CompilerIsEmscripten)
         # Removed -Winline it did not seem useful
         # He are some flags suggested for use an why they were not used:
-        # -Werror - this is used to force others to resolve errors, when they wouldn't normally, I
-        #           am resolving them as I go, but I want to option to run unit tests with warnings
-        #           in place.
         # -Woverloaded-virtual - What did the author of this think virtual methods were for if not
         #                        to be overloaded. This disagrees with explicit design decisions.
         # -Wmisleading-indentation - Help find errors revolving around tabs and control flow. I
@@ -516,7 +648,7 @@ endmacro(SetCommonCompilerFlags)
 # Add to a variable that contains an array of all the Jagati Packages.
 #
 # Usage:
-#   # Be certain to call project before calling this.
+#   # Be certain to call project before calling this. This uses ${PROJECT_NAME} to set name.
 #   AddJagatiPackage()
 #
 # Result:
@@ -533,6 +665,34 @@ macro(AddJagatiPackage)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiPackage)
 
+########################################################################################################################
+# FindGitExecutable
+#
+# Find git and put its name in a variable.
+#
+# Usage:
+#   # Call this anytime or just trust 
+#   FindGitExecutable()
+#
+# Result:
+#   If not already set this will put the git executable into the variable MEZZ_GitExecutable
+#
+macro(FindGitExecutable)
+    if(DEFINED MEZZ_GitExecutable)
+    else(DEFINED MEZZ_GitExecutable)
+        find_program (MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages.")
+        if(NOT EXISTS "${MEZZ_GitExecutable}")
+            message(
+                FATAL_ERROR 
+                "Git was not found or specified wrong currently MEZZ_GitExecutable is: ${MEZZ_GitExecutable}"
+            )
+        endif(NOT EXISTS "${MEZZ_GitExecutable}")
+        if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+            set(MEZZ_GitExecutable "${MEZZ_GitExecutable}" CACHE INTERNAL "" FORCE)
+        endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    endif(DEFINED MEZZ_GitExecutable)
+endmacro(FindGitExecutable)
 
 ########################################################################################################################
 # StandardJagatiSetup
@@ -552,7 +712,9 @@ endmacro(AddJagatiPackage)
 macro(StandardJagatiSetup)
     ClaimParentProject()
     CreateLocations()
+    DecideOutputNames()
     AddJagatiPackage()
+    FindGitExecutable()
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         message(STATUS "Determining platform specific details.")
         IdentifyOS()
@@ -568,8 +730,8 @@ endmacro(StandardJagatiSetup)
 # This sets a single variable that all Mezzanine libraries will use when building libraries.
 #
 # Usage:
-#   Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
-#   Mezzanine package.
+#   # Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
+#   # Mezzanine package. This is already dealt with in the StaticFoundation.
 #   ChooseLibraryType("ON")
 #   ChooseLibraryType("OFF")
 #
@@ -595,18 +757,18 @@ macro(ChooseLibraryType TrueForStatic)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(ChooseLibraryType TrueForStatic)
 
-# The end of the 
+# The end of the Functions and Macros that pretty much every package will use.
 
 ########################################################################################################################
 ########################################################################################################################
-# Coverage Control Macros some tools that can be used to get code coverage numbers.
+# Coverage control Macros some tools that can be used to get code coverage numbers.
 ########################################################################################################################
 ########################################################################################################################
 # Attempt to set code coverage flags.
-
+#
 # Usage:
-#   Don't. This can easily be controlled via the CodeCoverage cache level option. When used as part any
-#   Mezzanine package.
+#   # Don't. This can easily be controlled via the CodeCoverage cache level option. When used as part any
+#   # Mezzanine package. This is already dealt with in the StaticFoundation.
 #   ChooseCodeCoverage("ON")
 #   ChooseCodeCoverage("OFF")
 #
@@ -645,7 +807,7 @@ endmacro(ChooseCodeCoverage TrueForEnabled)
 # you should use this.
 #
 # Todo: Fix the use of StaticFoundation variable in Jagati, This needs to be set in a more project agnostic way.
-
+#
 # Usage:
 #   # When called after all targets are set up this will add code coverage support to the build targets.
 #   SetCodeCoverage()
@@ -659,7 +821,6 @@ macro(SetCodeCoverage)
     Internal_ChooseCodeCoverage("${MEZZ_CodeCoverage}")
 endmacro(SetCodeCoverage)
 
-
 ########################################################################################################################
 # Attempt to create a target that builds code coverage metadata.
 #
@@ -670,7 +831,7 @@ endmacro(SetCodeCoverage)
 #
 # Result:
 #   A new build target called ${ExecutableName}Coverage will be added that will run copy source files where needed and
-#   run gcov to generate profile and coverage notes and data that .
+#   run gcov to generate profile and coverage notes and data that.
 #
 
 macro(CreateCoverageTarget ExecutableName SourceList)
@@ -693,18 +854,19 @@ endmacro(CreateCoverageTarget SourceList)
 
 ########################################################################################################################
 ########################################################################################################################
-# Optional Macros that not all Jagati packages will set, but could be important for link or other build time activities.
+# Optional Macros that not all Jagati packages will use, but could be important for link or other build time activities.
 ########################################################################################################################
 ########################################################################################################################
 
 ########################################################################################################################
-# AddJagatiLibrary
+# AddManualJagatiLibrary
 #
-# A variable that contains an array of all the Jagati Linkable Libraries provided by loaded packages.
+# Add to a variable that contains an array of all the Jagati Linkable Libraries provided by loaded packages.
 #
 # Usage:
 #   # Be certain to call project before calling this.
-#   AddJagatiLibrary("LinkTarget")
+#   # Also be certain to have a valid target or library with name matching whatever string is passed.
+#   AddManualJagatiLibrary("LinkTarget")
 #
 # Result:
 #   The passed file will be added to a list of libaries. This list can be Accessed through the variable: 
@@ -714,12 +876,41 @@ endmacro(CreateCoverageTarget SourceList)
 #   Jagati package can be shared this way.
 #
 
-macro(AddJagatiLibrary FileName)
-    set(${PROJECT_NAME}Lib "${FileName}")
-    list(APPEND JagatiLibraryArray ${FileName})
-    set(${PROJECT_NAME}Lib "${FileName}" CACHE INTERNAL "" FORCE)
+macro(AddManualJagatiLibrary TargetName)
+    list(APPEND JagatiLibraryArray ${TargetName})
+    set(${PROJECT_NAME}Lib "${TargetName}" CACHE INTERNAL "" FORCE)
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
-endmacro(AddJagatiLibrary FileName)
+endmacro(AddManualJagatiLibrary FileName)
+
+########################################################################################################################
+# AddJagatiLibrary
+#
+# Create a linkable libary and add it to a variable that contains an array of all the Jagati Linkable Libraries provided
+# by loaded packages.
+#
+# Usage:
+#   # Be certain to call project before calling this and StandardJagatiSetup (or equivalent alternatives) 
+#   AddJagatiLibrary()
+#
+# Result:
+#   The passed file will be added to a list of libaries. This list can be Accessed through the variable: 
+#       JagatiLibraryArray
+#
+#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per 
+#   Jagati package can be shared this way.
+#
+
+macro(AddJagatiLibrary TargetName)
+    AddManualJagatiLibrary("${PROJECT_NAME}")
+    add_library(
+        "${${PROJECT_NAME}Lib}"
+        ${MEZZ_LibraryBuildType}
+        "${${PROJECT_NAME}HeaderFiles}"
+        "${${PROJECT_NAME}SourceFiles}"
+    )
+    target_link_libraries("${${PROJECT_NAME}Lib}" ${JagatiLinkArray})
+    message(STATUS "Adding Automatic Library - ${TargetName}")
+endmacro(AddJagatiLibrary TargetName)
 
 ########################################################################################################################
 # AddJagatiDoxInput
@@ -819,51 +1010,11 @@ endmacro(AddJagatiConfig Name Value RemarkBool)
 # I apologize for the formatting here, but the CMake parser is unforgiving on multiline strings.
 macro(EmitConfig)
 
-set(ConfigHeader
-"// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
-/* This file is part of The Mezzanine Engine.\n\
-\n\
-    The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
-    it under the terms of the GNU General Public License as published by\n\
-    the Free Software Foundation, either version 3 of the License, or\n\
-    (at your option) any later version.\n\
-\n\
-    The Mezzanine Engine is distributed in the hope that it will be useful,\n\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-    GNU General Public License for more details.\n\
-\n\
-    You should have received a copy of the GNU General Public License\n\
-    along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.\n\
-*/\n\
-/* The original authors have included a copy of the license specified above in the\n\
-   'Docs' folder. See 'gpl.txt'\n\
-*/\n\
-/* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
-   Build professional software and charge for their product.\n\
-\n\
-   However there are some practical restrictions, so if your project involves\n\
-   any of the following you should contact us and we will try to work something\n\
-   out:\n\
-    - DRM or Copy Protection of any kind(except Copyrights)\n\
-    - Software Patents You Do Not Wish to Freely License\n\
-    - Any Kind of Linking to Non-GPL licensed Works\n\
-    - Are Currently In Violation of Another Copyright Holder's GPL License\n\
-    - If You want to change our code and not add a few hundred MB of stuff to\n\
-        your distribution\n\
-\n\
-   These and other limitations could cause serious legal problems if you ignore\n\
-   them, so it is best to simply contact us or the Free Software Foundation, if\n\
-   you have any questions.\n\
-\n\
-   Joseph Toppi - toppij@gmail.com\n\
-   John Blackwood - makoenergy02@gmail.com\n\
-*/\n\
+set(ConfigHeader "${MEZZ_Copyright}\n\
 #ifndef ${PROJECT_NAME}_config_h\n\
 #define ${PROJECT_NAME}_config_h\n\
 \n\
 #ifndef DOXYGEN\n")
-
     set(DoxygenElse "\n\n#else // DOXYGEN\n")
     set(ConfigFooter "\n\n#endif // DOXYGEN\n\n#endif\n")
 
@@ -873,8 +1024,10 @@ set(ConfigHeader
         set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}ConfigFilename}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
-    set(${PROJECT_NAME}ConfigContent "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}\
-${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}")
+    set(
+        ${PROJECT_NAME}ConfigContent 
+        "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}"
+    )
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
     else("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}ConfigContent "${${PROJECT_NAME}ConfigContent}" PARENT_SCOPE)
@@ -900,55 +1053,14 @@ endmacro(EmitConfig)
 #   a unit test executable
 #
 macro(EmitTestCode)
-    set(TestsHeader
-"// © Copyright 2010 - 2016 BlackTopp Studios Inc.\n\
-/* This file is part of The Mezzanine Engine.\n\
-\n\
-    The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
-    it under the terms of the GNU General Public License as published by\n\
-    the Free Software Foundation, either version 3 of the License, or\n\
-    (at your option) any later version.\n\
-\n\
-    The Mezzanine Engine is distributed in the hope that it will be useful,\n\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-    GNU General Public License for more details.\n\
-\n\
-    You should have received a copy of the GNU General Public License\n\
-    along with The Mezzanine Engine.  If not, see <http://www.gnu.org/licenses/>.\n\
-*/\n\
-/* The original authors have included a copy of the license specified above in the\n\
-   'Docs' folder. See 'gpl.txt'\n\
-*/\n\
-/* We welcome the use of the Mezzanine engine to anyone, including companies who wish to\n\
-   Build professional software and charge for their product.\n\
-\n\
-   However there are some practical restrictions, so if your project involves\n\
-   any of the following you should contact us and we will try to work something\n\
-   out:\n\
-    - DRM or Copy Protection of any kind(except Copyrights)\n\
-    - Software Patents You Do Not Wish to Freely License\n\
-    - Any Kind of Linking to Non-GPL licensed Works\n\
-    - Are Currently In Violation of Another Copyright Holder's GPL License\n\
-    - If You want to change our code and not add a few hundred MB of stuff to\n\
-        your distribution\n\
-\n\
-   These and other limitations could cause serious legal problems if you ignore\n\
-   them, so it is best to simply contact us or the Free Software Foundation, if\n\
-   you have any questions.\n\
-\n\
-   Joseph Toppi - toppij@gmail.com\n\
-   John Blackwood - makoenergy02@gmail.com\n\
-*/\n\
-\n\
+    set(TestsHeader "${MEZZ_Copyright}\n\
 #include \"MezzTest.h\"\n\
 \n")
 
     set(TestsIncludes "// Start Dynamically Included Headers\n")
-    foreach(TestName ${${PROJECT_NAME}TestClassList})
-        set(TestFile "${TestName}.h")
-        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestFile}\"")
-    endforeach(TestName ${${PROJECT_NAME}TestClassList})
+    foreach(TestHeader ${${PROJECT_NAME}TestHeaderList})
+        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestHeader}\"")
+    endforeach(TestHeader ${${PROJECT_NAME}TestHeaderList})
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
     set(TestsMainHeader
@@ -986,41 +1098,41 @@ endmacro(EmitTestCode)
 
 ########################################################################################################################
 
+# Must call AddJagatiLibrary or AddManualJagatiLibrary first
+
 # Not added to API yet, do not use
-macro(AddTestTarget ExtraSourceFiles)
-    include_directories("${TestTestDir}")
+macro(AddTestTarget)
+    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+    message(STATUS "Include dirs for ${CMAKE_CURRENT_SOURCE_DIR}:")
+    foreach(dir ${dirs})
+        message(STATUS "\t'${dir}'")
+    endforeach(dir ${dirs})
 
-    set(HeaderFilesWithTests "")
-    foreach(TestName ${${PROJECT_NAME}TestClassList})
-        set(TestFile "${TestName}.h")
-        list(APPEND HeaderFilesWithTests "${TestTestDir}/${TestFile}")
-    endforeach(TestName ${${PROJECT_NAME}TestClassList})
-
-    add_library(
-        ${TestLib}
-        ${LibraryBuildType}
-        ${TesterHeaderFiles}
-        ${TesterSourceFiles}
-        ${${PROJECT_NAME}TestClassList}
-        ${HeaderFilesWithTests}
+    message(STATUS "Adding tester target - ${${PROJECT_NAME}TestTarget} - ${${PROJECT_NAME}TestHeaderList}")
+    add_executable(
+        ${${PROJECT_NAME}TestTarget}
+        "${${PROJECT_NAME}TestHeaderList}"
+        "${${PROJECT_NAME}TesterFilename}"
     )
-
-    target_link_libraries(${TestLib} ${StaticFoundationLib})
-    add_executable(Test_Tester ${HeaderFiles} ${TestSourceFiles} ${${PROJECT_NAME}TesterFilename})
-    target_link_libraries(Test_Tester ${StaticFoundationLib} ${TestLib})
-endmacro(AddTestTarget ExtraSourceFiles)
+    target_link_libraries(${${PROJECT_NAME}TestTarget} Test)
+    message(STATUS "\tTestIncludeDir - ${TestIncludeDir}")
+endmacro(AddTestTarget)
 
 ########################################################################################################################
+# AddTestClass
+#
 # Use this to add test classes to be run with the Mezz_Test Package.
-
+#
 # Usage:
 #   AddTestClass("TestName")
 #
 # Results:
-#   This will create a list containing the names of all the tests added.
-#       ${PROJECT_NAME}TestClassList - This is created or appended too.
+#   This will create a list containing the names of all the tests added and a with the filenames of all those tests.
 #
-#   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp:
+#       ${PROJECT_NAME}TestClassList - This is created or appended to and will have all the class names.
+#       ${PROJECT_NAME}TestHeaderList - This is created or appended to and will have all the absolute file names. 
+#
+#   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp (when emitted byEmitTestCode()) :
 #
 #       In the header section will be added:
 #           #include "${TestName}.h"
@@ -1038,27 +1150,35 @@ endmacro(AddTestTarget ExtraSourceFiles)
 #   You should have a header in your test directory (or other included directory) named exacly what was passed in
 #   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
 #   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
+#
+
+macro(Internal_AddTest AbsoluteFilename)
+    get_filename_component(InnerTestName "${AbsoluteFilename}" NAME_WE)
+    list(APPEND ${PROJECT_NAME}TestClassList ${InnerTestName})
+    list(APPEND ${PROJECT_NAME}TestHeaderList "${AbsoluteFilename}")
+    message(STATUS "\tAdding Test: '${InnerTestName}'")
+endmacro(Internal_AddTest AbsoluteFilename)
+
 macro(AddTestClass TestName)
-    list(APPEND ${PROJECT_NAME}TestClassList ${TestName})
-    set(${PROJECT_NAME}TestClassList "${${PROJECT_NAME}TestClassList}")
-    message(STATUS "  Adding Test: '${TestName}'")
+    Internal_AddTest("${${PROJECT_NAME}TestDir}${TestName}.h")
 endmacro(AddTestClass TestName)
 
 ########################################################################################################################
+# AddTestDirectory
+#
 # Usage:
 #   AddTestDirectory("TestDirectory")
 #
 # Results:
 #   This call add test for each header in the passed directory
+#
 
 macro(AddTestDirectory TestDir)
-    include_directories(${TestDir})
     message(STATUS "Adding all tests in: '${TestDir}'")
     file(GLOB TestFileList "${TestDir}*.h")
     foreach(TestFilename ${TestFileList})
-        message(STATUS "  Adding test File: '${TestFilename}'")
-        get_filename_component(TestName "${TestFilename}" NAME_WE)
-        AddTestClass("${TestName}")
+        get_filename_component(TestFile "${TestFilename}" ABSOLUTE)
+        Internal_AddTest("${TestFile}")
     endforeach(TestFilename ${TestFileList})
 endmacro(AddTestDirectory)
 
@@ -1087,6 +1207,9 @@ endfunction(ShowList)
 ########################################################################################################################
 # Basic Option Tools
 
+# This gaurantees that options will wind up in the config file if enabled or not (if disabled they will be remarked
+# in the config).
+#
 # Usage:
 #   # Call after project to insure PROJECT_NAME is set.
 #   AddJagatiCompileOption("BuildDoxygen" "Create HTML documentation with Doxygen." ON)
@@ -1113,57 +1236,25 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 ########################################################################################################################
 ########################################################################################################################
 
-# Package URLs
-
-set(Mezz_StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
-set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
-
-########################################################################################################################
-# Enviroment Variable management for package downloads
-
-set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
-if(EXISTS "${MEZZ_PackageDirectory}")
-    if("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-    else("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-        message(WARNING "Jagati Package Directory (${MEZZ_PackageDirectory}) should end in '/', appending slash.")
-        set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
-    endif("${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-else(EXISTS "${MEZZ_PackageDirectory}")
-    message(WARNING " MEZZ_PackageDirectory is not set, this needs to be a valid folder where Mezzanine Libraries \
-can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' or set MEZZ_PackageDirectory in CMake, \
-if left unset this will create a folder in the output directory.")
-    set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
-        PATH "Folder for storing Jagati Packages.")
-endif(EXISTS "${MEZZ_PackageDirectory}")
-
-# To insure that all the packages are downloaded this can be added as a dependencies to any target.
-
-if("${ParentProject}" STREQUAL "${FileName}")
-    add_custom_target(
-        Download
-        COMMENT "Checking for Jagati Packages to Download"
-    )
-endif("${ParentProject}" STREQUAL "${FileName}")
 
 ########################################################################################################################
 # Any package wanting to use another can include it with this function
-function(IncludeJagatiPackage PackageName)
+macro(IncludeJagatiPackage PassedPackageName)
     include(ExternalProject)
 
-    if("${PackageName}" MATCHES "MEZZ_.*")
-    else("${PackageName}" MATCHES "MEZZ_.*")
-        set(PackageName "Mezz_${PackageName}")
-    endif("${PackageName}" MATCHES "MEZZ_.*")
+    # Set name varaibles so that the name with or without the "Mezz" works.
+    if("${PassedPackageName}" MATCHES "MEZZ_.*")
+        string(SUBSTRING "${PassedPackageName}" 6 -1 RawPackageName)
+        set(PackageName "${PassedPackageName}")
+    else("${PassedPackageName}" MATCHES "MEZZ_.*")
+        set(RawPackageName "${PassedPackageName}")
+        set(PackageName "Mezz_${PassedPackageName}")
+    endif("${PassedPackageName}" MATCHES "MEZZ_.*")
 
-    find_program (MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages." )
-    if(NOT EXISTS "${MEZZ_GitExecutable}")
-        message(FATAL_ERROR "Git was not found or specified wrong currently MEZZ_GitExecutable is: ${MEZZ_GitExecutable}")
-    endif(NOT EXISTS "${MEZZ_GitExecutable}")
-
-    set(GitURL "${${PackageName}_GitURL}")
-    if("${GitURL}" STREQUAL "")
-        message(FATAL_ERROR "Could not find Package named ${PackageName}")
-    endif("${GitURL}" STREQUAL "")
+    # Bail if this is not a valid git package.
+    if("${${PackageName}_GitURL}" STREQUAL "")
+        message(FATAL_ERROR "Could not find URL for Package named ${PackageName}.")
+    endif("${${PackageName}_GitURL}" STREQUAL "")
 
     if("${MEZZ_PackageDirectory}" STREQUAL "")
         #message(FATAL_ERROR "Could not find Package named ${PackageName}")
@@ -1173,29 +1264,29 @@ function(IncludeJagatiPackage PackageName)
     set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
     set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
 
+    # Git Pull or Clone
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
-            COMMAND ${MEZZ_GitExecutable} pull ${GitURL}
+            COMMAND ${MEZZ_GitExecutable} pull ${${PackageName}_GitURL}
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
         file(MAKE_DIRECTORY "${MEZZ_PackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${MEZZ_PackageDirectory}
-            COMMAND ${MEZZ_GitExecutable} clone ${GitURL}
+            COMMAND ${MEZZ_GitExecutable} clone ${${PackageName}_GitURL}
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-
-    add_subdirectory(
-        "${TargetPackageSourceDir}"
-        "${TargetPackageBinaryDir}"
-        EXCLUDE_FROM_ALL
-    )
-
-    #add_dependencies(Download "${PackageName}")
-endfunction(IncludeJagatiPackage PackageName)
-
-
-
-
+    
+    # If there is no binary dir for the pacakge then we have not add e
+    if(DEFINED ${RawPackageName}BinaryDir)
+    else(DEFINED ${RawPackageName}BinaryDir)  
+        add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
+    endif(DEFINED ${RawPackageName}BinaryDir)
+    
+    message(STATUS "Indluepack ${${RawPackageName}IncludeDir}")
+    message(STATUS "IndlueGen ${${RawPackageName}GenHeadersDir}")
+    include_directories(${${RawPackageName}IncludeDir})
+    include_directories(${${RawPackageName}GenHeadersDir})
+endmacro(IncludeJagatiPackage PackageName)
 
