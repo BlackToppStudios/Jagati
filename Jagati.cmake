@@ -434,7 +434,6 @@ macro(IdentifyCompiler)
         set(CompilerDesignNix OFF)
         set(CompilerDesignMS OFF)
 
-        set(CompilerDebug OFF)
         set(CompilerSupportsCoverage OFF)
 
         set(CompilerDetected OFF)
@@ -481,13 +480,6 @@ macro(IdentifyCompiler)
             set(CompilerDesignMS ON)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-
-        if("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
-            message(STATUS "\t\tDetected compiler as creating debug data.")
-            set(CompilerDebug ON)
-        else("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
-            message(STATUS "\t\tDetected compiler as skipping debug data.")
-        endif("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
 
         if(CompilerDesignNix)
             message(STATUS "\t\tPresuming *nix style compiler.")
@@ -592,7 +584,7 @@ macro(SetCommonCompilerFlags)
         # -Wstrict-overflow=2 - When the compiler re-arranges some math that might cause an integer overflow.
         # -Wundef - Fail when undeclared preprocessor macros are used, almost always a bug/platform error.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -std=c++11  -pedantic -Wall -Wextra -Werror -pedantic-errors \
+        -std=c++11 -Wall -Wextra -Werror -pedantic-errors \
         -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
         -Wstrict-overflow=2 -Wundef")
@@ -633,22 +625,27 @@ macro(SetCommonCompilerFlags)
         #                            want to enable this, but not until GCC 6.
         # -DDEBUG_DIRECTOR_EXCEPTION  # Used to make swig emit more
     else(CompilerDesignNix)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
-            /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4221 /wd4711"
-        )
+        if(CompilerIsMsvc)
+            # Used:
+            # /nologo - Skips a few lines of microsoft branding.
+            # /Wall - Enable all warnings.
+            # /WX - treat warnings as errors.
+            # /MT - Statically link against the threading capable standard library.
 
-        # Used:
-        # /nologo - Skips a few lines of microsoft branding.
-        # /Wall - Enable all warnings.
-        # /WX - treat warnings as errors.
-        # /MT - Statically link against the threading capable standard library.
-
-        # Ignoring:
-        # C4710 - Failing to inline things in std::string, well that is STL's fault, not mine.
-        # C4514 - An unused function was optimized out. Why is the optimizer doing its job a warning?!
-        # C4251 - Is safe to ignore per STL
-        #   http://stackoverflow.com/questions/24511376/how-to-dllexport-a-class-derived-from-stdruntime-error
-        # C4820 - When padding is added for performance reasons.
+            # Ignoring:
+            # C4710 - Failing to inline things in std::string, well that is STL's fault, not mine.
+            # C4514 - An unused function was optimized out. Why is the optimizer doing its job a warning?!
+            # C4251 - Is safe to ignore per STL
+            #   http://stackoverflow.com/questions/24511376/how-to-dllexport-a-class-derived-from-stdruntime-error
+            # C4820 - When padding is added for performance reasons.
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
+                /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4221 /wd4711"
+            )
+        else(CompilerIsMsvc)
+            message(FATAL_ERROR 
+                "Your compiler is not GCC compatible and not MSVC... Add this mysterious software's flags here."
+            )
+        endif(CompilerIsMsvc)
     endif(CompilerDesignNix)
 
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -825,7 +822,6 @@ macro(CreateCoverageTarget ExecutableName SourceList)
         set(SingleTargetDir "${${PROJECT_NAME}BinaryDir}CMakeFiles/${ExecutableName}.dir/src/")
         set(CoveredTargetInputFiles "")
         foreach(SingleSourceFile ${SourceList})
-            get_filename_component(SingleSourceFileExtension ${SingleSourceFile} EXT)
             get_filename_component(SingleSourceFileName ${SingleSourceFile} NAME)
             set(SingleTarget "${SingleTargetDir}${SingleSourceFileName}${SingleSourceFileExtension}")
             list(APPEND CoveredTargetInputFiles ${SingleTarget})
@@ -1028,6 +1024,31 @@ macro(EmitConfig)
 endmacro(EmitConfig)
 
 ########################################################################################################################
+# AddJagatiCompileOption
+#
+# This gaurantees that options will wind up in the config file if enabled or not (if disabled they will be remarked
+# in the config).
+#
+# Usage:
+#   # Call after project to insure PROJECT_NAME is set.
+#   AddJagatiCompileOption("BuildDoxygen" "Create HTML documentation with Doxygen." ON)
+#   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
+#
+# Results:
+#   This will create a variable named after thee string in the first parameter. This variable will
+#   be added to the config file for the current project and as a CMake Option in the GUI (or command
+#   prompt).
+
+macro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
+    option(
+        ${VariableName}
+        "${HelpString}"
+        ${DefaultSetting}
+    )
+    AddJagatiConfig("${VariableName}" "" ${${VariableName}})
+endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
+
+########################################################################################################################
 ########################################################################################################################
 # Test Main creation
 ########################################################################################################################
@@ -1203,31 +1224,47 @@ function(ShowList Header Tabbing ToPrint)
 endfunction(ShowList)
 
 ########################################################################################################################
-# AddJagatiCompileOption
+# AddIDEVisibility
 #
-# Basic Option Tools
-#
-# This gaurantees that options will wind up in the config file if enabled or not (if disabled they will be remarked
-# in the config).
+# Make a default list of source files and every file in the passed list visible by adding to a build target that the IDE
+# will see.
 #
 # Usage:
-#   # Call after project to insure PROJECT_NAME is set.
-#   AddJagatiCompileOption("BuildDoxygen" "Create HTML documentation with Doxygen." ON)
-#   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
+#   # Call after creating all the default files and populating the default source file lists 
+#   # ${${PROJECT_NAME}HeaderFiles}, ${${PROJECT_NAME}SourceFiles}, ${${PROJECT_NAME}SwigFiles}, 
+#   # ${${PROJECT_NAME}ConfigFilename}, ${${PROJECT_NAME}DoxFiles}README.md, COPYING.md, .travis.yml, appveyor.yml, 
+#   # and codecov.yml.
+#   AddIDEVisibility("file1.txt;file2.md;file3.ext")
+#   # or
+#   set(FileList "")
+#   list(APPEND FileList "file1.txt")
+#   list(APPEND FileList "file2.md")
+#   list(APPEND FileList "file3.ext")
+#   AddIDEVisibility("${Files}")
 #
 # Results:
-#   This will create a variable named after thee string in the first parameter. This variable will
-#   be added to the config file for the current project and as a CMake Option in the GUI (or command
-#   prompt).
+#   A target named ${PROJECT_NAME}_IDE_Visibility is created with every source file and every passed file as a 
+#   dependency.
+#
 
-macro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
-    option(
-        ${VariableName}
-        "${HelpString}"
-        ${DefaultSetting}
-    )
-    AddJagatiConfig("${VariableName}" "" ${${VariableName}})
-endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
+macro(AddIDEVisibility Files)
+add_custom_target(
+    ${PROJECT_NAME}_IDE_Visibility
+    DEPENDS ${PROJECT_NAME}_Tester
+    SOURCES ${${PROJECT_NAME}HeaderFiles}
+            ${${PROJECT_NAME}SourceFiles}
+            ${${PROJECT_NAME}SwigFiles}
+            ${${PROJECT_NAME}ConfigFilename}
+            ${${PROJECT_NAME}DoxFiles}
+            ${StaticFoundationTestSourceFiles}
+            README.md
+            COPYING.md
+            .travis.yml
+            appveyor.yml
+            codecov.yml
+            "${Files}"
+)
+endmacro(AddIDEVisibility Files)
 
 ########################################################################################################################
 ########################################################################################################################
