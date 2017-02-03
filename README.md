@@ -19,10 +19,10 @@ To keep the Jagati as simple as possible it is a single CMakeLists.txt file that
 3. Add something like the following to your CMakeLists.txt to download, verify and run it:
 
 ```CMake
-set(JagatiChecksum "96252daabd7b82f6e8b1a667246ba252a462e604b055ddf99e5157\
-7f7fb77a0ca5a8c7da7ff7bd209efde2b86919cb2130ed657235d00208a53f0646e0e4f5ba")
+set(JagatiChecksum "e5282c8924cff5a620b50f8ca5fb84023d27a24f9302dbfaac055b\
+022a3a3883f4f541e071e2618edfd2f6b148b9e12823a98ca5b736e57ecf983bf6ece96de2")
 file(DOWNLOAD
-    "https://raw.githubusercontent.com/BlackToppStudios/Jagati/master/Jagati.cmake"
+    "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.13.1/Jagati.cmake"
     "${${PROJECT_NAME}_BINARY_DIR}/Jagati.cmake"
     EXPECTED_HASH SHA512=${JagatiChecksum}
 )

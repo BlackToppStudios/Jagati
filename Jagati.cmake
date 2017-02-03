@@ -148,6 +148,12 @@ set(MEZZ_Copyright
 )
 
 ########################################################################################################################
+# Require external packages.
+
+include(CTest)
+include(ExternalProject)
+
+########################################################################################################################
 ########################################################################################################################
 # From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that 
 # all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
@@ -729,8 +735,10 @@ endmacro(StandardJagatiSetup)
 function(Internal_ChooseLibraryType TrueForStatic)
     if(TrueForStatic)
         set(LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
+        set(LibraryInstallationComponent "development" CACHE INTERNAL "" FORCE)
     else(TrueForStatic)
         set(LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
+        set(LibraryInstallationComponent "runtime" CACHE INTERNAL "" FORCE)
     endif(TrueForStatic)
 endfunction(Internal_ChooseLibraryType TrueForStatic)
 
@@ -880,7 +888,8 @@ endmacro(AddManualJagatiLibrary FileName)
 # by loaded packages.
 #
 # Usage:
-#   # Be certain to call project before calling this and StandardJagatiSetup (or equivalent alternatives) 
+#   # Be certain to call project before calling this and StandardJagatiSetup (or equivalent alternatives), also call
+#   # ChooseLibraryType before calling this.
 #   AddJagatiLibrary()
 #
 # Result:
@@ -901,6 +910,12 @@ macro(AddJagatiLibrary)
     )
     target_link_libraries("${${PROJECT_NAME}LibTarget}" ${JagatiLinkArray})
     AddManualJagatiLibrary("${${PROJECT_NAME}LibTarget}")
+    install(
+        TARGETS "${${PROJECT_NAME}LibTarget}"
+        COMPONENT ${LibraryInstallationComponent}
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
 endmacro(AddJagatiLibrary)
 
 ########################################################################################################################
@@ -1135,6 +1150,7 @@ macro(AddTestTarget)
         "${${PROJECT_NAME}TesterFilename}"
     )
     target_link_libraries(${${PROJECT_NAME}TestTarget} ${JagatiLinkArray})
+    add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
 
 ########################################################################################################################
@@ -1320,8 +1336,6 @@ endfunction(GitUpdatePackage PackageName)
 #   code, add required linker libraries and required header search folders.
 #
 macro(IncludeJagatiPackage PassedPackageName)
-    include(ExternalProject)
-
     # Set name variables so that the name with or without the "Mezz" works.
     if("${PassedPackageName}" MATCHES "MEZZ_.*")
         string(SUBSTRING "${PassedPackageName}" 6 -1 RawPackageName)
