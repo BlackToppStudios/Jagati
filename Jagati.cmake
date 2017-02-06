@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2016 BlackTopp Studios Inc.
+# © Copyright 2010 - 2017 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -902,6 +902,7 @@ endmacro(AddManualJagatiLibrary FileName)
 
 macro(AddJagatiLibrary)
     message(STATUS "Adding Automatic Library - ${${PROJECT_NAME}LibTarget}")
+    add_definitions(-DMEZZ_EXPORT_LIB)
     add_library(
         "${${PROJECT_NAME}LibTarget}"
         ${MEZZ_LibraryBuildType}
