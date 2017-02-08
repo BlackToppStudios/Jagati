@@ -78,29 +78,10 @@ else("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ########################################################################################################################
-# Package Information Management
-
 # Package URLs
 set(Mezz_StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
 set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
 set(Mezz_Foundation_GitURL "https://github.com/BlackToppStudios/Mezz_Foundation.git")
-
-# Enviroment Variable management
-set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
-set(MEZZ_PackageDirectory_MissingWarning " MEZZ_PackageDirectory is not set, this needs to be a valid folder where \
-Mezzanine Libraries can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' or set \
-MEZZ_PackageDirectory in CMake, if left unset this will create a folder in the output directory."
-)
-if(EXISTS "${MEZZ_PackageDirectory}")
-    if(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-        message(WARNING "Jagati Package Directory (${MEZZ_PackageDirectory}) should end in '/', appending slash.")
-        set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
-    endif(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-else(EXISTS "${MEZZ_PackageDirectory}")
-    message(WARNING "${MEZZ_PackageDirectory_MissingWarning}")
-    set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
-        PATH "Folder for storing Jagati Packages.")
-endif(EXISTS "${MEZZ_PackageDirectory}")
 
 ########################################################################################################################
 # Other Variables
@@ -240,6 +221,23 @@ macro(CreateLocationVars)
     set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}RootDir}test/" CACHE INTERNAL "" FORCE)
 
     #######################################
+    # Package Variables
+    set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
+    set(MEZZ_PackageDirectory_MissingWarning "MEZZ_PackageDirectory is not set or could not be found, this needs to be a \
+    valid folder where Mezzanine Libraries can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' \
+    or set MEZZ_PackageDirectory in CMake, if left unset this will create a folder in the output directory."
+    )
+    if(NOT EXISTS "${MEZZ_PackageDirectory}")
+        message(WARNING "${MEZZ_PackageDirectory_MissingWarning}")
+        set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+            PATH "Folder for storing Jagati Packages.")
+    endif(NOT EXISTS "${MEZZ_PackageDirectory}")
+    if(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+        set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
+    endif(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+    set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}" CACHE INTERNAL "" FORCE)
+
+    #######################################
     message(STATUS "\tVariables for '${PROJECT_NAME}'")
 
     message(STATUS "\t\tDerived Output folders")
@@ -255,6 +253,8 @@ macro(CreateLocationVars)
     message(STATUS "\t\t\t'${PROJECT_NAME}SourceDir' - ${${PROJECT_NAME}SourceDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}SwigDir' - ${${PROJECT_NAME}SwigDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
+
+    message(STATUS "\t\tPackage folder - ${MEZZ_PackageDirectory}")
 endmacro(CreateLocationVars)
 
 ########################################################################################################################
@@ -1351,15 +1351,9 @@ macro(IncludeJagatiPackage PassedPackageName)
         message(FATAL_ERROR "Could not find URL for Package named ${PackageName}.")
     endif("${${PackageName}_GitURL}" STREQUAL "")
 
-    if("${MEZZ_PackageDirectory}" STREQUAL "")
-        #message(FATAL_ERROR "Could not find Package named ${PackageName}")
-        set(MEZZ_PackageDirectory "${${ParentProject}BinaryDir}JagatiPackages/")
-    endif("${MEZZ_PackageDirectory}" STREQUAL "")
-
     # Setup directory for coming work.
     set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
     set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
-
     GitUpdatePackage(${PackageName})
     
     # If there is no binary dir for the package then we have not added it, so add it now.
