@@ -212,7 +212,7 @@ macro(CreateLocationVars)
     #######################################
     # Derived Input Folders
     set(${PROJECT_NAME}RootDir "${${PROJECT_NAME}_SOURCE_DIR}/" CACHE INTERNAL "" FORCE)
-    
+
     set(${PROJECT_NAME}DoxDir "${${PROJECT_NAME}RootDir}dox/" CACHE INTERNAL "" FORCE)
     set(${PROJECT_NAME}IncludeDir "${${PROJECT_NAME}RootDir}include/" CACHE INTERNAL "" FORCE)
     set(${PROJECT_NAME}LibDir "${${PROJECT_NAME}RootDir}lib/" CACHE INTERNAL "" FORCE)
@@ -1100,13 +1100,13 @@ macro(EmitTestCode)
     foreach(TestName ${${PROJECT_NAME}TestClassList})
         string(TOLOWER "${TestName}" TestLowerName)
         set(TestsInit "${TestsInit}\n\
-        ${TestName}Tests ${TestName}Instance;\n\
-        TestInstances[\"${TestLowerName}\"] = &${TestName}Instance;\n")
+        ${TestName} ${TestName}Instance;\n\
+        TestInstances[${TestName}Instance.Name()] = &${TestName}Instance;\n")
     endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
     set(TestsMainFooter 
-        "    return Mezzanine::Testing::MainImplementation(argc, argv, TestInstances); \n}\n\n"
+        "    return Mezzanine::Int32(Mezzanine::Testing::MainImplementation(argc, argv, TestInstances)); \n}\n\n"
     )
 
     # Connect everything
