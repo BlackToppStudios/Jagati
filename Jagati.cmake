@@ -1101,7 +1101,7 @@ macro(EmitTestCode)
         string(TOLOWER "${TestName}" TestLowerName)
         set(TestsInit "${TestsInit}\n\
         ${TestName} ${TestName}Instance;\n\
-        TestInstances[${TestName}Instance.Name()] = &${TestName}Instance;\n")
+        TestInstances[AllLower(${TestName}Instance.Name())] = &${TestName}Instance;\n")
     endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
