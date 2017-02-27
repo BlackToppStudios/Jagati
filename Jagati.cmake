@@ -227,15 +227,16 @@ macro(CreateLocationVars)
     valid folder where Mezzanine Libraries can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' \
     or set MEZZ_PackageDirectory in CMake, if left unset this will create a folder in the output directory."
     )
-    if(NOT EXISTS "${MEZZ_PackageDirectory}")
+    if(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
+        set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages." FORCE)
+    else(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
         message(WARNING "${MEZZ_PackageDirectory_MissingWarning}")
-        set(MEZZ_PackageDirectory "{${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
-            PATH "Folder for storing Jagati Packages.")
-    endif(NOT EXISTS "${MEZZ_PackageDirectory}")
+        set(MEZZ_PackageDirectory "${${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
+            PATH "Folder for storing Jagati Packages." FORCE)
+    endif(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
     if(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
         set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
     endif(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
-    set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}" CACHE INTERNAL "" FORCE)
 
     #######################################
     message(STATUS "\tVariables for '${PROJECT_NAME}'")
@@ -254,7 +255,8 @@ macro(CreateLocationVars)
     message(STATUS "\t\t\t'${PROJECT_NAME}SwigDir' - ${${PROJECT_NAME}SwigDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
 
-    message(STATUS "\t\tPackage folder - ${MEZZ_PackageDirectory}")
+    message(STATUS "\t\tMEZZ_PackageDirectory - ${MEZZ_PackageDirectory}")
+    message(STATUS "\t\tENV{MEZZ_PACKAGE_DIR} - ${MEZZ_PackageDirectory}")
 endmacro(CreateLocationVars)
 
 ########################################################################################################################
@@ -1365,4 +1367,5 @@ macro(IncludeJagatiPackage PassedPackageName)
     include_directories(${${RawPackageName}IncludeDir})
     include_directories(${${RawPackageName}GenHeadersDir})
 endmacro(IncludeJagatiPackage PackageName)
+
 
