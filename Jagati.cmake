@@ -560,7 +560,7 @@ endmacro(IdentifyDebug)
 #           Treat warnings as errors are set.
 #           Turn off compiler logos.
 #           Enable Position independent code or otherwise fix linker issues.
-#           Turn on C++11.
+#           Turn on C++14.
 #
 #       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries
 #           
@@ -569,7 +569,7 @@ macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
 
         # These warnings work will work on all nix style compilers. Here are the most important flags:
-        # -std=c++11 - Set the C++ standard to C++11, might update all the Jagati Packages to 14 soon.
+        # -std=c++14 - Set the C++ standard to C++14, might update all the Jagati Packages to 14 soon.
         # -fno-strict-aliasing - Required for linking some of the Mezzanine dependencies correctly.
         # -Wall - Enables "all" compiler warnings, actually abour 2/3rds, including common stuff like bad inits.
         # -Wextra - Enable the rest of the warnings except some sketchy ones.
@@ -592,7 +592,7 @@ macro(SetCommonCompilerFlags)
         # -Wstrict-overflow=2 - When the compiler re-arranges some math that might cause an integer overflow.
         # -Wundef - Fail when undeclared preprocessor macros are used, almost always a bug/platform error.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-        -std=c++11 -Wall -Wextra -Werror -pedantic-errors \
+        -std=c++14 -Wall -Wextra -Werror -pedantic-errors \
         -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
         -Wstrict-overflow=2 -Wundef")
