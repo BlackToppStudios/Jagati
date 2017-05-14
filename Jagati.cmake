@@ -646,11 +646,16 @@ macro(SetCommonCompilerFlags)
             # C4251 - Is safe to ignore per STL
             #   http://stackoverflow.com/questions/24511376/how-to-dllexport-a-class-derived-from-stdruntime-error
             # C4820 - When padding is added for performance reasons.
-            # C4626, C4625, C5026, C5027 - All BS about implicitly removed default functions, with no workarounds,
+            # C4987 - A garbage error about "throw(...)" not being standard.
+            # C4626, C4625, C4623, C5026, C5027 - BS about implicitly removed default functions, with no workarounds,
             #   because all of these all core parts of C++. It is the moral equivalent of warning on "a=b;" because
             #   could be overwritten and errors will arise if the previous value of "a" is needed.
+            # C4365 - This is actually a useful warning about conversions changing signedness, but 50+ are thrown from
+            #   the std lib for builds as simple as the just Mezz_StaticFoundation.
+            # C4774  - BS warning about some sprintf derivative we never use.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
-                /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711"
+                /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
+                /wd4987 /wd4365 /wd4774 /wd4623"
             )
         else(CompilerIsMsvc)
             message(FATAL_ERROR 
@@ -1370,4 +1375,3 @@ macro(IncludeJagatiPackage PassedPackageName)
     include_directories(${${RawPackageName}IncludeDir})
     include_directories(${${RawPackageName}GenHeadersDir})
 endmacro(IncludeJagatiPackage PackageName)
-
