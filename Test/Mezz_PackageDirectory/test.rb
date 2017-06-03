@@ -1,6 +1,6 @@
 # This tests The the Mezz_PackageDirectory feature works correctly
 
-class TestPackageDirectory < Test::Unit::TestCase
+class TestPackageDirectory < MiniTest::Unit::TestCase
 
     def initialize(arg)
         @source_dir = 'Mezz_PackageDirectory'
@@ -11,7 +11,7 @@ class TestPackageDirectory < Test::Unit::TestCase
     def test_cmake
         cmake = CMake.new(@source_dir)
 
-        assert_not_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path.')
+        refute_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path.')
         assert_match(/build$/, cmake.build_dir.to_s, 'Cmake class should pick a sane build directory.')
 
         cmake.add_argument 'name', 'value'

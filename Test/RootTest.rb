@@ -8,7 +8,7 @@ require_relative 'CMakeCache'
 require_relative 'CMake'
 
 # Std library stuff
-require 'test/unit'
+require 'minitest/autorun'
 
 # Tests
 require_relative 'Mezz_PackageDirectory/test.rb'
