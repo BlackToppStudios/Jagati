@@ -221,20 +221,27 @@ macro(CreateLocationVars)
     set(${PROJECT_NAME}TestDir "${${PROJECT_NAME}RootDir}test/" CACHE INTERNAL "" FORCE)
 
     #######################################
-    # Package Variables
+    # Package Directory Variables
     set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages.")
-    set(MEZZ_PackageDirectory_MissingWarning "MEZZ_PackageDirectory is not set or could not be found, this needs to be a \
-    valid folder where Mezzanine Libraries can be downloaded to. You can set the Environment variable 'MEZZ_PACKAGE_DIR' \
-    or set MEZZ_PackageDirectory in CMake, if left unset this will create a folder in the output directory."
+    set(PackageDirectory_Description "Folder for storing Jagati Packages.")
+    set(PackageDirectory_Default "${${PROJECT_NAME}BinaryDir}JagatiPackages/")
+    set(PackageDirectory_MissingWarning "MEZZ_PackageDirectory is not set or could not be found, this needs to be \
+    a valid folder where Mezzanine Libraries can be downloaded to. You can set the Environment variable \
+    'MEZZ_PACKAGE_DIR' or set MEZZ_PackageDirectory in CMake, if left unset this will create a folder in the output \
+    directory."
     )
     if(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
-        set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "Folder for storing Jagati Packages." FORCE)
+        set(MEZZ_PackageDirectory "$ENV{MEZZ_PACKAGE_DIR}" CACHE PATH "${PackageDirectory_Description}" FORCE)
     else(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
-        message(WARNING "${MEZZ_PackageDirectory_MissingWarning}")
-        set(MEZZ_PackageDirectory "${${PROJECT_NAME}BinaryDir}JagatiPackages/" CACHE
-            PATH "Folder for storing Jagati Packages." FORCE)
+        if(EXISTS "${MEZZ_PackageDirectory}")
+            set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}" CACHE PATH "${PackageDirectory_Description}" FORCE)
+        else(EXISTS "${MEZZ_PackageDirectory}")
+            message(WARNING "${PackageDirectory_MissingWarning}")
+            set(MEZZ_PackageDirectory "${PackageDirectory_Default}" CACHE PATH "${PackageDirectory_Description}" FORCE)
+        endif(EXISTS "${MEZZ_PackageDirectory}")
     endif(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
-    if(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
+
+    if(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$") # Append Slash if needed
         set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}/")
     endif(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
 
