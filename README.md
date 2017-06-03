@@ -56,18 +56,18 @@ set MEZZ_PACKAGE_DIR=C:\users\sqeaky\code\
 
 ## Testing
 
-This build tool is sophisticated to need unit tests, so it has them. At the time of this writing the tests are limited,
-but more will be added as bugs are found or features added. Running them is completely optional for most users, but if
-you want a basic sanity or just to see what it does, you can easily run them. 
+This build tool is sophisticated enough to need unit tests, so it has them. At the time of this writing the tests are
+limited, but more will be added as bugs are found or features added. Running them is completely optional for most users,
+but if you want a basic sanity check or just to see what they do, you can easily run them. 
 
-To run the tests (which is optional for most users) you will need a Ruby interpretter. This where written using Ruby
+To run the tests (which is optional for most users) you will need a Ruby interpretter. These were written using Ruby
 Ruby 2.3.3 and tested on JRuby 1.7.26 (which implements Ruby 1.9.3), and no special Ruby features newer than 1.9.3 were
-used so just about any supported Ruby interpretter ought to work. Make sure that Ruby or Jruby is installed and in the
+used, so just about any supported Ruby interpretter ought to work. Make sure that Ruby or JRuby is installed and in the
 system path, then cd into the "Test" directory and run "RootTest.rb"
 
 ```Bash
 ~/Code/Jagati/$ cd Test
-~/Code/Jagati/Test$ jruby RootTest.rb 
+~/Code/Jagati/Test$ jruby RootTest.rb # Optional
 Run options: 
 
 # Running tests:
@@ -78,7 +78,7 @@ Finished tests in 1.047000s, 3.8204 tests/s, 18.1471 assertions/s.
 
 4 tests, 19 assertions, 0 failures, 0 errors, 0 skips
 
-~/Code/Jagati/Test$ ruby RootTest.rb 
+~/Code/Jagati/Test$ ruby RootTest.rb # Optional
 Loaded suite RootTest
 Started
 ....
