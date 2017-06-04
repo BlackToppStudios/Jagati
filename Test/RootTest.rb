@@ -7,12 +7,12 @@
 require_relative 'CMakeCache'
 require_relative 'CMake'
 
-# Std library stuff
+# Pick some test Suite in the stand library
 require 'minitest/autorun'
 
-if MiniTest::Test.is_a?(Class) then
+begin
     TestCase = MiniTest::Test
-else
+rescue
     TestCase = MiniTest::Unit::TestCase
 end
 
