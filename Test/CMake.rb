@@ -30,7 +30,7 @@ class CMake
         if type.nil? then
             @args[name]=value
         else
-            @args[name]="#{value}:#{type}"
+            @args["#{name}:#{type}"]=value
         end
     end
 

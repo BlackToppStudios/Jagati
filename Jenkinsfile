@@ -52,6 +52,7 @@ try {
         MacOSSierra: {
             node('MacOSSierra') {
                 sh """ cd Test                                                                                        &&
+                       export PATH=$PATH:/usr/local/bin/                                                              &&
                        ruby RootTest.rb
                 """
             }
