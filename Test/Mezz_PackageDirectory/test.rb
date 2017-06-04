@@ -1,6 +1,6 @@
 # This tests The the Mezz_PackageDirectory feature works correctly
 
-class TestPackageDirectory < MiniTest::Test
+class TestPackageDirectory < TestCase
 
     def initialize(arg)
         @source_dir = 'Mezz_PackageDirectory'

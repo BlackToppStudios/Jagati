@@ -10,5 +10,11 @@ require_relative 'CMake'
 # Std library stuff
 require 'minitest/autorun'
 
+if MiniTest::Test.is_a?(Class) then
+    TestCase = MiniTest::Test
+else
+    TestCase = MiniTest::Unit::TestCase
+end
+
 # Tests
 require_relative 'Mezz_PackageDirectory/test.rb'
