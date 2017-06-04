@@ -47,7 +47,7 @@ class CMakeCache
             if found = line.match(/^([^#]+):([^#]+)=([^#]+)$/)
                 name, type, value = found.captures
             end
-            @value_cache[name] = value.tr("\r", '')
+            @value_cache[name] = value.to_s.tr("\r", '')
             @type_cache[name] = type
         end
     end
