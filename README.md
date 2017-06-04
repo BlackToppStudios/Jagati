@@ -14,6 +14,15 @@ about a dozen variables for each library
 Packages can change, they can be updated. Any package manager, packaging tool or any other system for handling
 different pieces of software needs a way to keep up to date on these changes.
 
+The current Jenkins (Ubuntu Linux, Fedora, Rasberry Pi, Mac) build status is:
+[![Build Status](http://blacktopp.ddns.net:8080/job/Jagati/badge/icon)](http://blacktopp.ddns.net:8080/job/Jagati/)
+
+The current Travis CI (Apple and Old Ubuntu) build status is:
+[![Build Status](https://travis-ci.org/BlackToppStudios/Jagati.svg?branch=master)](https://travis-ci.org/BlackToppStudios/Jagati)
+
+The current Appveyor (Windows) build status is:
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/BlackToppStudios/Jagati?branch=master&svg=true)](https://ci.appveyor.com/project/Sqeaky/Jagati)
+
 ## Usage 
 
 To keep the Jagati as simple as possible it is a single CMakeLists.txt file that is intended to be downloaded
