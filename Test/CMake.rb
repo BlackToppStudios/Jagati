@@ -26,8 +26,12 @@ class CMake
         cache.remove_file
     end
 
-    def add_argument(name,value)
-        @args[name]=value
+    def add_argument(name, value, type=nil)
+        if type.nil? then
+            @args[name]=value
+        else
+            @args["#{name}:#{type}"]=value
+        end
     end
 
     def clear_arguments

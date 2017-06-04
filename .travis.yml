@@ -1,0 +1,22 @@
+sudo: required
+dist: trusty
+language: cpp
+osx_image: xcode8.3
+
+os:
+  - linux 
+  - osx
+
+compiler:
+  - gcc
+
+script:
+  - cd Test
+  - ruby RootTest.rb
+
+notifications:
+  email:
+    recipients:
+      - contact@blacktoppstudios.com
+    on_success: change
+    on_failure: always

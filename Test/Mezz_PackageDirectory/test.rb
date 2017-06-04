@@ -1,6 +1,6 @@
 # This tests The the Mezz_PackageDirectory feature works correctly
 
-class TestPackageDirectory < Test::Unit::TestCase
+class TestPackageDirectory < MiniTest::Unit::TestCase
 
     def initialize(arg)
         @source_dir = 'Mezz_PackageDirectory'
@@ -11,10 +11,11 @@ class TestPackageDirectory < Test::Unit::TestCase
     def test_cmake
         cmake = CMake.new(@source_dir)
 
-        assert_not_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path.')
+        refute_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path.')
         assert_match(/build$/, cmake.build_dir.to_s, 'Cmake class should pick a sane build directory.')
 
         cmake.add_argument 'name', 'value'
+        cmake.add_argument 'typedname', 'typedValue', 'STRING'
         cmake.add_argument 'CMAKE_BUILD_TYPE', 'debug'
         assert_match(/-Dname=value/, cmake.invocation_string, 'Cmake args are in correct format.')
 
@@ -26,8 +27,9 @@ class TestPackageDirectory < Test::Unit::TestCase
         cache.load_cache # This reads the file
         assert_equal(true, cache.file_valid?, 'When cmake runs it should create a cache file.')
         assert_equal('value', cache.value('name'), 'Custom Values can be read from the CMakeCache.')
+        assert_equal('typedValue', cache.value('typedname'), 'Custom Typed Values can be read from the CMakeCache.')
+        assert_equal('STRING', cache.type('typedname'), 'Types can be read from the CMakeCache.')
         assert_equal('debug', cache.value('CMAKE_BUILD_TYPE'), 'Normal Values can be read from the CMakeCache.')
-        assert_equal('STRING', cache.type('CMAKE_BUILD_TYPE'), 'Types can be read from the CMakeCache.')
     end
     
     def test_default_location

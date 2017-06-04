@@ -44,10 +44,10 @@ class CMakeCache
         @value_cache = {}
         @type_cache = {}
         lines.each do |line|
-            if found = line.match(/^([^#]+):([^#]+)=([^#]+)$/)
+            if found = line.match(/^([^#:]+):([^#]+)=([^#]+)$/)
                 name, type, value = found.captures
             end
-            @value_cache[name] = value
+            @value_cache[name] = value.to_s.tr("\r", '')
             @type_cache[name] = type
         end
     end
