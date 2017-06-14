@@ -37,9 +37,9 @@
 #   Joseph Toppi - toppij@gmail.com
 #   John Blackwood - makoenergy02@gmail.com
 
-# This will be the basic package manager for the Mezzanine, called the Jagati. This will track and download packages 
-# from git repositories. This will handle centrally locating Mezzanine packages and provide tools for finding and 
-# linking against them appropriately. This will not be included directly in git repos, but rather a small download 
+# This will be the basic package manager for the Mezzanine, called the Jagati. This will track and download packages
+# from git repositories. This will handle centrally locating Mezzanine packages and provide tools for finding and
+# linking against them appropriately. This will not be included directly in git repos, but rather a small download
 # snippet with ensure this stays up to date.
 
 # # Do something like this to include the Jagati. Try to use the newest version and
@@ -54,7 +54,7 @@
 
 ########################################################################################################################
 ########################################################################################################################
-# From Here to the next thick banner exist a series of simple checks and variables to act as baseline assumptions for 
+# From Here to the next thick banner exist a series of simple checks and variables to act as baseline assumptions for
 # the rest of the Jagati, so it can perform complex things confidently.
 ########################################################################################################################
 ########################################################################################################################
@@ -136,7 +136,7 @@ include(ExternalProject)
 
 ########################################################################################################################
 ########################################################################################################################
-# From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that 
+# From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that
 # all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
 # set and easily inspectable, from just the output of cmake and a sample CMakeLists.txt.
 ########################################################################################################################
@@ -156,10 +156,12 @@ include(ExternalProject)
 #   ClaimParentProject()
 #
 # Result:
-#   The following variables will all be set, made available and printed and other Jagati projects
-#   will know to pollute your namespace:
-#       ParentProject
+#   The ParentProject variable will all be set, made available, printed and other Jagati projects
+#   will know not to pollute your namespace:
 #
+#   This also initializes a the following which are use by sother functions and macros in the
+#   jagati and need to be initialized at the root level.
+#       JagatiLinkArray
 
 macro(ClaimParentProject)
     if(ParentProject)
@@ -167,16 +169,15 @@ macro(ClaimParentProject)
         message(STATUS "Project '${PROJECT_NAME}' acknowledges '${ParentProject}' as the Parent Project.")
     else(ParentProject)
         message(STATUS "Claiming '${PROJECT_NAME}' as the Parent Project.")
-        set(ParentProject "${PROJECT_NAME}")
-        set(JagatiConfig "")
-        set(JagatiLinkArray ""  CACHE INTERNAL "" FORCE)
+        set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
+        set(JagatiLinkArray ""  CACHE INTERNAL "Am empty list of names to link against")
     endif(ParentProject)
 endmacro(ClaimParentProject)
 
 ########################################################################################################################
 # CreateLocationVars
 #
-# This will create a number of variables in the Scope of the calling script that correspond to the name of the Project 
+# This will create a number of variables in the Scope of the calling script that correspond to the name of the Project
 # so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
@@ -289,7 +290,7 @@ endmacro(CreateLocations)
 ########################################################################################################################
 # DecideOutputNames
 #
-# This will create a few variables in the Scope of the calling script that correspond to the name of the Project 
+# This will create a few variables in the Scope of the calling script that correspond to the name of the Project
 # so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
@@ -315,7 +316,7 @@ endmacro(DecideOutputNames)
 
 ########################################################################################################################
 # IdentifyOS
-# Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin tools are not as well 
+# Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin tools are not as well
 # identified as the could be. Hopefully this overcomes these minor shortfalls and provide a single source of truth for
 # build time platform determination in the Jagati/Mezzanine.
 #
@@ -399,8 +400,8 @@ endmacro(IdentifyOS)
 ########################################################################################################################
 # IdentifyCompiler
 #
-# Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes of the Mezzanine 
-# there are really two categories of compiler: visual studio and good compilers. This can roughly identify those 
+# Again, CMake knows how to detect the compiler. It does this in hyper precise detail. For purposes of the Mezzanine
+# there are really two categories of compiler: visual studio and good compilers. This can roughly identify those
 # categories and provide a single source of truth for each of the 5 supported compilers.
 #
 # If this fails to detect the compiler this reports a message with status of FATAL_ERROR which may terminate CMake.
@@ -457,7 +458,7 @@ macro(IdentifyCompiler)
             message(STATUS "\t\tDetected compiler as 'GCC'.")
             set(CompilerIsGCC ON)
             set(CompilerDesignNix ON)
-            set(CompilerDetected ON)        
+            set(CompilerDetected ON)
             set(CompilerSupportsCoverage ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
@@ -570,7 +571,7 @@ endmacro(IdentifyDebug)
 #           Turn on C++14.
 #
 #       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries
-#           
+#
 
 macro(SetCommonCompilerFlags)
     if(CompilerDesignNix)
@@ -665,7 +666,7 @@ macro(SetCommonCompilerFlags)
                 /wd4987 /wd4365 /wd4774 /wd4623"
             )
         else(CompilerIsMsvc)
-            message(FATAL_ERROR 
+            message(FATAL_ERROR
                 "Your compiler is not GCC compatible and not MSVC... Add this mysterious software's flags here."
             )
         endif(CompilerIsMsvc)
@@ -682,7 +683,7 @@ endmacro(SetCommonCompilerFlags)
 # Find git and put its name in a variable.
 #
 # Usage:
-#   # Call this anytime or just trust 
+#   # Call this anytime or just trust
 #   FindGitExecutable()
 #
 # Result:
@@ -693,7 +694,7 @@ macro(FindGitExecutable)
     if(NOT DEFINED MEZZ_GitExecutable)
         find_program (MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages.")
         if(NOT EXISTS "${MEZZ_GitExecutable}")
-            message(FATAL_ERROR 
+            message(FATAL_ERROR
                     "Git was not found or specified wrong currently MEZZ_GitExecutable is: ${MEZZ_GitExecutable}")
         endif(NOT EXISTS "${MEZZ_GitExecutable}")
         if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -704,8 +705,8 @@ endmacro(FindGitExecutable)
 
 ########################################################################################################################
 # StandardJagatiSetup
-# 
-# This does what several of the above macros (ClaimParentProject, CreateLocationVars, CreateLocations, IdentifyOS, 
+#
+# This does what several of the above macros (ClaimParentProject, CreateLocationVars, CreateLocations, IdentifyOS,
 # etc...) do, but this does it all together.
 #
 # Usage:
@@ -713,7 +714,7 @@ endmacro(FindGitExecutable)
 #   StandardJagatiSetup()
 #
 # Result:
-#   The Parent scope will attempt to be claimed, many variables for compiler, OS, Debug, Git and locations will be set, 
+#   The Parent scope will attempt to be claimed, many variables for compiler, OS, Debug, Git and locations will be set,
 #   see above. Compiler Flags will be set.
 #
 
@@ -860,8 +861,8 @@ macro(CreateCoverageTarget ExecutableName SourceList)
         endforeach(SingleSourceFile ${SourceList})
         message(STATUS "Adding code coverage target for ${PROJECT_NAME} - ${ExecutableName}Coverage")
         add_custom_target(${ExecutableName}Coverage DEPENDS ${CoveredTargetInputFiles})
-    else(${CompilerSupportsCoverage})  
-        message(STATUS "Not producing code coverage target despite being requested for ${PROJECT_NAME}")      
+    else(${CompilerSupportsCoverage})
+        message(STATUS "Not producing code coverage target despite being requested for ${PROJECT_NAME}")
     endif(${CompilerSupportsCoverage})
 endmacro(CreateCoverageTarget SourceList)
 
@@ -882,10 +883,10 @@ endmacro(CreateCoverageTarget SourceList)
 #   AddManualJagatiLibrary("LinkTarget")
 #
 # Result:
-#   The passed file will be added to a list of libaries. This list can be Accessed through the variable: 
+#   The passed file will be added to a list of libaries. This list can be Accessed through the variable:
 #       JagatiLinkArray
 #
-#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per 
+#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
 #
 
@@ -910,10 +911,10 @@ endmacro(AddManualJagatiLibrary FileName)
 #   AddJagatiLibrary()
 #
 # Result:
-#   The passed file will be added to a list of libaries. This list can be Accessed through the variable: 
+#   The passed file will be added to a list of libaries. This list can be Accessed through the variable:
 #       JagatiLinkArray
 #
-#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per 
+#   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
 #
 
@@ -942,7 +943,7 @@ endmacro(AddJagatiLibrary)
 # Add input files to list of all files doxygen will scan.
 #
 # Usage:
-#   # Call any time after the parent scope is claimed and when the project is built if doxygen is installed and the 
+#   # Call any time after the parent scope is claimed and when the project is built if doxygen is installed and the
 #   # option is chosen then html docs will be generated from all past files.
 #   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
 #   AddJagatiDoxInput("${DoxFiles}")
@@ -959,17 +960,17 @@ endmacro(AddJagatiDoxInput FileName)
 #
 # Some projects have many files that are created at compile time. This can cause issues in the build system as it has to
 # manage complexities in the source code. Most software developers want to spend their reasoning about the code and not
-# the code that makes or manages the code. In general the Jagati or a specific package should handle meta-programming 
+# the code that makes or manages the code. In general the Jagati or a specific package should handle meta-programming
 # where possible.
 #
-# A good Jagati config file is simple header containing nothing but literal values in preprocessor macros. Every 
-# possible variable is included in the config file, but ones that need to be excluded from the build should be remarked 
+# A good Jagati config file is simple header containing nothing but literal values in preprocessor macros. Every
+# possible variable is included in the config file, but ones that need to be excluded from the build should be remarked
 # out. This allows someone inspecting just that file to know what the options could be without needing to inspect the
 # CMakeLists.txt for the package. This CMake macro adds one line to the config file for a specific package.
 #
 # Usage:
-#   # Call any time after the parent scope is claimed. The first parameter is the name of a preprocessor macro to 
-#   # create. The second is the value, "" for no value. The third argument is for determining if the remark should be 
+#   # Call any time after the parent scope is claimed. The first parameter is the name of a preprocessor macro to
+#   # create. The second is the value, "" for no value. The third argument is for determining if the remark should be
 #   # enabled(true) or remarked out(false).
 #       AddJagatiConfig("FOO" "BAR" ON)
 #       AddJagatiConfig("EmptyOption" "" ON)
@@ -977,7 +978,7 @@ endmacro(AddJagatiDoxInput FileName)
 #       AddJagatiConfig("EmptyOption_nope" "" OFF)
 #
 # Result:
-#   Adds a preprocessor macro to string that config headers can directly include. Here is the output from the sample 
+#   Adds a preprocessor macro to string that config headers can directly include. Here is the output from the sample
 #   above:
 #       #define FOO BAR
 #       #define EmptyOption
@@ -986,7 +987,7 @@ endmacro(AddJagatiDoxInput FileName)
 #
 #   The set variable will be ${PROJECT_NAME}JagatiConfig.
 #
-#   This sets the variables ${PROJECT_NAME}JagatiConfigRaw to similar contents to ${PROJECT_NAME}JagatiConfig, except 
+#   This sets the variables ${PROJECT_NAME}JagatiConfigRaw to similar contents to ${PROJECT_NAME}JagatiConfig, except
 #   the Raw version has no remarks.
 #
 #   This also writes to the variable "JagatiConfigRemarks" in the parentmost scope as a temporary.
@@ -1033,14 +1034,14 @@ endmacro(AddJagatiConfig Name Value RemarkBool)
 
 macro(EmitConfig)
     # Prepare parts to be assembled.
-    set(ConfigHeader 
+    set(ConfigHeader
         "${MEZZ_Copyright}#ifndef ${PROJECT_NAME}_config_h\n#define ${PROJECT_NAME}_config_h\n\n#ifndef DOXYGEN\n"
     )
     set(DoxygenElse "\n\n#else // DOXYGEN\n")
     set(ConfigFooter "\n\n#endif // DOXYGEN\n\n#endif\n")
-    
+
     # Assemble the content and notify correct scopes
-    set(${PROJECT_NAME}ConfigContent 
+    set(${PROJECT_NAME}ConfigContent
         "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}"
     )
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1052,7 +1053,7 @@ macro(EmitConfig)
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}ConfigFilename}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    
+
     message(STATUS "Emitting Config Header File - ${${PROJECT_NAME}ConfigFilename}")
     file(WRITE "${${PROJECT_NAME}ConfigFilename}" "${${PROJECT_NAME}ConfigContent}")
 endmacro(EmitConfig)
@@ -1109,7 +1110,7 @@ macro(EmitTestCode)
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
     # The main function
-    set(TestsMainHeader 
+    set(TestsMainHeader
         "\n\nint main (int argc, char** argv)\n{\n    Mezzanine::Testing::CoreTestGroup TestInstances;\n\n"
     )
 
@@ -1122,7 +1123,7 @@ macro(EmitTestCode)
     endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
-    set(TestsMainFooter 
+    set(TestsMainFooter
         "    return Mezzanine::Int32(Mezzanine::Testing::MainImplementation(argc, argv, TestInstances)); \n}\n\n"
     )
 
@@ -1183,7 +1184,7 @@ endmacro(AddTestTarget)
 #   This will create a list containing the names of all the tests added and a with the filenames of all those tests.
 #
 #       ${PROJECT_NAME}TestClassList - This is created or appended to and will have all the class names.
-#       ${PROJECT_NAME}TestHeaderList - This is created or appended to and will have all the absolute file names. 
+#       ${PROJECT_NAME}TestHeaderList - This is created or appended to and will have all the absolute file names.
 #
 #   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp (when emitted byEmitTestCode()) :
 #
@@ -1265,9 +1266,9 @@ endfunction(ShowList)
 # will see.
 #
 # Usage:
-#   # Call after creating all the default files and populating the default source file lists 
-#   # ${${PROJECT_NAME}HeaderFiles}, ${${PROJECT_NAME}SourceFiles}, ${${PROJECT_NAME}SwigFiles}, 
-#   # ${${PROJECT_NAME}ConfigFilename}, ${${PROJECT_NAME}DoxFiles}README.md, COPYING.md, .travis.yml, appveyor.yml, 
+#   # Call after creating all the default files and populating the default source file lists
+#   # ${${PROJECT_NAME}HeaderFiles}, ${${PROJECT_NAME}SourceFiles}, ${${PROJECT_NAME}SwigFiles},
+#   # ${${PROJECT_NAME}ConfigFilename}, ${${PROJECT_NAME}DoxFiles}README.md, COPYING.md, .travis.yml, appveyor.yml,
 #   # and codecov.yml.
 #   AddIDEVisibility("file1.txt;file2.md;file3.ext")
 #   # or
@@ -1278,7 +1279,7 @@ endfunction(ShowList)
 #   AddIDEVisibility("${Files}")
 #
 # Results:
-#   A target named ${PROJECT_NAME}_IDE_Visibility is created with every source file and every passed file as a 
+#   A target named ${PROJECT_NAME}_IDE_Visibility is created with every source file and every passed file as a
 #   dependency.
 #
 
@@ -1312,7 +1313,7 @@ endmacro(AddIDEVisibility Files)
 # out without interference from the Jagati.
 #
 # Usage:
-#   # MEZZ_GitExecutable must be set, so either set it or call FindGitExecutable(). 
+#   # MEZZ_GitExecutable must be set, so either set it or call FindGitExecutable().
 #   # The argment is a complete package name, in the format of Mezz_PackageName.
 #   GitUpdatePackage("Mezz_Test")
 #   GitUpdatePackage("Mezz_Foundation")
@@ -1335,7 +1336,7 @@ function(GitUpdatePackage PackageName)
             WORKING_DIRECTORY ${MEZZ_PackageDirectory}
             COMMAND ${MEZZ_GitExecutable} clone ${${PackageName}_GitURL}
         )
-    endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")  
+    endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
 endfunction(GitUpdatePackage PackageName)
 
 ########################################################################################################################
@@ -1344,7 +1345,7 @@ endfunction(GitUpdatePackage PackageName)
 # Any package wanting to use another can include it with this function, and this will specify dependency.
 #
 # Usage:
-#   # MEZZ_GitExecutable must be set, so either set it or call FindGitExecutable(). 
+#   # MEZZ_GitExecutable must be set, so either set it or call FindGitExecutable().
 #   # The argment is the packagename, complete of partial.
 #   IncludeJagatiPackage("Mezz_Test")
 #   IncludeJagatiPackage("Foundation")
@@ -1372,12 +1373,13 @@ macro(IncludeJagatiPackage PassedPackageName)
     set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
     set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
     GitUpdatePackage(${PackageName})
-    
+
     # If there is no binary dir for the package then we have not added it, so add it now.
     if(NOT DEFINED ${RawPackageName}BinaryDir)
+    message("===============================================================================================================================")
         add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
     endif(NOT DEFINED ${RawPackageName}BinaryDir)
-    
+
     # Make the headers available in this directory.
     include_directories(${${RawPackageName}IncludeDir})
     include_directories(${${RawPackageName}GenHeadersDir})
