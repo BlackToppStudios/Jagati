@@ -18,3 +18,4 @@ end
 
 # Tests
 require_relative 'Mezz_PackageDirectory/test.rb'
+require_relative 'ClaimParentProject/test.rb'

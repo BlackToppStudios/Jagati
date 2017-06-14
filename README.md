@@ -33,10 +33,10 @@ dynamically as part of the software build process.
 3. Add something like the following to your CMakeLists.txt to download, verify and run it:
 
 ```CMake
-set(JagatiChecksum "e5282c8924cff5a620b50f8ca5fb84023d27a24f9302dbfaac055b\
-022a3a3883f4f541e071e2618edfd2f6b148b9e12823a98ca5b736e57ecf983bf6ece96de2")
+set(JagatiChecksum "719ae92582192044914ca5059728a3a8ea7263d01fcf45b793aa5d\
+c59361993e2171e9e50c7c3ee7360d596dfe4aa9bd0b15de62e8f36eb97c569e173568703c")
 file(DOWNLOAD
-    "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.13.1/Jagati.cmake"
+    "http://raw.githubusercontent.com/BlackToppStudios/Jagati/0.18.0/Jagati.cmake"
     "${${PROJECT_NAME}_BINARY_DIR}/Jagati.cmake"
     EXPECTED_HASH SHA512=${JagatiChecksum}
 )
@@ -76,32 +76,26 @@ system path, then cd into the "Test" directory and run "RootTest.rb"
 
 ```Bash
 ~/Code/Jagati/$ cd Test
-~/Code/Jagati/Test$ jruby RootTest.rb # Optional
-Run options: 
+~/Code/Jagati/Test jruby RootTest.rb # Optional
+Run options: --seed 41193
 
 # Running tests:
 
-....
+......
 
-Finished tests in 1.047000s, 3.8204 tests/s, 18.1471 assertions/s.
+Finished tests in 1.911000s, 3.1397 tests/s, 14.6520 assertions/s.
 
-4 tests, 19 assertions, 0 failures, 0 errors, 0 skips
+6 tests, 28 assertions, 0 failures, 0 errors, 0 skips
 
 ~/Code/Jagati/Test$ ruby RootTest.rb # Optional
-Loaded suite RootTest
-Started
-....
+Run options: --seed 18883
 
-Finished in 0.918599045 seconds.
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-4 tests, 14 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
-100% passed
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-4.35 tests/s, 15.24 assertions/s
+# Running:
+
+......
+
+Finished in 1.621144s, 3.7011 runs/s, 17.2718 assertions/s.
+
+6 runs, 28 assertions, 0 failures, 0 errors, 0 skips
+
 ```
-
-## Known Issues
-
-Sometimes while using https the download will fail, the error will indicate a hash mismatch and Jagati.cmake will be
-empty. If this happens try setting -DCMAKE_USE_OPENSSL=ON in the CMake command or enabling the advanced view from the
-CMake-gui and checking CMAKE_USE_OPENSSL.
