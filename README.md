@@ -77,25 +77,30 @@ system path, then cd into the "Test" directory and run "RootTest.rb"
 ```Bash
 ~/Code/Jagati/$ cd Test
 ~/Code/Jagati/Test jruby RootTest.rb # Optional
-Run options: --seed 41193
+Run options: --seed 48341
 
 # Running tests:
 
-......
+.........
 
-Finished tests in 1.911000s, 3.1397 tests/s, 14.6520 assertions/s.
+Finished tests in 2.227000s, 4.0413 tests/s, 24.6969 assertions/s.
 
-6 tests, 28 assertions, 0 failures, 0 errors, 0 skips
+9 tests, 55 assertions, 0 failures, 0 errors, 0 skips
 
+
+------------------
 ~/Code/Jagati/Test$ ruby RootTest.rb # Optional
-Run options: --seed 18883
+Run options: --seed 21724
 
 # Running:
 
-......
+.........
 
-Finished in 1.621144s, 3.7011 runs/s, 17.2718 assertions/s.
+Finished in 2.343915s, 3.8397 runs/s, 23.4650 assertions/s.
 
-6 runs, 28 assertions, 0 failures, 0 errors, 0 skips
+9 runs, 55 assertions, 0 failures, 0 errors, 0 skips
+
+
+------------------
 
 ```

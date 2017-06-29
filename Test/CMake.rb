@@ -1,6 +1,7 @@
 # This is a simple class for invoking cmake
 
 require './CMakeCache'
+require './CMakeJagati'
 
 # Ruby std lib stuff
 require 'fileutils'
@@ -24,6 +25,8 @@ class CMake
     def clear_build_dir
         FileUtils::mkdir_p @build_dir
         cache.remove_file
+        @cache = nil
+        @jagati = nil
     end
 
     def add_argument(name, value, type=nil)
@@ -36,6 +39,8 @@ class CMake
 
     def clear_arguments
         @args={}
+        @cache = nil
+        @jagati = nil
     end
 
     def invocation_string
@@ -53,7 +58,10 @@ class CMake
     end
 
     def cache
-        CMakeCache.new("#{@build_dir}/CMakeCache.txt")
+        @cache ||= CMakeCache.new("#{@build_dir}/CMakeCache.txt")
     end
 
+    def jagati
+        @jagati ||= CMakeJagati.new(self)
+    end
 end

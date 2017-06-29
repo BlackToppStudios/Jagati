@@ -145,8 +145,8 @@ include(ExternalProject)
 ########################################################################################################################
 # ClaimParentProject
 #
-# This is used to determine what the parentmost project is. Whichever project calls this first will
-# be the only one that doesn't set all of it's variables in its parent's scope.
+# This is used to determine what the parentmost project is. Whichever project calls this first will be presumed to be
+# the parentmost scope and be the only one that doesn't set all of it's variables in its parent's scope.
 #
 # This is also used to initialize a few internal variable that need to only be initilized once.
 #
@@ -189,7 +189,7 @@ endmacro(ClaimParentProject)
 #
 #       ${PROJECT_NAME}BinaryDir
 #       ${PROJECT_NAME}GenHeadersDir
-#       ${PROJECT_NAME}GenSourceFolder
+#       ${PROJECT_NAME}GenSourceDir
 #
 #       ${PROJECT_NAME}RootDir
 #       ${PROJECT_NAME}DoxDir
@@ -208,7 +208,7 @@ macro(CreateLocationVars)
     set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}_BINARY_DIR}/" CACHE INTERNAL "" FORCE)
 
     set(${PROJECT_NAME}GenHeadersDir "${${PROJECT_NAME}BinaryDir}config/" CACHE INTERNAL "" FORCE)
-    set(${PROJECT_NAME}GenSourceFolder "${${PROJECT_NAME}BinaryDir}generated_source/" CACHE INTERNAL "" FORCE)
+    set(${PROJECT_NAME}GenSourceDir "${${PROJECT_NAME}BinaryDir}generated_source/" CACHE INTERNAL "" FORCE)
 
     #######################################
     # Derived Input Folders
@@ -252,7 +252,7 @@ macro(CreateLocationVars)
     message(STATUS "\t\tDerived Output folders")
     message(STATUS "\t\t\t'${PROJECT_NAME}BinaryDir' - ${${PROJECT_NAME}BinaryDir}")
     message(STATUS "\t\t\t'${PROJECT_NAME}GenHeadersDir' - ${${PROJECT_NAME}GenHeadersDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}GenSourceFolder' - ${${PROJECT_NAME}GenSourceFolder}")
+    message(STATUS "\t\t\t'${PROJECT_NAME}GenSourceDir' - ${${PROJECT_NAME}GenSourceDir}")
 
     message(STATUS "\t\tDerived Input folders")
     message(STATUS "\t\t\t'${PROJECT_NAME}RootDir' - ${${PROJECT_NAME}RootDir}")
@@ -283,7 +283,7 @@ endmacro(CreateLocationVars)
 
 macro(CreateLocations)
     file(MAKE_DIRECTORY ${${PROJECT_NAME}GenHeadersDir})
-    file(MAKE_DIRECTORY ${${PROJECT_NAME}GenSourceFolder})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}GenSourceDir})
     include_directories(${${PROJECT_NAME}IncludeDir} ${${PROJECT_NAME}GenHeadersDir})
 endmacro(CreateLocations)
 
@@ -1133,7 +1133,7 @@ macro(EmitTestCode)
     )
 
     # Write it out and notify the correct scopes.
-    set(${PROJECT_NAME}TesterFilename "${${PROJECT_NAME}GenSourceFolder}${PROJECT_NAME}_tester.cpp")
+    set(${PROJECT_NAME}TesterFilename "${${PROJECT_NAME}GenSourceDir}${PROJECT_NAME}_tester.cpp")
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}TesterFilename "${${PROJECT_NAME}TestFilename}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")

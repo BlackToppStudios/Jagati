@@ -59,4 +59,8 @@ class CMakeCache
     def type(name)
         @type_cache[name]
     end
+
+    def project_name
+        value('CMAKE_PROJECT_NAME')
+    end
 end

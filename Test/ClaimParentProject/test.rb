@@ -10,10 +10,6 @@ class TestClaimParentProject < TestCase
     def test_single
         cmake = CMake.new(@source_dir + '/Single')
 
-        #refute_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path.')
-        #assert_match(/build$/, cmake.build_dir.to_s, 'Cmake class should pick a sane build directory.')
-        #assert_equal(true, cache.file_valid?, 'When cmake runs it should create a cache file.')
-
         cmake.invoke
         cache_contents = cmake.cache.load_cache
         assert_equal("ClaimParentProject_Test",
@@ -22,11 +18,6 @@ class TestClaimParentProject < TestCase
         assert_match(/Claiming.+ClaimParentProject_Test/,
                      cmake.invocation_stdout.join,
                      'Jagati messages about the claim.')
-
-
-        #message(STATUS "Project '${PROJECT_NAME}' acknowledges '${ParentProject}' as the Parent Project.")
-        #message(STATUS "Claiming '${PROJECT_NAME}' as the Parent Project.")
-        
     end
 
     def test_ours_first
