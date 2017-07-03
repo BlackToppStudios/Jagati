@@ -24,19 +24,24 @@ rescue
     TestCase = MiniTest::Unit::TestCase
 end
 
-# Problems with trailing slashes were common, so we added this
-class ::Pathname
-    def with_slash
-        to_s + '/'
+# Dir doesn't guarantee a case on #pwd, this allows us 
+def samecase_drive(path)
+    if path.nil? then return nil end
+    cleaned = path.to_s
+    cleaned[0] = cleaned[0].upcase if cleaned.size > 2 && cleaned[1] == ':'
+    cleaned
+end
+
+class Dir
+    def self.lpwd
+        samecase_drive(Dir.pwd)
     end
 end
 
-# Dir doesn't guarantee a case on pwd.
-class Dir
-    def self.lpwd
-        cleaned = Dir.pwd
-        cleaned[0] = cleaned[0].downcase if !cleaned.nil? && cleaned.size > 2 && cleaned[1] == ':'
-        cleaned
+# Problems with trailing slashes were common, so we added this
+class ::Pathname
+    def with_slash
+        samecase_drive(to_s + '/')
     end
 end
 
