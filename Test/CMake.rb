@@ -15,6 +15,10 @@ class CMake
     attr_reader :invocation_stdout
     attr_reader :invocation_stderr
 
+    class << self
+        attr_accessor :generator
+    end
+
     def initialize(source_dir, build_dir = "#{source_dir}/build")
         @source_dir = Pathname.new(source_dir).realpath
         FileUtils::mkdir_p build_dir
@@ -44,7 +48,8 @@ class CMake
     end
 
     def invocation_string
-        arg_string = @args.collect { |k,v| " -D#{k}=#{v}" }.join
+        arg_string = if CMake.generator.nil? then "" else " -G\"#{CMake.generator}\"" end
+        arg_string += @args.collect { |k,v| " -D#{k}=#{v}" }.join
         "cmake #{source_dir}#{arg_string}"
     end
 

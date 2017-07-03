@@ -53,7 +53,9 @@ class CMakeCache
     end
 
     def value(name)
-        @value_cache[name]
+        cleaned = @value_cache[name]
+        cleaned[0] = cleaned[0].downcase if !cleaned.nil? && cleaned.size > 2 && cleaned[1] == ':'
+        cleaned
     end
     
     def type(name)
