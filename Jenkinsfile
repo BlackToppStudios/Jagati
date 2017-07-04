@@ -2,82 +2,65 @@
 
 try {
     stage('Checkout') {
-        parallel UbuntuEmscripten: {
-            node('UbuntuEmscripten') {
-                checkout scm
-            }
-        },
-        RaspianJessie: {
-            node('RaspianJessie') {
-                checkout scm
-            }
-        },
-        MacOSSierra: {
-            node('MacOSSierra') {
-                checkout scm
-            }
-        },
-        FedoraGcc: {
-            node('FedoraGcc') {
-                checkout scm
-            }
-        },
-        UbuntuGcc: {
-            node('UbuntuGcc') {
-                checkout scm
-            }
-        },
-        UbuntuClang: {
-            node('UbuntuClang') {
-                checkout scm
-            }
-        }
+        parallel FedoraGcc: { node('FedoraGcc') {
+            checkout scm
+        } },
+        MacOSSierra: { node('MacOSSierra') {
+            checkout scm
+        } },
+        RaspianJessie: { node('RaspianJessie') {
+            checkout scm
+        } },
+        UbuntuClang: { node('UbuntuClang') {
+            checkout scm
+        } },
+        UbuntuEmscripten: { node('UbuntuEmscripten') {
+            checkout scm
+        } },
+        UbuntuGcc: { node('UbuntuGcc') {
+            checkout scm
+        } },
+        windows7Mingw32: { node('windows7Mingw32') {
+            checkout scm
+        } },
+        windows7Mingw64: { node('windows7Mingw64') {
+            checkout scm
+        } },
+        windows7msvc: { node('windows7msvc') {
+            checkout scm
+        } }
     }
 
     stage('Test') {
-        parallel UbuntuEmscripten: {
-            node('UbuntuEmscripten') {
-                sh """ cd Test                                                                                        &&
-                       ruby RootTest.rb
-                """
+        parallel FedoraGcc: { node('FedoraGcc') {
+            dir('Test') { sh 'ruby RootTest.rb' }
+        } },
+        MacOSSierra: { node('MacOSSierra') {
+            dir('Test') { sh 'export PATH=$PATH:/usr/local/bin/ && ruby RootTest.rb' }
+        } },
+        RaspianJessie: { node('RaspianJessie') {
+            dir('Test') { sh 'ruby RootTest.rb' }
+        } },
+        UbuntuClang: { node('UbuntuClang') {
+            dir('Test') { sh 'ruby RootTest.rb' }
+        } },
+        UbuntuEmscripten: { node('UbuntuEmscripten') {
+            dir('Test') { sh 'ruby RootTest.rb' }
+        } },
+        UbuntuGcc: { node('UbuntuGcc') {
+            dir('Test') { sh 'ruby RootTest.rb' }
+        } },
+        windows7Mingw32: { node('windows7Mingw32') {
+            dir('Test') { bat 'ruby RootTest.rb -G MinGW Makefiles' }
+        } },
+        windows7Mingw64: { node('windows7Mingw64') {
+            dir('Test') { bat 'ruby RootTest.rb -G MinGW Makefiles' }
+        } },
+        windows7msvc: { node('windows7msvc') {
+            dir('Test') {
+                bat '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G "Visual Studio 15 2017 Win64"'
             }
-        },
-        RaspianJessie: {
-            node('RaspianJessie') {
-                sh """ cd Test                                                                                        &&
-                       ruby RootTest.rb
-                """
-            }
-        },
-        MacOSSierra: {
-            node('MacOSSierra') {
-                sh """ cd Test                                                                                        &&
-                       export PATH=$PATH:/usr/local/bin/                                                              &&
-                       ruby RootTest.rb
-                """
-            }
-        },
-        FedoraGcc: {
-            node('FedoraGcc') {
-                sh """ cd Test                                                                                        &&
-                       ruby RootTest.rb
-                """
-            }
-        },
-        UbuntuGcc: {
-            node('UbuntuGcc') {
-                sh """ cd Test                                                                                        &&
-                       ruby RootTest.rb
-                """
-            }
-        },
-        UbuntuClang: {
-            node('UbuntuClang') {
-                sh """ cd Test                                                                                        &&
-                       ruby RootTest.rb
-                """
-            }
-        }
+        } }
     }
 
     stage('SendMail') {

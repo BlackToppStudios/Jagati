@@ -53,7 +53,7 @@ class CMakeCache
     end
 
     def value(name)
-        @value_cache[name]
+        samecase_drive(@value_cache[name])
     end
     
     def type(name)
