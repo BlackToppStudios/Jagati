@@ -51,14 +51,14 @@ try {
             dir('Test') { sh 'ruby RootTest.rb' }
         } },
         windows7Mingw32: { node('windows7Mingw32') {
-            dir('Test') { bat 'ruby RootTest.rb -G MinGW Makefiles' }
+            dir('Test') { bat 'ruby RootTest.rb -G "MinGW Makefiles"' }
         } },
         windows7Mingw64: { node('windows7Mingw64') {
-            dir('Test') { bat 'ruby RootTest.rb -G MinGW Makefiles' }
+            dir('Test') { bat 'ruby RootTest.rb -G "MinGW Makefiles"' }
         } },
         windows7msvc: { node('windows7msvc') {
             dir('Test') {
-                bat '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G "Visual Studio 15 2017 Win64"'
+                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G "Visual Studio 15 2017 Win64"'
             }
         } }
     }
