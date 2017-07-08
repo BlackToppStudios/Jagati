@@ -495,6 +495,13 @@ macro(IdentifyCompiler)
             set(CompilerIsMsvc ON)
             set(CompilerDesignMS ON)
             set(CompilerDetected ON)
+            # This stops msvc from breaking linking and the purpose of output dirs with multiple output dirs.
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUTPUT_DIRECTORY}")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIRECTORY}")
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUTPUT_DIRECTORY}")
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIRECTORY}")
+            set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${OUTPUT_DIRECTORY}")
+            set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIRECTORY}")
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
         if(CompilerDesignNix)
