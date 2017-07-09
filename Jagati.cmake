@@ -497,6 +497,16 @@ macro(IdentifyCompiler)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "${CMAKE_GENERATOR}" STREQUAL "Xcode")
+            # This stops msvc and xcode from breaking linking and the purpose of output dirs with multiple output dirs.
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${${PROJECT_NAME}BinaryDir}")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${${PROJECT_NAME}BinaryDir}")
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${${PROJECT_NAME}BinaryDir}")
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${${PROJECT_NAME}BinaryDir}")
+            set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${${PROJECT_NAME}BinaryDir}")
+            set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${${PROJECT_NAME}BinaryDir}")
+        endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "${CMAKE_GENERATOR}" STREQUAL "Xcode")
+
         if(CompilerDesignNix)
             message(STATUS "\t\tPresuming *nix style compiler.")
         endif(CompilerDesignNix)
