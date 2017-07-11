@@ -41,7 +41,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # The underscore at the end of this name is just to make the tests easier to read.
-project(LocationVarsTest_)
+project(IdentifyTest_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
@@ -49,7 +49,11 @@ message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VER
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 ClaimParentProject()    # Tested Previously
+CreateLocationVars()    # Tested Previously
+CreateLocations()       # Tested Previously
+DecideOutputNames()     # Tested Previously
 
-CreateLocationVars()    # Tested by test_locations
-CreateLocations()       # Tested by test_created_locations_exist
-DecideOutputNames()     # Tested by test_output_names
+IdentifyOS()                # Tested by TestIdentify#test_id_os
+IdentifyCompiler()          # Tested by TestIdentify#test_id_compiler
+IdentifyDebug()             # Tested by TestIdentify#test_id_debug
+SetCommonCompilerFlags()    # Tested by TestIdentify#test_set_compiler_flags

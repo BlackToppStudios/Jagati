@@ -49,3 +49,4 @@ end
 require_relative 'Mezz_PackageDirectory/test.rb'
 require_relative 'ClaimParentProject/test.rb'
 require_relative 'LocationVars/test.rb'
+require_relative 'Identify/test.rb'
