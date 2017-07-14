@@ -45,7 +45,7 @@ project(LocationVarsTest_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
-# Don'y Download or Verify but setup the Jagati
+# Don't Download or Verify but setup the Jagati
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 ClaimParentProject()    # Tested Previously

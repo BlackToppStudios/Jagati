@@ -43,7 +43,7 @@ project(ClaimParentProject_Ours_Test)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
-# Download, Verify and setup the Jagati
+# Don't Download or Verify but setup the Jagati
 include("${CMAKE_SOURCE_DIR}/../../../Jagati.cmake")
 
 StandardJagatiSetup()
