@@ -39,12 +39,21 @@
 
 ########################################################################################################################
 cmake_minimum_required(VERSION 2.8)
-project(ClaimParentProject_Ours_Test)
+
+# The underscore at the end of this name is just to make the tests easier to read.
+project(IdentifyTest_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
 # Don't Download or Verify but setup the Jagati
-include("${CMAKE_SOURCE_DIR}/../../../Jagati.cmake")
+include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
-StandardJagatiSetup()
-IncludeJagatiPackage("StaticFoundation") # Never build just has cmake run.
+ClaimParentProject()    # Tested Previously
+CreateLocationVars()    # Tested Previously
+CreateLocations()       # Tested Previously
+DecideOutputNames()     # Tested Previously
+
+IdentifyOS()                # Tested by TestIdentify#test_id_os
+IdentifyCompiler()          # Tested by TestIdentify#test_id_compiler
+IdentifyDebug()             # Tested by TestIdentify#test_id_debug
+SetCommonCompilerFlags()    # Tested by TestIdentify#test_set_compiler_flags

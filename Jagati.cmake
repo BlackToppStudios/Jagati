@@ -270,8 +270,8 @@ endmacro(CreateLocationVars)
 ########################################################################################################################
 # CreateLocations
 #
-# This will use the created location variables to create any needed generated file folders and include default folders
-# in the include path.
+# This will use the created location variables to create any needed folders for generated source and include files and
+# add default folders to the include path.
 #
 # Usage:
 #   # Be certain to call project before calling this.
