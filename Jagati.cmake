@@ -330,6 +330,7 @@ endmacro(DecideOutputNames)
 #       SystemIsLinux   - ON/OFF
 #       SystemIsWindows - ON/OFF
 #       SystemIsMacOSX  - ON/OFF
+#       SystemIsIOS     - ON/OFF
 #
 #       Platform32Bit - ON/OFF
 #       Platform64Bit - ON/OFF
@@ -345,6 +346,7 @@ macro(IdentifyOS)
         set(SystemIsLinux OFF)
         set(SystemIsWindows OFF)
         set(SystemIsMacOSX OFF)
+        set(SystemIsIOS OFF)
 
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
             message(STATUS "\t\tDetected OS as 'Linux'.")
@@ -361,9 +363,15 @@ macro(IdentifyOS)
             set(SystemIsMacOSX ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 
+        if("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
+            message(STATUS "\t\tDetected OS as 'iOS'.")
+            set(SystemIsIOS ON)
+        endif("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
+
         message(STATUS "\t\tLinux: ${SystemIsLinux}")
         message(STATUS "\t\tWindows: ${SystemIsWindows}")
         message(STATUS "\t\tMacOSX: ${SystemIsMacOSX}")
+        message(STATUS "\t\tiOS: ${SystemIsIOS}")
 
         if(SystemIsLinux)
             message(STATUS "\t\tSetting specific variables for 'Linux'.")
@@ -382,6 +390,12 @@ macro(IdentifyOS)
             set(CatCommand "cat")
             set(PlatformDefinition "MACOSX")
         endif(SystemIsMacOSX)
+
+        if(SystemIsIOS)
+            message(STATUS "\t\tSetting specific variables for 'iOS'.")
+            set(CatCommand "cat")
+            set(PlatformDefinition "IOS")
+        endif(SystemIsIOS)
 
         set(Platform32Bit OFF)
         set(Platform64Bit OFF)
