@@ -57,3 +57,34 @@ IdentifyOS()                # Tested by TestIdentify#test_id_os
 IdentifyCompiler()          # Tested by TestIdentify#test_id_compiler
 IdentifyDebug()             # Tested by TestIdentify#test_id_debug
 SetCommonCompilerFlags()    # Tested by TestIdentify#test_set_compiler_flags
+
+
+# Everything above this line is a reasonable example of use.
+##########################################################################|#############################################
+# Everything below this lines is kind of crazy and done only for testing.
+
+# Storing some values in the cache for testing. Testing the values of variables sounds off until you
+# accept that variables are part of the API.
+set(SystemIsLinux   "${SystemIsLinux}"      CACHE INTERNAL "Lifting SystemIsLinux for testing,")
+set(SystemIsWindows "${SystemIsWindows}"    CACHE INTERNAL "Lifting SystemIsWindows for testing,")
+set(SystemIsMacOSX  "${SystemIsMacOSX}"     CACHE INTERNAL "Lifting SystemIsMacOSX for testing,")
+#set(SystemIsIOS     "${SystemIsIOS}"        CACHE INTERNAL "Lifting SystemIsIOS for testing,")
+
+set(Platform32Bit   "${Platform32Bit}"      CACHE INTERNAL "Lifting Platform32Bit for testing,")
+set(Platform64Bit   "${Platform64Bit}"      CACHE INTERNAL "Lifting Platform64Bit for testing,")
+
+set(CompilerIsGCC           "${CompilerIsGCC}"         CACHE INTERNAL "Lifting CompilerIsGCC for testing,")
+set(CompilerIsClang         "${CompilerIsClang}"       CACHE INTERNAL "Lifting CompilerIsClang for testing,")
+set(CompilerIsIntel         "${CompilerIsIntel}"       CACHE INTERNAL "Lifting CompilerIsIntel for testing,")
+set(CompilerIsMsvc          "${CompilerIsMsvc}"        CACHE INTERNAL "Lifting CompilerIsMsvc for testing,")
+set(CompilerIsEmscripten    "${CompilerIsEmscripten}"  CACHE INTERNAL "Lifting CompilerIsEmscripten for testing,")
+
+set(CompilerDesignNix   "${CompilerDesignNix}"  CACHE INTERNAL "Lifting CompilerDesignNix for testing,")
+set(CompilerDesignMS    "${CompilerDesignMS}"   CACHE INTERNAL "Lifting CompilerDesignMS for testing,")
+
+set(CompilerSupportsCoverage    "${CompilerSupportsCoverage}"
+        CACHE INTERNAL "Lifting CompilerSupportsCoverage for testing,")
+set(CompilerDetected            "${CompilerDetected}"
+        CACHE INTERNAL "Lifting CompilerDetected for testing,")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"  CACHE INTERNAL "Lifting CMAKE_CXX_FLAGS for testing,")

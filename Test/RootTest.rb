@@ -45,6 +45,21 @@ class ::Pathname
     end
 end
 
+class String
+    # To Boolean
+    def to_b
+        true_regex = Regexp.new("(true|on)", Regexp::IGNORECASE)
+        if true_regex.match(self) then true else false end
+    end
+end
+
+class NilClass
+    # To Boolean
+    def to_b
+        false
+    end
+end
+
 # Tests
 require_relative 'Mezz_PackageDirectory/test.rb'
 require_relative 'ClaimParentProject/test.rb'
