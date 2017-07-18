@@ -204,11 +204,12 @@ macro(EnableIOSCrossCompile)
     if( MEZZ_iOSSimulator )
         set(XCODE_IOS_TARGET iphonesimulator)
         set(IOS_ARCH x86_64)
+        message(STATUS "Configuring iOS build for Simulator using architecture(s): ${IOS_ARCH}")
     else( MEZZ_iOSSimulator )
         set(XCODE_IOS_TARGET iphoneos)
         set(IOS_ARCH armv7 armv7s arm64)
+        message(STATUS "Configuring iOS build for Device using architecture(s): ${IOS_ARCH}")
     endif( MEZZ_iOSSimulator )
-    message(STATUS "Configuring iOS build for target: ${MEZZ_iOSTarget}, architecture(s): ${IOS_ARCH}")
     set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE STRING "Build architecture for iOS")
 
     # We need to find the iOS SDK to use
