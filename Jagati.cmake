@@ -444,7 +444,6 @@ macro(IdentifyCompiler)
         set(CompilerIsClang OFF)
         set(CompilerIsIntel OFF)
         set(CompilerIsMsvc OFF)
-        set(CompilerIsMsvc OFF)
         set(CompilerIsEmscripten OFF)
 
         set(CompilerDesignNix OFF)

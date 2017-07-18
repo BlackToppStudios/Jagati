@@ -104,3 +104,35 @@ Finished in 2.343915s, 3.8397 runs/s, 23.4650 assertions/s.
 ------------------
 
 ```
+
+## Testing Plans
+
+Going forward we want to test each API in the Jagati, here are the functiona and macros and how testable they are.
+
+Currently most of what is called by StandardJagatiSetup and all of the platform detection macros work and are tested.
+This excludes FindGitExecutable because that call depends entirely on external state so it can't be easily tested. All
+the other functions are listed here and a brief description of the short term plans to test them.
+
+   - StandardJagatiSetup - ✔
+   - FindGitExecutable - 💥
+   - IdentifyOS -  ✔
+   - IdentifyCompiler - ✔
+   - IdentifyDebug - ✔
+   - ChooseLibraryType - fully testable
+   - ChooseCodeCoverage - fully testable
+   - CreateCoverageTarget - Testable if we can get a list of targets and check them
+   - AddManualJagatiLibrary - Testable if we can store arbitrary variables.
+   - AddJagatiLibrary - Needs in depth analysis and my change with the index feature.
+   - AddJagatiDoxInput - The reason we are doing this, testable with variable checks and cache checks
+   - AddJagatiConfig - Testable by variables
+   - AddJagatiConfig - testable by reading file with EmitConfig
+   - EmitConfig - testable by reading file
+   - AddJagatiCompileOption - testable by reading file with EmitConfig
+   - EmitTestCode - We can test this by file
+   - AddTestTarget - This can be tested by target.
+   - AddTestClass - This can be tested by reading the test file emitted, or by reading variables.
+   - AddTestDirectory - This can be tested the same way as AddTestTarget.
+   - ShowList - This can be tested by reading output, but doesn't need testing.
+   - AddIDEVisibility - Doesn't need testing, if it doesn't work life will get more difficult immediately.
+   - GitUpdatePackage - Not immediately testable.
+   - IncludeJagatiPackage - This can be tested by looking at files and checking targets for the added package.
