@@ -33,10 +33,10 @@ dynamically as part of the software build process.
 3. Add something like the following to your CMakeLists.txt to download, verify and run it:
 
 ```CMake
-set(JagatiChecksum "719ae92582192044914ca5059728a3a8ea7263d01fcf45b793aa5d\
-c59361993e2171e9e50c7c3ee7360d596dfe4aa9bd0b15de62e8f36eb97c569e173568703c")
+set(JagatiChecksum "048e41af2ae39c5cb504a5b41b453471f0081c67fc8c7a54f05ff6\
+8a2a6054be97a6505e0c4bef66e29f44ca944ceee280562ab001e6377ab61d0f957a81f4b5")
 file(DOWNLOAD
-    "http://raw.githubusercontent.com/BlackToppStudios/Jagati/0.18.0/Jagati.cmake"
+    "http://raw.githubusercontent.com/BlackToppStudios/Jagati/0.20.0/Jagati.cmake"
     "${${PROJECT_NAME}_BINARY_DIR}/Jagati.cmake"
     EXPECTED_HASH SHA512=${JagatiChecksum}
 )
@@ -77,31 +77,25 @@ system path, then cd into the "Test" directory and run "RootTest.rb"
 ```Bash
 ~/Code/Jagati/$ cd Test
 ~/Code/Jagati/Test jruby RootTest.rb # Optional
-Run options: --seed 48341
-
-# Running tests:
-
-.........
-
-Finished tests in 2.227000s, 4.0413 tests/s, 24.6969 assertions/s.
-
-9 tests, 55 assertions, 0 failures, 0 errors, 0 skips
-
-
-------------------
-~/Code/Jagati/Test$ ruby RootTest.rb # Optional
-Run options: --seed 21724
+Run options: --seed 10533
 
 # Running:
 
-.........
+...............
 
-Finished in 2.343915s, 3.8397 runs/s, 23.4650 assertions/s.
+Finished in 3.400392s, 4.4113 runs/s, 23.8208 assertions/s.
 
-9 runs, 55 assertions, 0 failures, 0 errors, 0 skips
+15 runs, 81 assertions, 0 failures, 0 errors, 0 skips
+~/Code/Jagati/Test$ ruby RootTest.rb # Optional
+Run options: --seed 97
 
+# Running tests:
 
-------------------
+...............
+
+Finished tests in 5.037000s, 2.9780 tests/s, 16.0810 assertions/s.
+
+15 tests, 81 assertions, 0 failures, 0 errors, 0 skips
 
 ```
 
@@ -119,13 +113,13 @@ the other functions are listed here and a brief description of the short term pl
    - IdentifyCompiler - ✔
    - IdentifyDebug - ✔
    - ChooseLibraryType - fully testable
-   - ChooseCodeCoverage - fully testable
-   - CreateCoverageTarget - Testable if we can get a list of targets and check them
+   - SetCodeCoverage - ✔
+   - ChooseCodeCoverage - ✔
+   - CreateCoverageTarget - ✔
    - AddManualJagatiLibrary - Testable if we can store arbitrary variables.
    - AddJagatiLibrary - Needs in depth analysis and my change with the index feature.
    - AddJagatiDoxInput - The reason we are doing this, testable with variable checks and cache checks
-   - AddJagatiConfig - Testable by variables
-   - AddJagatiConfig - testable by reading file with EmitConfig
+   - AddJagatiConfig - Testable by variables and by reading file with EmitConfig
    - EmitConfig - testable by reading file
    - AddJagatiCompileOption - testable by reading file with EmitConfig
    - EmitTestCode - We can test this by file

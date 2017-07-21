@@ -1,7 +1,8 @@
 # This is a simple class for invoking cmake
 
-require './CMakeCache'
-require './CMakeJagati'
+require_relative 'CMakeCache'
+require_relative 'CMakeJagati'
+require_relative 'CMakeTargets'
 
 # Ruby std lib stuff
 require 'fileutils'
@@ -31,6 +32,7 @@ class CMake
         cache.remove_file
         @cache = nil
         @jagati = nil
+        @targets = nil
     end
 
     def add_argument(name, value, type=nil)
@@ -45,6 +47,7 @@ class CMake
         @args={}
         @cache = nil
         @jagati = nil
+        @targets = nil
     end
 
     def invocation_string
@@ -68,5 +71,9 @@ class CMake
 
     def jagati
         @jagati ||= CMakeJagati.new(self)
+    end
+
+    def targets
+        @targets ||= CMakeTargets.new(self)
     end
 end

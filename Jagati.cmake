@@ -466,6 +466,7 @@ macro(IdentifyCompiler)
             set(CompilerIsClang ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
+            set(CompilerSupportsCoverage ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -473,6 +474,7 @@ macro(IdentifyCompiler)
             set(CompilerIsClang ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
+            set(CompilerSupportsCoverage ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
@@ -854,22 +856,26 @@ endmacro(SetCodeCoverage)
 
 macro(CreateCoverageTarget ExecutableName SourceList)
     if(${CompilerSupportsCoverage})
-        set(SingleTargetDir "${${PROJECT_NAME}BinaryDir}CMakeFiles/${ExecutableName}.dir/src/")
-        set(CoveredTargetInputFiles "")
-        foreach(SingleSourceFile ${SourceList})
-            get_filename_component(SingleSourceFileExtension ${SingleSourceFile} EXT)
-            get_filename_component(SingleSourceFileName ${SingleSourceFile} NAME)
-            set(SingleTarget "${SingleTargetDir}${SingleSourceFileName}${SingleSourceFileExtension}")
-            list(APPEND CoveredTargetInputFiles ${SingleTarget})
-            add_custom_command(
-                OUTPUT ${SingleTarget}
-                COMMAND ${CMAKE_COMMAND} -E copy ${SingleSourceFile} ${SingleTarget}
-                COMMAND gcov ${SingleTarget}
-                DEPENDS ${SingleSourceFile}
-            )
-        endforeach(SingleSourceFile ${SourceList})
-        message(STATUS "Adding code coverage target for ${PROJECT_NAME} - ${ExecutableName}Coverage")
-        add_custom_target(${ExecutableName}Coverage DEPENDS ${CoveredTargetInputFiles})
+        if(${CompilerCodeCoverage})
+            set(SingleTargetDir "${${PROJECT_NAME}BinaryDir}CMakeFiles/${ExecutableName}.dir/src/")
+            set(CoveredTargetInputFiles "")
+            foreach(SingleSourceFile ${SourceList})
+                get_filename_component(SingleSourceFileExtension ${SingleSourceFile} EXT)
+                get_filename_component(SingleSourceFileName ${SingleSourceFile} NAME)
+                set(SingleTarget "${SingleTargetDir}${SingleSourceFileName}${SingleSourceFileExtension}")
+                list(APPEND CoveredTargetInputFiles ${SingleTarget})
+                add_custom_command(
+                    OUTPUT ${SingleTarget}
+                    COMMAND ${CMAKE_COMMAND} -E copy ${SingleSourceFile} ${SingleTarget}
+                    COMMAND gcov ${SingleTarget}
+                    DEPENDS ${SingleSourceFile}
+                )
+            endforeach(SingleSourceFile ${SourceList})
+            message(STATUS "Adding code coverage target for ${PROJECT_NAME} - ${ExecutableName}Coverage")
+            add_custom_target(${ExecutableName}Coverage DEPENDS ${CoveredTargetInputFiles})
+        else(${CompilerCodeCoverage})
+            message(STATUS "Not producing code coverage target because it was not requested for ${PROJECT_NAME}")
+        endif(${CompilerCodeCoverage})
     else(${CompilerSupportsCoverage})
         message(STATUS "Not producing code coverage target despite being requested for ${PROJECT_NAME}")
     endif(${CompilerSupportsCoverage})
