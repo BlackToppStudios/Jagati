@@ -194,10 +194,10 @@ macro(EnableIOSCrossCompile)
 
     # Set Bundle stuff
     if( NOT DEFINED MEZZ_iOSCompanyName )
-        set(MEZZ_iOSCompanyName "yourcompany")
+        set(MEZZ_iOSCompanyName "BlackToppStudios")
     endif( NOT DEFINED MEZZ_iOSCompanyName )
     set(MEZZ_iOSCompanyName ${MEZZ_iOSCompanyName} CACHE STRING "The name of the company building the iOS target.  Used to generate the Bundle ID.")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.\${MEZZ_iOSCompanyName}.\${PRODUCT_NAME:rfc1034identifier}")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.${MEZZ_iOSCompanyName}.\${PRODUCT_NAME:rfc1034identifier}")
 
     # Determine our target
     option(MEZZ_iOSSimulator "Whether or not to compile iOS binaries to target a simulator. Disable for physical device." ON)
