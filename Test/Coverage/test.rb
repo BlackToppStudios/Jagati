@@ -31,7 +31,6 @@ class TestCoverage < TestCase
         cmake.invoke
 
         # When turned on and the platform supports it coverage should be enabled.
-        puts cmake.invocation_stdout
         assert_equal(true && cmake.cache.value('CompilerSupportsCoverage').to_b,
                      cmake.cache.value('CompilerCodeCoverage').to_b,
                      "Coverage should be enabled when supported and set explicitly")
