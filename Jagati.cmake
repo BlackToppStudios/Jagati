@@ -136,6 +136,95 @@ include(ExternalProject)
 
 ########################################################################################################################
 ########################################################################################################################
+# From here to the next thick banner is the Cross-Compiling utilities provided by the Jagati, with a primary focus on
+# compiling to Android and iOS.
+########################################################################################################################
+########################################################################################################################
+
+########################################################################################################################
+# EnableIOSCrossCompile
+#
+# This is used to configure the basic build settings for projects that wish to build on iOS.
+# Some projects may want or need to perform additional configuration than what is provided
+# here to get a working build.
+#
+# This attempts to make sane settings for building with either the live OS or simulator in
+# mind as possible targets.
+#
+# Usage:
+#   # Be certain to call project() before calling this.  Ideally this should be called
+#   # just after downloading the Jagati, prior to any other calls.
+#   EnableIOSCrossCompile()
+#
+# Result:
+#   The following options will all be created, made available, and printed:
+#      MEZZ_iOSTarget
+#      MEZZ_iOSCompanyName
+#
+
+macro(EnableIOSCrossCompile)
+    if( NOT CMAKE_GENERATOR STREQUAL "Xcode" )
+        message(FATAL_ERROR "XCode generator required to cross-compile to iOS.")
+    endif( NOT CMAKE_GENERATOR STREQUAL "Xcode" )
+    if( NOT LibraryBuildType STREQUAL "STATIC" )
+        message(FATAL_ERROR "iOS only permits static builds.")
+    endif( NOT LibraryBuildType STREQUAL "STATIC" )
+
+    set(CMAKE_SYSTEM_NAME "AppleIOS")
+    if( NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "" )
+        set(CMAKE_SYSTEM_VERSION $ENV{IOS_SDK_VERSION})
+    endif( NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "" )
+
+    set(CMAKE_SYSTEM_PROCESSOR arm)
+    set(CMAKE_CROSSCOMPILING_TARGET IOS)
+    set(IOS ON)
+    set(UNIX ON)
+    set(APPLE ON)
+
+    set(CMAKE_MACOSX_BUNDLE YES)
+    set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhoneDeveloper")
+    set(XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+
+    # Required as of cmake 2.8.10
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Force unset of the deployment target for iOS" FORCE)
+
+    # Skip the platform compiler checks for cross compiling
+    set(CMAKE_CXX_COMPILER_WORKS TRUE)
+    set(CMAKE_C_COMPILER_WORKS TRUE)
+
+    # Set Bundle stuff
+    if( NOT DEFINED MEZZ_iOSCompanyName )
+        set(MEZZ_iOSCompanyName "BlackToppStudios")
+    endif( NOT DEFINED MEZZ_iOSCompanyName )
+    set(MEZZ_iOSCompanyName ${MEZZ_iOSCompanyName} CACHE STRING "The name of the company building the iOS target.  Used to generate the Bundle ID.")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.${MEZZ_iOSCompanyName}.\${PRODUCT_NAME:rfc1034identifier}")
+
+    # Determine our target
+    option(MEZZ_iOSSimulator "Whether or not to compile iOS binaries to target a simulator. Disable for physical device." ON)
+    if( MEZZ_iOSSimulator )
+        set(XCODE_IOS_TARGET iphonesimulator)
+        set(IOS_ARCH x86_64)
+        message(STATUS "Configuring iOS build for Simulator using architecture(s): ${IOS_ARCH}")
+    else( MEZZ_iOSSimulator )
+        set(XCODE_IOS_TARGET iphoneos)
+        set(IOS_ARCH armv7 armv7s arm64)
+        message(STATUS "Configuring iOS build for Device using architecture(s): ${IOS_ARCH}")
+    endif( MEZZ_iOSSimulator )
+    set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE STRING "Build architecture for iOS")
+
+    # We need to find the iOS SDK to use
+    execute_process(COMMAND xcodebuild -version -sdk ${XCODE_IOS_TARGET} Path
+                    OUTPUT_VARIABLE CMAKE_OSX_SYSROOT
+                    ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT} for platform: ${MEZZ_iOSTarget}")
+
+    # Hidden visibilty is required for cxx on iOS
+    set(CMAKE_C_FLAGS_INIT "")
+    set(CMAKE_CXX_FLAGS_INIT "-fvisibility=hidden -fvisibility-inlines-hidden -isysroot ${CMAKE_OSX_SYSROOT}")
+endmacro(EnableIOSCrossCompile)
+
+########################################################################################################################
+########################################################################################################################
 # From Here to the next thick banner exist macros to set variables in the scope of the calling CMakeList Project that
 # all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
 # set and easily inspectable, from just the output of cmake and a sample CMakeLists.txt.
@@ -330,6 +419,7 @@ endmacro(DecideOutputNames)
 #       SystemIsLinux   - ON/OFF
 #       SystemIsWindows - ON/OFF
 #       SystemIsMacOSX  - ON/OFF
+#       SystemIsIOS     - ON/OFF
 #
 #       Platform32Bit - ON/OFF
 #       Platform64Bit - ON/OFF
@@ -345,6 +435,7 @@ macro(IdentifyOS)
         set(SystemIsLinux OFF)
         set(SystemIsWindows OFF)
         set(SystemIsMacOSX OFF)
+        set(SystemIsIOS OFF)
 
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
             message(STATUS "\t\tDetected OS as 'Linux'.")
@@ -361,9 +452,15 @@ macro(IdentifyOS)
             set(SystemIsMacOSX ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 
+        if("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
+            message(STATUS "\t\tDetected OS as 'iOS'.")
+            set(SystemIsIOS ON)
+        endif("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
+
         message(STATUS "\t\tLinux: ${SystemIsLinux}")
         message(STATUS "\t\tWindows: ${SystemIsWindows}")
         message(STATUS "\t\tMacOSX: ${SystemIsMacOSX}")
+        message(STATUS "\t\tiOS: ${SystemIsIOS}")
 
         if(SystemIsLinux)
             message(STATUS "\t\tSetting specific variables for 'Linux'.")
@@ -382,6 +479,12 @@ macro(IdentifyOS)
             set(CatCommand "cat")
             set(PlatformDefinition "MACOSX")
         endif(SystemIsMacOSX)
+
+        if(SystemIsIOS)
+            message(STATUS "\t\tSetting specific variables for 'iOS'.")
+            set(CatCommand "cat")
+            set(PlatformDefinition "IOS")
+        endif(SystemIsIOS)
 
         set(Platform32Bit OFF)
         set(Platform64Bit OFF)
