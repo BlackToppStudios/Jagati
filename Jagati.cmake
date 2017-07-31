@@ -848,43 +848,6 @@ macro(StandardJagatiSetup)
 endmacro(StandardJagatiSetup)
 
 ########################################################################################################################
-# ChooseLibraryType and Internal_ChooseLibraryType
-#
-# This sets a single variable that all Mezzanine libraries will use when building libraries.
-#
-# Usage:
-#   # Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
-#   # Mezzanine package. This is already dealt with in the StaticFoundation.
-#   ChooseLibraryType("ON")
-#   ChooseLibraryType("OFF")
-#
-# Result:
-#   A variable called LibraryBuildType is set with either "STATIC" if true is passed or "SHARED" if false is passed.
-#
-# Notes:
-#   Forcing this into the cache effectively makes it global is that really what we want? For now it seems ok.
-
-function(Internal_ChooseLibraryType TrueForStatic)
-    if(TrueForStatic)
-        set(LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
-        set(LibraryInstallationComponent "development" CACHE INTERNAL "" FORCE)
-    else(TrueForStatic)
-        set(LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
-        set(LibraryInstallationComponent "runtime" CACHE INTERNAL "" FORCE)
-    endif(TrueForStatic)
-endfunction(Internal_ChooseLibraryType TrueForStatic)
-
-macro(ChooseLibraryType TrueForStatic)
-    Internal_ChooseLibraryType(TrueForStatic)
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(LibraryBuildType "${LibraryBuildType}" CACHE INTERNAL "" FORCE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    message(STATUS "Building libraries as: ${LibraryBuildType}")
-endmacro(ChooseLibraryType TrueForStatic)
-
-# The end of the Functions and Macros that pretty much every package will use.
-
-########################################################################################################################
 ########################################################################################################################
 # Coverage control Macros some tools that can be used to get code coverage numbers.
 ########################################################################################################################
@@ -986,9 +949,40 @@ endmacro(CreateCoverageTarget SourceList)
 
 ########################################################################################################################
 ########################################################################################################################
-# Optional Macros that not all Jagati packages will use, but could be important for link or other build time activities.
+# Tools for working with Libraries.
 ########################################################################################################################
 ########################################################################################################################
+
+########################################################################################################################
+# UseStaticLinking
+#
+# This sets a single variable that all Mezzanine libraries will use when building libraries.
+#
+# Usage:
+#   # Don't. This can easily be controlled via the BuildStaticLibraries cache level option. When used as part any
+#   # Mezzanine package. This is already dealt with in the StaticFoundation.
+#   UseStaticLinking("ON")
+#   UseStaticLinking("OFF")
+#
+# Result:
+#   A variable called LibraryBuildType is set with either "STATIC" if true is passed or "SHARED" if false is passed.
+#
+#   A variable intended for internal Jagati use only is set, named LibraryInstallationComponent that is suitable for
+#   use in subsequent calls to INSTALL as the COMPENENT parameter.
+#
+# Notes:
+#   Forcing this into the cache effectively makes it global is that really what we want? For now it seems ok.
+
+function(UseStaticLinking TrueForStatic)
+    if(TrueForStatic)
+        set(LibraryBuildType "STATIC" CACHE INTERNAL "" FORCE)
+        set(LibraryInstallationComponent "development" CACHE INTERNAL "" FORCE)
+    else(TrueForStatic)
+        set(LibraryBuildType "SHARED" CACHE INTERNAL "" FORCE)
+        set(LibraryInstallationComponent "runtime" CACHE INTERNAL "" FORCE)
+    endif(TrueForStatic)
+    message(STATUS "Building libraries as: ${LibraryBuildType}")
+endfunction(Internal_UseStaticLinking TrueForStatic)
 
 ########################################################################################################################
 # AddManualJagatiLibrary
@@ -1024,8 +1018,8 @@ endmacro(AddManualJagatiLibrary FileName)
 # by loaded packages.
 #
 # Usage:
-#   # Be certain to call project before calling this and StandardJagatiSetup (or equivalent alternatives), also call
-#   # ChooseLibraryType before calling this.
+#   # Be certain to call project before calling this and StandardJagatiSetup (or equivalent alternatives) and call
+#   # UseStaticLinking before calling this.
 #   AddJagatiLibrary()
 #
 # Result:
