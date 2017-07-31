@@ -107,12 +107,13 @@ Currently most of what is called by StandardJagatiSetup and all of the platform 
 This excludes FindGitExecutable because that call depends entirely on external state so it can't be easily tested. All
 the other functions are listed here and a brief description of the short term plans to test them.
 
+   - EnableIOSCrossCompile - Testable by variable extraction
    - StandardJagatiSetup - ✔
    - FindGitExecutable - 💥
    - IdentifyOS -  ✔
    - IdentifyCompiler - ✔
    - IdentifyDebug - ✔
-   - ChooseLibraryType - fully testable
+   - ChooseLibraryType - fully testable-
    - SetCodeCoverage - ✔
    - ChooseCodeCoverage - ✔
    - CreateCoverageTarget - ✔
