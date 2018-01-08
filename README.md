@@ -109,16 +109,18 @@ the other functions are listed here and a brief description of the short term pl
 
    - EnableIOSCrossCompile - Testable by variable extraction
    - StandardJagatiSetup - ✔
-   - FindGitExecutable - 💥
+   - SetProjectVariables - Trivially Testable
+   - FindGitExecutable - Not Testing, too system dependent.
    - IdentifyOS -  ✔
    - IdentifyCompiler - ✔
    - IdentifyDebug - ✔
-   - ChooseLibraryType - fully testable-
+   - ChooseLibraryType - ✔
    - SetCodeCoverage - ✔
    - ChooseCodeCoverage - ✔
    - CreateCoverageTarget - ✔
-   - AddManualJagatiLibrary - Testable if we can store arbitrary variables.
-   - AddJagatiLibrary - Needs in depth analysis and my change with the index feature.
+   - UseStaticLinking - ✔
+   - AddManualJagatiLibrary - (Tested indirectly by AddJagatiLibrary tests in Libraries tests)
+   - AddJagatiLibrary - ✔
    - AddJagatiDoxInput - The reason we are doing this, testable with variable checks and cache checks
    - AddJagatiConfig - Testable by variables and by reading file with EmitConfig
    - EmitConfig - testable by reading file

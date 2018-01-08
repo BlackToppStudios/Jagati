@@ -27,8 +27,9 @@
 *.out
 *.app
 
-# QT Creator Items
+# Local Temp Files
 CMakeLists.txt.user*
+*.kate-swp
 
 # Doxygen Temp Files
 *.tmp
