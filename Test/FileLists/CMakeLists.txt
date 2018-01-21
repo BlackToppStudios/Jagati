@@ -60,6 +60,7 @@ AddHeaderFile("Hello2.h")
 
 AddJagatiDoxInput("HelloDoc.h")
 AddSwigEntryPoint("HelloSwig.h")
+AddTestClass("HelloTest")
 
 # Can the coverage stuff consume lists correctly?
 ChooseCodeCoverage("ON")
@@ -79,8 +80,10 @@ set(${PROJECT_NAME}SourceFiles      "${${PROJECT_NAME}SourceFiles}" CACHE INTERN
                                     "Lifting ${PROJECT_NAME}SourceFiles for testing,")
 set(${PROJECT_NAME}HeaderFiles      "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
                                     "Lifting ${PROJECT_NAME}HeaderFiles for testing,")
-set(${PROJECT_NAME}TestSourceFiles  "${${PROJECT_NAME}TestSourceFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}TestSourceFiles for testing,")
+set(${PROJECT_NAME}TestClassList    "${${PROJECT_NAME}TestClassList}" CACHE INTERNAL 
+                                    "Lifting ${PROJECT_NAME}TestClassList for testing,")
+set(${PROJECT_NAME}TestHeaderList   "${${PROJECT_NAME}TestHeaderList}" CACHE INTERNAL 
+                                    "Lifting ${PROJECT_NAME}TestHeaderList for testing,")
 set(${PROJECT_NAME}SwigFiles        "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL 
                                     "Lifting ${PROJECT_NAME}SwigFiles for testing,")
 set(JagatiDoxArray                  "${JagatiDoxArray}" CACHE INTERNAL 

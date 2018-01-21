@@ -77,4 +77,12 @@ class CMakeJagati
         @cache.value(@project_name + 'SwigFiles')
     end
 
+    def test_file_list
+        @cache.value(@project_name + 'TestHeaderList')
+    end
+
+    def test_class_list
+        @cache.value(@project_name + 'TestClassList')
+    end
+
 end

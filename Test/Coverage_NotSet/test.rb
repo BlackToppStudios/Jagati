@@ -12,11 +12,11 @@ class Coverage_NotSet < JagatiTestCase
         assert_match(/^((?!coverage).)*$/, cmake.cache.value('CMAKE_CXX_FLAGS'), "/Wall or -Wall passed to compiler")
 
         # Test that not setting coverage doesn't touch these
-        assert_equal('Hello2.h',
-                     cmake.cache.value('CoverageTest_NotSet_HeaderFiles'),
+        assert_match('Hello2.h',
+                     cmake.jagati.header_file_list,
                      'Not Setting Coverage Touched CoverageTest_NotSet_HeaderFiles')
-        assert_equal('Hello2.cpp',
-                     cmake.cache.value('CoverageTest_NotSet_SourceFiles'),
+        assert_match('Hello2.cpp',
+                     cmake.jagati.source_file_list,
                     'Not Setting Coverage Touched CoverageTest_NotSet_SourceFiles')
     end
 end

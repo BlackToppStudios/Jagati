@@ -53,15 +53,10 @@ StandardJagatiSetup()
 ########################################################################################################################
 
 AddSourceFile("Hello.cpp")
-AddSourceFile("Hello2.cpp")
-
 AddHeaderFile("Hello.h")
-AddHeaderFile("Hello2.h")
-
 
 # Can the coverage stuff consume lists correctly?
-ChooseCodeCoverage("ON")
-CreateCoverageTarget(Hello "Hello.cpp")
+EmitConfig()
 
 
 # Everything above this line is a reasonable example of use.

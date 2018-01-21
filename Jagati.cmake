@@ -294,6 +294,8 @@ endmacro(ClaimParentProject)
 macro(CreateLocationVars)
     message(STATUS "Creating Location Variables for '${PROJECT_NAME}'")
 
+    # TODO: Figure out the best way to accept already set versions of these if set already.
+
     #######################################
     # Derived Output Folders
     set(${PROJECT_NAME}BinaryDir "${${PROJECT_NAME}_BINARY_DIR}/" CACHE INTERNAL "" FORCE)
@@ -373,9 +375,19 @@ endmacro(CreateLocationVars)
 #
 
 macro(CreateLocations)
+    # Derived Output Folders
     file(MAKE_DIRECTORY ${${PROJECT_NAME}GenHeadersDir})
     file(MAKE_DIRECTORY ${${PROJECT_NAME}GenSourceDir})
+
     include_directories(${${PROJECT_NAME}IncludeDir} ${${PROJECT_NAME}GenHeadersDir})
+
+    # Derived Input Folders
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}DoxDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}IncludeDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}LibDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}SourceDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}SwigDir})
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}TestDir})
 endmacro(CreateLocations)
 
 ########################################################################################################################
@@ -1124,12 +1136,12 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 #   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
 #
 macro(AddHeaderFile FileName)
-    list(APPEND ${PROJECT_NAME}HeaderFiles "${FileName}")
+    list(APPEND ${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}IncludeDir}${FileName}")
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}HeaderFiles} "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     message(STATUS "Header File Added: '${FileName}'")
-    AddJagatiDoxInput("${FileName}")
+    AddJagatiDoxInput("${${PROJECT_NAME}IncludeDir}${FileName}")
 endmacro(AddHeaderFile FileName)
 
 ########################################################################################################################
@@ -1145,7 +1157,7 @@ endmacro(AddHeaderFile FileName)
 #
 
 macro(AddSourceFile FileName)
-    list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+    list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}SourceFiles} "${${PROJECT_NAME}SourceFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1155,7 +1167,8 @@ endmacro(AddSourceFile FileName)
 ########################################################################################################################
 # AddJagatiDoxInput
 #
-# Add input files to list of all files doxygen will scan.
+# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the 
+# file is relative to the dox dir for this project
 #
 # Usage:
 #   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
@@ -1168,7 +1181,12 @@ endmacro(AddSourceFile FileName)
 #   This should check paths relative to the project, source dir and dox directory.
 
 macro(AddJagatiDoxInput FileName)
-    list(APPEND JagatiDoxArray "${FileName}")
+    if(EXISTS "${FileName}")
+        list(APPEND JagatiDoxArray "${FileName}")
+    else(EXISTS "${FileName}")
+        list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(JagatiDoxArray "${JagatiDoxArray}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1176,12 +1194,12 @@ macro(AddJagatiDoxInput FileName)
 endmacro(AddJagatiDoxInput FileName)
 
 ########################################################################################################################
-# Append the give source file to the list of files to be used as SWIG inputs.
+# Append the given source file to the list of files to be used as SWIG inputs.
 #
 # Usage:
 #   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
 #   # of the StandardJagatiSetup
-#   AddHeaderFile("Hello.h")
+#   AddSwigEntryPoint("Hello.h")
 #
 # Result:
 #   The variable ${PROJECT_NAME}SwigFiles in the parent scope will have the file appended
@@ -1190,16 +1208,12 @@ endmacro(AddJagatiDoxInput FileName)
 #   This should check paths relative to the project, source dir and swig directory.
 
 macro(AddSwigEntryPoint FileName)
-    list(APPEND ${PROJECT_NAME}SwigFiles "${FileName}")
+    list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}SwigFiles} "${${PROJECT_NAME}SwigFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     message(STATUS "Swig Entry File Added: '${FileName}'")
-  #set(${PROJECT_NAME}SwigDir "${${PROJECT_NAME}RootDir}swig/" CACHE INTERNAL "" FORCE)
 endmacro(AddSwigEntryPoint FileName)
-
-
-
 
 ########################################################################################################################
 ########################################################################################################################

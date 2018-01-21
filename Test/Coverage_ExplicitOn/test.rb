@@ -15,11 +15,11 @@ class Coverage_ExplicitOn < JagatiTestCase
                      "There should be no coverage target when enabled if the compiler supports coverage")
 
         # Test that coverage doesn't touch these
-        assert_equal('Hello2.h',
-                     cmake.cache.value('CoverageTest_Enabled_HeaderFiles'),
+        assert_match('Hello2.h',
+                     cmake.jagati.header_file_list,
                      'Enabling Coverage Touched CoverageTest_Enabled_HeaderFiles')
-        assert_equal('Hello2.cpp',
-                     cmake.cache.value('CoverageTest_Enabled_SourceFiles'),
+        assert_match('Hello2.cpp',
+                     cmake.jagati.source_file_list,
                      'Enabling Coverage Touched CoverageTest_Enabled_SourceFiles')
     end
 end
