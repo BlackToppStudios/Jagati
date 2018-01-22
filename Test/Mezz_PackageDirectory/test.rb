@@ -33,14 +33,14 @@ class Mezz_PackageDirectory < JagatiTestCase
         cmake = run_cmake
 
         # Does the Jagati pick a good location in the Build directory?
-        expected_dir = "#{Dir.lpwd}/#{@source_dir}/build/JagatiPackages"        
+        expected_dir = "#{Dir.lpwd}/#{@source_dir}/build/JagatiPackages"
         assert_equal(expected_dir, cmake.cache.value('MEZZ_PackageDirectory'), 'Has sane default package dir')
 
         # Does the warning look good?
-        assert_match(/CMake Warning/, cmake.stderr.join, 'There is a warning')
-        assert_match(/Environment\s*variable[ \t']*MEZZ_PACKAGE_DIR/, cmake.stderr.join,
+        assert_match(/MEZZ_PackageDirectory is not set/, cmake.stdout.join, 'There is a message about the package')
+        assert_match(/Environment\s*variable[ \t']*MEZZ_PACKAGE_DIR/, cmake.stdout.join,
             'The warning mentions the environment variable')
-        assert_match(/MEZZ_PackageDirectory/, cmake.stderr.join, 'The warning mentions the cmake setting')
+        assert_match(/MEZZ_PackageDirectory/, cmake.stdout.join, 'The message mentions the cmake setting')
     end
 
     def test_location_from_env

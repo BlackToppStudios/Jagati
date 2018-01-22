@@ -50,10 +50,10 @@ include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()   # Tested Previously
 
-AddSourceFile("Hello2.cpp") # Test that file list and coverage integration work correctly.
-AddHeaderFile("Hello2.h")
+AddSourceFile("hello2.cpp") # Test that file list and coverage integration work correctly.
+AddHeaderFile("hello2.h")
 
-add_executable(Hello "Hello.cpp")
+add_executable(Hello "src/hello.cpp")
 add_executable(Hello2 "${${PROJECT_NAME}HeaderFiles};${${PROJECT_NAME}SourceFiles}") # This needs to be replaced with the default create executable
 
 # ChooseCodeCoverage, Internal_ChooseCodeCoverage, SetCodeCoverage and CreateCoverageTarget test for the explictly on

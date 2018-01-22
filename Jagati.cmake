@@ -330,7 +330,7 @@ macro(CreateLocationVars)
         if(EXISTS "${MEZZ_PackageDirectory}")
             set(MEZZ_PackageDirectory "${MEZZ_PackageDirectory}" CACHE PATH "${PackageDirectory_Description}" FORCE)
         else(EXISTS "${MEZZ_PackageDirectory}")
-            message(WARNING "${PackageDirectory_MissingWarning}")
+            message(STATUS "${PackageDirectory_MissingWarning}")
             set(MEZZ_PackageDirectory "${PackageDirectory_Default}" CACHE PATH "${PackageDirectory_Description}" FORCE)
         endif(EXISTS "${MEZZ_PackageDirectory}")
     endif(EXISTS "$ENV{MEZZ_PACKAGE_DIR}")
@@ -1182,11 +1182,36 @@ endmacro(AddSourceFile FileName)
 
 macro(AddJagatiDoxInput FileName)
     if(EXISTS "${FileName}")
-        list(APPEND JagatiDoxArray "${FileName}")
+
+        # File exists So we need to check if it is in the right folder
+        if("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+            # File is good it is in the Dox dir.
+            list(APPEND JagatiDoxArray "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+            # Not in the Dox dir so we check the include dir
+            if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+                # Found it in the include dir
+                list(APPEND JagatiDoxArray "${FileName}")
+            else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+                message(SEND_ERROR "Found'${FileName}' Outside dox and header directories '${${PROJECT_NAME}DoxDir}'\
+ and '${${PROJECT_NAME}IncludeDir}'.")
+            endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+
     else(EXISTS "${FileName}")
-        list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
+
+        # File does not exist, so lets search for it in the dox folder
+        if(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+            # Found It! Add to DoxArray
+            list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+            # Not Found anywhere, bail.
+            message(SEND_ERROR "Could not find '${FileName}' in dox directory, check '${${PROJECT_NAME}DoxDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+
     endif(EXISTS "${FileName}")
 
+    # File has been added scope and report it.
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(JagatiDoxArray "${JagatiDoxArray}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1597,18 +1622,30 @@ endmacro(AddIDEVisibility Files)
 
 function(GitUpdatePackage PackageName)
     set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
+    set(StdOut "")
+    set(StdErr "")
+    message(STATUS "Updating ${PackageName}...")
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+        message(STATUS "\tPulling with git")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
             COMMAND ${MEZZ_GitExecutable} pull ${${PackageName}_GitURL}
+            OUTPUT_VARIABLE StdOut
+            ERROR_VARIABLE StdErr
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+        message(STATUS "\tCloneing with git")
         file(MAKE_DIRECTORY "${MEZZ_PackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${MEZZ_PackageDirectory}
             COMMAND ${MEZZ_GitExecutable} clone ${${PackageName}_GitURL}
+            OUTPUT_VARIABLE StdOut
+            ERROR_VARIABLE StdErr
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
+    message(STATUS "\tOutput: ${StdOut}")
+    message(STATUS "\tError Text: ${StdErr}")
+    message(STATUS "Updating ${PackageName} completed successfully.")
 endfunction(GitUpdatePackage PackageName)
 
 ########################################################################################################################
@@ -1648,7 +1685,7 @@ macro(IncludeJagatiPackage PassedPackageName)
 
     # If there is no binary dir for the package then we have not added it, so add it now.
     if(NOT DEFINED ${RawPackageName}BinaryDir)
-    message("===============================================================================================================================")
+        message(STATUS "============================================================================================")
         add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
     endif(NOT DEFINED ${RawPackageName}BinaryDir)
 

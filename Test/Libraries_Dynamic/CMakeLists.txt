@@ -41,7 +41,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # The underscore at the end of this name is just to make the tests easier to read.
-project(LibrariesDynamic_)
+project(LibrariesDynamic_ )
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
@@ -51,14 +51,10 @@ include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 StandardJagatiSetup()       # Tested Previously
 UseStaticLinking("OFF")      # This is some of what we are testing (in TestLibraries#test_static_libraries)
 
-set(LibrariesStatic_HeaderFiles
-    "${LibrariesDynamic_IncludeDir}foo.h"
-)
+AddHeaderFile("foo.h")
 ShowList("Header Files:" "\t" "${LibrariesStatic_HeaderFiles}")
 
-set(LibrariesStatic_SourceFiles
-    "${LibrariesDynamic_SourceDir}foo.cpp"
-)
+AddSourceFile("foo.cpp")
 ShowList("Source Files:" "\t" "${LibrariesStatic_SourceFiles}")
 
 AddJagatiLibrary()          # This is rest of what we are testing (in TestLibraries#test_static_libraries).

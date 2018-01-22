@@ -10,6 +10,7 @@ class CMakeTargets
     end
 
     def load_target_file
+        return nil unless File.exist? @target_file
         File.open(@target_file).each do |line|
             if found = line.match(/.*\/([^\/]+).dir/)
                 @target_array << found.captures.first

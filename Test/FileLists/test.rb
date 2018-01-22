@@ -47,7 +47,8 @@ class FileLists < JagatiTestCase
 
         #require 'pry'; binding.pry
 
-        # Do build here
+        # Add checks to each macro
+        # Do build here     
         # check build works
         # Copy this and make one that depends one Mezz_StaticFoundation
 

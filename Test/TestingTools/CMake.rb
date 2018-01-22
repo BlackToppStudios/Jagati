@@ -76,4 +76,8 @@ class CMake
     def targets
         @targets ||= CMakeTargets.new(self)
     end
+
+    def fail_if_error
+        unless stderr.empty? then raise "A CMake Error Occurred:\n" + stderr.join end
+    end
 end

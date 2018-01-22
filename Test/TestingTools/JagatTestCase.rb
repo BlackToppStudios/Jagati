@@ -20,9 +20,10 @@ class JagatiTestCase < TestCase
 
     # Some tests will need the cache quite a bit, they should use this to
     # preload it. If this cache is needed this is slightly faster.
-    def run_cmake_and_load_cache
+    def run_cmake_and_load_cache(fail_mode = :cannot_fail)
         cmake = run_cmake
         cmake.cache.load_cache
+        if :cannot_fail == fail_mode then cmake.fail_if_error end
         cmake
     end
 
