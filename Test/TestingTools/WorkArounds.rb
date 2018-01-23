@@ -3,6 +3,7 @@
 
 # Pick some test Suite in the standard library and give it some alias all our tests will use.
 require 'minitest/autorun'
+#require "minitest/hell"
 begin
     TestCase = MiniTest::Test
 rescue

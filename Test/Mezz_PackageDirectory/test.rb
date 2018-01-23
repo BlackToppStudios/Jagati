@@ -28,7 +28,7 @@ class Mezz_PackageDirectory < JagatiTestCase
     end
 
     def test_default_location
-        ENV.delete('MEZZ_PACKAGE_DIR') # To prevent interference from system settingss
+        ENV.delete('MEZZ_PACKAGE_DIR') # To prevent interference from system settings
 
         cmake = run_cmake
 

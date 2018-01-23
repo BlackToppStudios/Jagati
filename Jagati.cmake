@@ -1136,7 +1136,26 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 #   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
 #
 macro(AddHeaderFile FileName)
-    list(APPEND ${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}IncludeDir}${FileName}")
+    if(EXISTS "${FileName}")
+        # It exists, but is it valid?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+            # Found it in the include dir
+            list(APPEND ${PROJECT_NAME}HeaderFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+            message(SEND_ERROR "Found'${FileName}' outside header directory, move to '${${PROJECT_NAME}IncludeDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the header folder
+        if(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}IncludeDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in header directory, check \
+'${${PROJECT_NAME}IncludeDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}HeaderFiles} "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1157,7 +1176,25 @@ endmacro(AddHeaderFile FileName)
 #
 
 macro(AddSourceFile FileName)
-    list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            # Found it in the Source dir
+            list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in source directory, check '${${PROJECT_NAME}SourceDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}SourceFiles} "${${PROJECT_NAME}SourceFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1182,7 +1219,6 @@ endmacro(AddSourceFile FileName)
 
 macro(AddJagatiDoxInput FileName)
     if(EXISTS "${FileName}")
-
         # File exists So we need to check if it is in the right folder
         if("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
             # File is good it is in the Dox dir.
@@ -1197,9 +1233,7 @@ macro(AddJagatiDoxInput FileName)
  and '${${PROJECT_NAME}IncludeDir}'.")
             endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
-
     else(EXISTS "${FileName}")
-
         # File does not exist, so lets search for it in the dox folder
         if(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
             # Found It! Add to DoxArray
@@ -1208,7 +1242,6 @@ macro(AddJagatiDoxInput FileName)
             # Not Found anywhere, bail.
             message(SEND_ERROR "Could not find '${FileName}' in dox directory, check '${${PROJECT_NAME}DoxDir}'.")
         endif(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
-
     endif(EXISTS "${FileName}")
 
     # File has been added scope and report it.
@@ -1233,7 +1266,25 @@ endmacro(AddJagatiDoxInput FileName)
 #   This should check paths relative to the project, source dir and swig directory.
 
 macro(AddSwigEntryPoint FileName)
-    list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+            # Found it in the Swig dir
+            list(APPEND ${PROJECT_NAME}SwigFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+            message(SEND_ERROR "Found'${FileName}' outside swig directory, move to '${${PROJECT_NAME}SwigDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in swig directory, check '${${PROJECT_NAME}SwigDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${${PROJECT_NAME}SwigFiles} "${${PROJECT_NAME}SwigFiles}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")

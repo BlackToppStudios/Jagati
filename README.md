@@ -1,6 +1,6 @@
 # Jagati
 
-The Jagati is a single CMake script that can be incorporatesd into a C++ build that already uses CMake to provide easy
+The Jagati is a single CMake script that can be incorporated into a C++ build that already uses CMake to provide easy
 access to all the Mezzanine game engine libraries.
 
 # About
@@ -120,8 +120,13 @@ the other functions are listed here and a brief description of the short term pl
    - CreateCoverageTarget - ✔
    - UseStaticLinking - ✔
    - AddManualJagatiLibrary - (Tested indirectly by AddJagatiLibrary tests in Libraries tests)
-   - AddJagatiLibrary - ✔
-   - AddJagatiDoxInput - The reason we are doing this, testable with variable checks and cache checks
+   - AddJagatiLibrary - ✔ 
+   - AddSourceFile - ✔
+   - AddHeaderFile - ✔
+   - AddJagatiDoxInput - ✔
+   - AddSwigEntryPoint - ✔
+   - AddTestTarget - Need to test error conditions.
+   - AddTestClass - Need to test error conditions.
    - AddJagatiConfig - Testable by variables and by reading file with EmitConfig
    - EmitConfig - testable by reading file
    - AddJagatiCompileOption - testable by reading file with EmitConfig

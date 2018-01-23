@@ -1,3 +1,5 @@
+# A test of many of the basic OS detection operations
+
 class Identify < JagatiTestCase
 
     def test_id_os
@@ -61,7 +63,7 @@ class Identify < JagatiTestCase
     def test_set_compiler_flags
         cmake = run_cmake_and_load_cache
 
-        # Only a basic smoke, Did it run? 
+        # Only a basic smoke test, Did it run?
         assert_match(/build$/, cmake.stdout.join, 'C++ compiler and linker flags:')
 
         assert_match(/[\/-]Wall/, cmake.cache.value('CMAKE_CXX_FLAGS'), "/Wall or -Wall is passed to compiler")
