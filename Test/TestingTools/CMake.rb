@@ -2,6 +2,7 @@
 
 require_relative 'CMakeCache'
 require_relative 'CMakeJagati'
+require_relative 'CMakeOutput'
 require_relative 'CMakeTargets'
 
 # Ruby std lib stuff
@@ -24,6 +25,7 @@ class CMake
         @source_dir = Pathname.new(source_dir).realpath
         FileUtils::mkdir_p build_dir
         @build_dir = Pathname.new(build_dir).realpath
+        @invoked = false
         clear_arguments
     end
 
@@ -48,6 +50,7 @@ class CMake
         @cache = nil
         @jagati = nil
         @targets = nil
+        @outputs = nil
     end
 
     def invocation_string
@@ -63,6 +66,7 @@ class CMake
             @stdout = stdout.readlines
             @stderr = stderr.readlines
         }
+        @invoked = true
     end
 
     def cache
@@ -73,11 +77,40 @@ class CMake
         @jagati ||= CMakeJagati.new(self)
     end
 
+    def outputs
+        @outputs ||= CMakeOutput.new(self)
+    end
+
     def targets
         @targets ||= CMakeTargets.new(self)
     end
 
     def fail_if_error
-        unless stderr.empty? then raise "A CMake Error Occurred:\n" + stderr.join end
+        # A temporary hack to reject lines from git pulls being up to date
+        err = stderr.join("")
+        err.slice!(/From.*FETCH_HEAD\n/m) # Nuke git checkout messages
+        err.slice!(/CMake.*MEZZ_PackageDirectory.*StandardJagatiSetup\)\n\n\n/m) # cut out MEZZ_PackageDirectory Error
+        unless err.empty? then
+            #require 'pry'; binding.pry
+            raise "A CMake Error Occurred:\n" + stderr.join 
+        end
+    end
+
+    def invoked?
+        @invoked
+    end
+
+    def build_string
+        "cmake --build ."
+    end
+
+    def build
+        invoke unless invoked?
+        Dir.chdir(@build_dir) {
+            stdin, stdout, stderr = Open3.popen3(build_string)
+            @stdout = stdout.readlines
+            @stderr = stderr.readlines
+        }
+        @invoked
     end
 end

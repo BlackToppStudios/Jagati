@@ -65,6 +65,10 @@ class CMakeJagati
         @cache.value(@project_name + 'SourceFiles')
     end
 
+    def main_source_file_list
+        @cache.value(@project_name + 'MainSourceFiles')
+    end
+
     def header_file_list
         @cache.value(@project_name + 'HeaderFiles')
     end
@@ -78,7 +82,7 @@ class CMakeJagati
     end
 
     def test_file_list
-        @cache.value(@project_name + 'TestHeaderList')
+        @cache.value(@project_name + 'TestHeaderFiles')
     end
 
     def test_class_list

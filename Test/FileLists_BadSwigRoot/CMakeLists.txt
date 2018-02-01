@@ -48,10 +48,6 @@ include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
 
-
-# Everything above this line is well tested.
-########################################################################################################################
-
 AddSourceFile("Hello.cpp")
 AddSourceFile("Hello2.cpp")
 
@@ -60,31 +56,4 @@ AddHeaderFile("Hello2.h")
 
 AddJagatiDoxInput("HelloDoc.h")
 AddSwigEntryPoint("${FileLists_BadSwigRoot_Test_RootDir}HelloSwig.h") # This line will fail because its misplaced.
-AddTestClass("HelloTest")
-
-# Can the coverage stuff consume lists correctly?
-ChooseCodeCoverage("ON")
-CreateCoverageTarget(Hello "Hello.cpp")
-
-# Need to add default swig file and test
-
-
-# Everything above this line is a reasonable example of use.
-##########################################################################|#############################################
-# Everything below this lines is kind of crazy and done only for testing.
-
-# Storing some values in the cache for testing. Testing the values of variables sounds off until you
-# accept that variables are part of the API.
-
-set(${PROJECT_NAME}SourceFiles      "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}SourceFiles for testing,")
-set(${PROJECT_NAME}HeaderFiles      "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}HeaderFiles for testing,")
-set(${PROJECT_NAME}TestClassList    "${${PROJECT_NAME}TestClassList}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}TestClassList for testing,")
-set(${PROJECT_NAME}TestHeaderList   "${${PROJECT_NAME}TestHeaderList}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}TestHeaderList for testing,")
-set(${PROJECT_NAME}SwigFiles        "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}SwigFiles for testing,")
-set(JagatiDoxArray                  "${JagatiDoxArray}" CACHE INTERNAL 
-                                    "Lifting JagatiDoxArray for testing,")
+AddTestFile("HelloTest.h")

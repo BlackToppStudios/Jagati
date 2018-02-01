@@ -64,6 +64,15 @@
 ########################################################################################################################
 # Basic Sanity Checks the Jagati enforces
 
+# Prevent The jagati from being loaded twice.
+if(JagatiVersion)
+    message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
+    return()
+else(JagatiVersion)
+    set(JagatiVersion "0.2.0")
+    message(STATUS "Preparign Jagati Version: ${JagatiVersion}")
+endif(JagatiVersion)
+
 # Break if some fool tries to build in his source directory.
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     message(FATAL_ERROR "Prevented in source tree build. Please create a build directory outside of"
@@ -409,11 +418,26 @@ endmacro(CreateLocations)
 
 macro(DecideOutputNames)
     message(STATUS "Creating Output Executable Variables for '${PROJECT_NAME}'")
-    set(${PROJECT_NAME}BinTarget "${PROJECT_NAME}" CACHE INTERNAL "" FORCE)
-    set(${PROJECT_NAME}LibTarget "${PROJECT_NAME}" CACHE INTERNAL "" FORCE)
-    set(${PROJECT_NAME}TestTarget "${PROJECT_NAME}_Tester" CACHE INTERNAL "" FORCE)
+
+    if(${PROJECT_NAME}BinTarget)
+        set(${PROJECT_NAME}BinTarget "${${PROJECT_NAME}BinTarget}" CACHE INTERNAL "" FORCE)
+    else(${PROJECT_NAME}BinTarget)
+        set(${PROJECT_NAME}BinTarget "${PROJECT_NAME}_Main" CACHE INTERNAL "" FORCE)
+    endif(${PROJECT_NAME}BinTarget)
     message(STATUS "\t'${PROJECT_NAME}BinTarget' - ${${PROJECT_NAME}BinTarget}")
+
+    if(${PROJECT_NAME}LibTarget)
+        set(${PROJECT_NAME}LibTarget "${${PROJECT_NAME}LibTarget}" CACHE INTERNAL "" FORCE)
+    else(${PROJECT_NAME}LibTarget)
+        set(${PROJECT_NAME}LibTarget "${PROJECT_NAME}" CACHE INTERNAL "" FORCE)
+    endif(${PROJECT_NAME}LibTarget)
     message(STATUS "\t'${PROJECT_NAME}LibTarget' - ${${PROJECT_NAME}LibTarget}")
+
+    if(${PROJECT_NAME}TestTarget)
+        set(${PROJECT_NAME}TestTarget "${${PROJECT_NAME}TestTarget}" CACHE INTERNAL "" FORCE)
+    else(${PROJECT_NAME}TestTarget)
+        set(${PROJECT_NAME}TestTarget "${PROJECT_NAME}_Tester" CACHE INTERNAL "" FORCE)
+    endif(${PROJECT_NAME}TestTarget)
     message(STATUS "\t'${PROJECT_NAME}TestTarget' - ${${PROJECT_NAME}TestTarget}")
 endmacro(DecideOutputNames)
 
@@ -821,7 +845,8 @@ endmacro(SetCommonCompilerFlags)
 #
 #       ${PROJECT_NAME}HeaderFiles     - A variable intended to be used for storing a list of conventional .h files.
 #       ${PROJECT_NAME}SourceFiles     - Another variable for storing a list of files, any C++ source files.
-#       ${PROJECT_NAME}TestSourceFiles - A list of header and other files to go into the test executable.
+#       ${PROJECT_NAME}TestClassList   - A list classes that will be used in tests
+#       ${PROJECT_NAME}TestHeaderFiles  - A list of header and other files to go into the test executable.
 #       ${PROJECT_NAME}SwigFiles       - The list of all files that should be s
 #
 #       JagatiDoxArray - This list exist only one build process and it will contain the list of Doxygen input files.
@@ -830,16 +855,20 @@ endmacro(SetCommonCompilerFlags)
 macro(SetProjectVariables)
     set(${PROJECT_NAME}HeaderFiles          "")
     set(${PROJECT_NAME}SourceFiles          "")
-    set(${PROJECT_NAME}TestSourceFiles      "")
+    set(${PROJECT_NAME}MainSourceFiles      "")
+    set(${PROJECT_NAME}TestClassList        "")
+    set(${PROJECT_NAME}TestHeaderFiles      "")
     set(${PROJECT_NAME}SwigFiles            "")
 
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(JagatiDoxArray "")
     elseif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${${PROJECT_NAME}HeaderFiles} "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
-        set(${${PROJECT_NAME}SourceFiles} "${${PROJECT_NAME}SourceFiles}" PARENT_SCOPE)
-        set(${${PROJECT_NAME}TestSourceFiles} "${${PROJECT_NAME}TestSourceFiles}" PARENT_SCOPE)
-        set(${${PROJECT_NAME}SwigFiles} "${${PROJECT_NAME}SwigFiles}" PARENT_SCOPE)
+        set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
+        set(${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceFiles}" PARENT_SCOPE)
+        set(${PROJECT_NAME}MainSourceFiles "${${PROJECT_NAME}MainSourceFiles}" PARENT_SCOPE)
+        set(${PROJECT_NAME}TestClassList "${${PROJECT_NAME}TestClassList}" PARENT_SCOPE)
+        set(${PROJECT_NAME}TestHeaderFiles "${${PROJECT_NAME}TestHeaderFiles}" PARENT_SCOPE)
+        set(${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigFiles}" PARENT_SCOPE)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(SetProjectVariables)
 
@@ -995,6 +1024,294 @@ endmacro(SetCodeCoverage)
 
 ########################################################################################################################
 ########################################################################################################################
+# Source Code (and other file) list management
+########################################################################################################################
+########################################################################################################################
+
+########################################################################################################################
+# Append the give header file to the list of header files for this project.
+#
+# Usage:
+#   # Call it and pass the name of the header file to add. This must be called after SetProjectVariables() which is part
+#   # of the StandardJagatiSetup
+#   AddHeaderFile("Hello.h")
+#
+# Result:
+#   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
+#
+macro(AddHeaderFile FileName)
+    message(STATUS "Considering File : '${FileName}'")
+    set(TempHeaderFileToAdd "") # Prepare for adding this as a dox input too
+    if(EXISTS "${FileName}")
+        # It exists, but is it valid?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+            # Found it in the include dir
+            set(TempHeaderFileToAdd "${FileName}")
+        elseif("${FileName}" MATCHES "${${PROJECT_NAME}GenHeadersDir}")
+            # Found it in the generated include dir
+            set(TempHeaderFileToAdd "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+            message(SEND_ERROR "Found'${FileName}' outside header directory, move to '${${PROJECT_NAME}IncludeDir}'.\
+or '${${PROJECT_NAME}GenHeadersDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the header folder
+        if(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+            # Found It! Add to list
+            set(TempHeaderFileToAdd "${${PROJECT_NAME}IncludeDir}${FileName}")
+        elseif(EXISTS "${${PROJECT_NAME}GenHeadersDir}${FileName}")
+            # Found It! Add to list
+            set(TempHeaderFileToAdd "${${PROJECT_NAME}GenHeadersDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in header or generated header directory , check \
+'${${PROJECT_NAME}IncludeDir}' and '${${PROJECT_NAME}GenHeadersDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    list(APPEND ${PROJECT_NAME}HeaderFiles "${TempHeaderFileToAdd}")
+    # This was another possible way to do this without forcing the cache, but couldn't force through enough scope
+    # levels. There are good reasons to no cache this, but 
+    #if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    #    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
+    #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
+        "List of Header files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
+    AddJagatiDoxInput("${TempHeaderFileToAdd}") # This can subtly different than the input.
+endmacro(AddHeaderFile FileName)
+
+########################################################################################################################
+# Append the given source file to the list of source files for the library part of this project.
+#
+# Usage:
+#   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
+#   # of the StandardJagatiSetup
+#   AddSourceFile("Hello.cpp")
+#
+# Result:
+#   The variable ${PROJECT_NAME}SourceFiles in the parent scope will have the file appended
+#
+
+macro(AddSourceFile FileName)
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            # Found it in the Source dir
+            list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in source directory, check '${${PROJECT_NAME}SourceDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    set(${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL
+        "List of Source files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Source File Added to '${PROJECT_NAME}SourceFiles' : '${FileName}'")
+endmacro(AddSourceFile FileName)
+
+########################################################################################################################
+# Add the source file to the list of those that are part of the main executable but not the library
+#
+# Usage:
+#   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
+#   # of the StandardJagatiSetup
+#   AddMainSourceFile("Main.cpp")
+#
+# Result:
+#   The variable ${PROJECT_NAME}MainSourceFiles in the parent scope will have the file appended
+#
+
+macro(AddMainSourceFile FileName)
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            # Found it in the Source dir
+            list(APPEND ${PROJECT_NAME}MainSourceFiles "${FileName}")
+        elseif("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
+            # Allow stuff in the Test directory but don't advertise it loudly.
+            list(APPEND ${PROJECT_NAME}MainSourceFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+            message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}MainSourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in source directory, check '${${PROJECT_NAME}SourceDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    set(${PROJECT_NAME}MainSourceFiles "${${PROJECT_NAME}MainSourceFiles}" CACHE INTERNAL
+        "List of Main Source files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Executable Source File Added: '${FileName}'")
+endmacro(AddMainSourceFile FileName)
+
+########################################################################################################################
+# AddTestFile
+#
+# Use this to add test classes to be run with the Mezz_Test Package.
+#
+# Usage:
+#   AddTestClass("TestName")
+#
+# Results:
+#   This will create a list containing the names of all the tests added and a with the filenames of all those tests.
+#
+#       ${PROJECT_NAME}TestClassList - This is created or appended to and will have all the class names.
+#       ${PROJECT_NAME}TestHeaderFiles - This is created or appended to and will have all the absolute file names.
+#
+#   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp (when emitted byEmitTestCode()) :
+#
+#       In the header section will be added:
+#           #include "${TestName}.h"
+#
+#       In the instantiation section will be added:
+#           ${TestName}Tests ${TestName}Instance;
+#           TestInstances["${TestName}"] = &${TestName}Instance;
+#
+#       If you called AddTest("Foo") you would get these lines:
+#           #include "Foo.h"
+#
+#           FooTests FooInstance;
+#           TestInstances["Foo"] = &FooInstance;
+#
+#   You should have a header in your test directory (or other included directory) named exacly what was passed in
+#   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
+#   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
+#
+
+macro(AddTestFile FileName)
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
+            # Found it in the Test dir
+            list(APPEND ${PROJECT_NAME}TestHeaderFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
+            message(SEND_ERROR "Found'${FileName}' outside test directory, move to '${${PROJECT_NAME}TestDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}TestDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}TestHeaderFiles "${${PROJECT_NAME}TestDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}TestDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in test directory, check '${${PROJECT_NAME}TestDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}TestDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    get_filename_component(InnerTestName "${FileName}" NAME_WE)
+    list(APPEND ${PROJECT_NAME}TestClassList ${InnerTestName})
+
+    set(${PROJECT_NAME}TestClassList "${${PROJECT_NAME}TestClassList}" CACHE INTERNAL
+        "List of Test Classes files for ${PROJECT_NAME}." FORCE)
+    set(${PROJECT_NAME}TestHeaderFiles "${${PROJECT_NAME}TestHeaderFiles}" CACHE INTERNAL
+        "List of Test Header files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Executable Source File Added: '${FileName}'")
+endmacro(AddTestFile FileName)
+
+
+########################################################################################################################
+# AddJagatiDoxInput
+#
+# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the 
+# file is relative to the dox dir for this project
+#
+# Usage:
+#   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
+#   # generated from all past files.
+#   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
+#   AddJagatiDoxInput("${DoxFiles}")
+#   AddJagatiDoxInput("foo.h")
+#
+# Todo:
+#   This should check paths relative to the project, source dir and dox directory.
+
+macro(AddJagatiDoxInput FileName)
+    if(EXISTS "${FileName}")
+        # File exists So we need to check if it is in the right folder
+        if("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+            # File is good it is in the Dox dir.
+            list(APPEND JagatiDoxArray "${FileName}")
+        elseif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
+            # Found it in the include dir
+            list(APPEND JagatiDoxArray "${FileName}")
+        elseif("${FileName}" MATCHES "${${PROJECT_NAME}GenHeadersDir}")
+            # Found it in the generated include dir
+            list(APPEND JagatiDoxArray "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+             message(SEND_ERROR "Found'${FileName}' Outside dox and header directories '${${PROJECT_NAME}DoxDir}'\
+ and '${${PROJECT_NAME}IncludeDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the dox folder
+        if(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+            # Found It! Add to DoxArray
+            list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+            # Not Found anywhere, bail.
+            message(SEND_ERROR "Could not find '${FileName}' in dox directory, check '${${PROJECT_NAME}DoxDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    # File has been added scope and report it.
+    set(JagatiDoxArray "${JagatiDoxArray}"  CACHE INTERNAL "List of all Jagati Doxygen inputs" FORCE)
+    message(STATUS "Doxygen Input Added: '${FileName}'")
+endmacro(AddJagatiDoxInput FileName)
+
+########################################################################################################################
+# Append the given source file to the list of files to be used as SWIG inputs.
+#
+# Usage:
+#   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
+#   # of the StandardJagatiSetup
+#   AddSwigEntryPoint("Hello.h")
+#
+# Result:
+#   The variable ${PROJECT_NAME}SwigFiles in the parent scope will have the file appended
+#
+# Todo:
+#   This should check paths relative to the project, source dir and swig directory.
+
+macro(AddSwigEntryPoint FileName)
+    if(EXISTS "${FileName}")
+        # It exists but does its location make sense?
+        if("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+            # Found it in the Swig dir
+            list(APPEND ${PROJECT_NAME}SwigFiles "${FileName}")
+        else("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+            message(SEND_ERROR "Found'${FileName}' outside swig directory, move to '${${PROJECT_NAME}SwigDir}'.")
+        endif("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
+    else(EXISTS "${FileName}")
+        # File does not exist, so lets search for it in the source folder
+        if(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+            # Found It! Add to list
+            list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
+        else(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+            # Not Found bail.
+            message(SEND_ERROR "Could not find '${FileName}' in swig directory, check '${${PROJECT_NAME}SwigDir}'.")
+        endif(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
+    endif(EXISTS "${FileName}")
+
+    set(${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL
+        "List of Swig files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Swig Entry File Added: '${FileName}'")
+endmacro(AddSwigEntryPoint FileName)
+
+########################################################################################################################
+########################################################################################################################
 # Target Creation Macros, for libs, tests and executables
 ########################################################################################################################
 ########################################################################################################################
@@ -1067,7 +1384,6 @@ macro(AddJagatiLibrary)
     )
 endmacro(AddJagatiLibrary)
 
-
 ########################################################################################################################
 # Attempt to create a target that builds code coverage metadata for a given list of source code or the default lists.
 #
@@ -1117,179 +1433,17 @@ macro(CreateDefaultCoverageTarget ExecutableName)
     CreateCoverageTarget(${ExecutableName} "${${PROJECT_NAME}HeaderFiles};${${PROJECT_NAME}SourceFiles}")
 endmacro(CreateDefaultCoverageTarget ExecutableName)
 
-
 ########################################################################################################################
-########################################################################################################################
-# Source Code (and other file) list management
-########################################################################################################################
-########################################################################################################################
+# Add the default executable based on the 
+#
+# PROJECT_NAME
+# AddJagatiExecutable() 
+macro(AddJagatiExecutable)
+    add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
+    target_link_libraries("${${PROJECT_NAME}BinTarget}" ${JagatiLinkArray})
+endmacro(AddJagatiExecutable)
 
-########################################################################################################################
-# Append the give header file to the list of header files for this project.
-#
-# Usage:
-#   # Call it and pass the name of the header file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
-#   AddHeaderFile("Hello.h")
-#
-# Result:
-#   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
-#
-macro(AddHeaderFile FileName)
-    if(EXISTS "${FileName}")
-        # It exists, but is it valid?
-        if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-            # Found it in the include dir
-            list(APPEND ${PROJECT_NAME}HeaderFiles "${FileName}")
-        else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-            message(SEND_ERROR "Found'${FileName}' outside header directory, move to '${${PROJECT_NAME}IncludeDir}'.")
-        endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-    else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the header folder
-        if(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
-            # Found It! Add to list
-            list(APPEND ${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}IncludeDir}${FileName}")
-        else(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
-            # Not Found bail.
-            message(SEND_ERROR "Could not find '${FileName}' in header directory, check \
-'${${PROJECT_NAME}IncludeDir}'.")
-        endif(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
-    endif(EXISTS "${FileName}")
 
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${${PROJECT_NAME}HeaderFiles} "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    message(STATUS "Header File Added: '${FileName}'")
-    AddJagatiDoxInput("${${PROJECT_NAME}IncludeDir}${FileName}")
-endmacro(AddHeaderFile FileName)
-
-########################################################################################################################
-# Append the give source file to the list of source files for this project.
-#
-# Usage:
-#   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
-#   AddHeaderFile("Hello.h")
-#
-# Result:
-#   The variable ${PROJECT_NAME}SourceFiles in the parent scope will have the file appended
-#
-
-macro(AddSourceFile FileName)
-    if(EXISTS "${FileName}")
-        # It exists but does its location make sense?
-        if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-            # Found it in the Source dir
-            list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
-        else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-            message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
-        endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-    else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
-        if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
-            # Found It! Add to list
-            list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
-        else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
-            # Not Found bail.
-            message(SEND_ERROR "Could not find '${FileName}' in source directory, check '${${PROJECT_NAME}SourceDir}'.")
-        endif(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
-    endif(EXISTS "${FileName}")
-
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${${PROJECT_NAME}SourceFiles} "${${PROJECT_NAME}SourceFiles}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    message(STATUS "Source File Added: '${FileName}'")
-endmacro(AddSourceFile FileName)
-
-########################################################################################################################
-# AddJagatiDoxInput
-#
-# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the 
-# file is relative to the dox dir for this project
-#
-# Usage:
-#   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
-#   # generated from all past files.
-#   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
-#   AddJagatiDoxInput("${DoxFiles}")
-#   AddJagatiDoxInput("foo.h")
-#
-# Todo:
-#   This should check paths relative to the project, source dir and dox directory.
-
-macro(AddJagatiDoxInput FileName)
-    if(EXISTS "${FileName}")
-        # File exists So we need to check if it is in the right folder
-        if("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
-            # File is good it is in the Dox dir.
-            list(APPEND JagatiDoxArray "${FileName}")
-        else("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
-            # Not in the Dox dir so we check the include dir
-            if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-                # Found it in the include dir
-                list(APPEND JagatiDoxArray "${FileName}")
-            else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-                message(SEND_ERROR "Found'${FileName}' Outside dox and header directories '${${PROJECT_NAME}DoxDir}'\
- and '${${PROJECT_NAME}IncludeDir}'.")
-            endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-        endif("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
-    else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the dox folder
-        if(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
-            # Found It! Add to DoxArray
-            list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
-        else(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
-            # Not Found anywhere, bail.
-            message(SEND_ERROR "Could not find '${FileName}' in dox directory, check '${${PROJECT_NAME}DoxDir}'.")
-        endif(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
-    endif(EXISTS "${FileName}")
-
-    # File has been added scope and report it.
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiDoxArray "${JagatiDoxArray}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    message(STATUS "Doxygen Input Added: '${FileName}'")
-endmacro(AddJagatiDoxInput FileName)
-
-########################################################################################################################
-# Append the given source file to the list of files to be used as SWIG inputs.
-#
-# Usage:
-#   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
-#   AddSwigEntryPoint("Hello.h")
-#
-# Result:
-#   The variable ${PROJECT_NAME}SwigFiles in the parent scope will have the file appended
-#
-# Todo:
-#   This should check paths relative to the project, source dir and swig directory.
-
-macro(AddSwigEntryPoint FileName)
-    if(EXISTS "${FileName}")
-        # It exists but does its location make sense?
-        if("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
-            # Found it in the Swig dir
-            list(APPEND ${PROJECT_NAME}SwigFiles "${FileName}")
-        else("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
-            message(SEND_ERROR "Found'${FileName}' outside swig directory, move to '${${PROJECT_NAME}SwigDir}'.")
-        endif("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
-    else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
-        if(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
-            # Found It! Add to list
-            list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
-        else(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
-            # Not Found bail.
-            message(SEND_ERROR "Could not find '${FileName}' in swig directory, check '${${PROJECT_NAME}SwigDir}'.")
-        endif(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
-    endif(EXISTS "${FileName}")
-
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${${PROJECT_NAME}SwigFiles} "${${PROJECT_NAME}SwigFiles}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    message(STATUS "Swig Entry File Added: '${FileName}'")
-endmacro(AddSwigEntryPoint FileName)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -1452,9 +1606,9 @@ macro(EmitTestCode)
     # Everything before Main
     set(TestsHeader "${MEZZ_Copyright}#include \"MezzTest.h\"\n\n")
     set(TestsIncludes "// Start Dynamically Included Headers\n")
-    foreach(TestHeader ${${PROJECT_NAME}TestHeaderList})
-        set(TestsIncludes "${TestsIncludes}\n    #include \"${TestHeader}\"")
-    endforeach(TestHeader ${${PROJECT_NAME}TestHeaderList})
+    foreach(OneHeader ${${PROJECT_NAME}TestHeaderFiles})
+        set(TestsIncludes "${TestsIncludes}\n    #include \"${OneHeader}\"")
+    endforeach(OneHeader ${${PROJECT_NAME}TestHeaderFiles})
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
     # The main function
@@ -1467,7 +1621,7 @@ macro(EmitTestCode)
         string(TOLOWER "${TestName}" TestLowerName)
         set(TestsInit "${TestsInit}\n\
         ${TestName} ${TestName}Instance;\n\
-        TestInstances[AllLower(${TestName}Instance.Name())] = &${TestName}Instance;\n")
+        TestInstances[Mezzanine::Testing::AllLower(${TestName}Instance.Name())] = &${TestName}Instance;\n")
     endforeach(TestName ${${PROJECT_NAME}TestClassList})
     set(TestsInit "${TestsInit}\n    // Start Dynamically Instanced Tests\n\n")
 
@@ -1513,57 +1667,13 @@ macro(AddTestTarget)
     message(STATUS "Adding tester target - ${${PROJECT_NAME}TestTarget} - ${JagatiLinkArray}")
     add_executable(
         ${${PROJECT_NAME}TestTarget}
-        "${${PROJECT_NAME}TestHeaderList}"
+        "${${PROJECT_NAME}TestHeaderFiles}"
         "${${PROJECT_NAME}TesterFilename}"
+        "${${PROJECT_NAME}SourceFiles}"
     )
     target_link_libraries(${${PROJECT_NAME}TestTarget} ${JagatiLinkArray})
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
-
-########################################################################################################################
-# AddTestClass
-#
-# Use this to add test classes to be run with the Mezz_Test Package.
-#
-# Usage:
-#   AddTestClass("TestName")
-#
-# Results:
-#   This will create a list containing the names of all the tests added and a with the filenames of all those tests.
-#
-#       ${PROJECT_NAME}TestClassList - This is created or appended to and will have all the class names.
-#       ${PROJECT_NAME}TestHeaderList - This is created or appended to and will have all the absolute file names.
-#
-#   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp (when emitted byEmitTestCode()) :
-#
-#       In the header section will be added:
-#           #include "${TestName}.h"
-#
-#       In the instantiation section will be added:
-#           ${TestName}Tests ${TestName}Instance;
-#           TestInstances["${TestName}"] = &${TestName}Instance;
-#
-#       If you called AddTest("Foo") you would get these lines:
-#           #include "Foo.h"
-#
-#           FooTests FooInstance;
-#           TestInstances["Foo"] = &FooInstance;
-#
-#   You should have a header in your test directory (or other included directory) named exacly what was passed in
-#   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
-#   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
-#
-
-macro(Internal_AddTest AbsoluteFilename)
-    get_filename_component(InnerTestName "${AbsoluteFilename}" NAME_WE)
-    list(APPEND ${PROJECT_NAME}TestClassList ${InnerTestName})
-    list(APPEND ${PROJECT_NAME}TestHeaderList "${AbsoluteFilename}")
-    message(STATUS "\tAdding Test: '${InnerTestName}'")
-endmacro(Internal_AddTest AbsoluteFilename)
-
-macro(AddTestClass TestName)
-    Internal_AddTest("${${PROJECT_NAME}TestDir}${TestName}.h")
-endmacro(AddTestClass TestName)
 
 ########################################################################################################################
 # AddTestDirectory
@@ -1580,7 +1690,7 @@ macro(AddTestDirectory TestDir)
     file(GLOB TestFileList "${TestDir}*.h")
     foreach(TestFilename ${TestFileList})
         get_filename_component(TestFile "${TestFilename}" ABSOLUTE)
-        Internal_AddTest("${TestFile}")
+        AddTestFile("${TestFile}")
     endforeach(TestFilename ${TestFileList})
 endmacro(AddTestDirectory)
 
@@ -1637,10 +1747,11 @@ add_custom_target(
     DEPENDS ${PROJECT_NAME}_Tester
     SOURCES ${${PROJECT_NAME}HeaderFiles}
             ${${PROJECT_NAME}SourceFiles}
+            ${${PROJECT_NAME}MainSourceFiles}
             ${${PROJECT_NAME}SwigFiles}
             ${${PROJECT_NAME}ConfigFilename}
-            ${${PROJECT_NAME}DoxFiles}
-            ${StaticFoundationTestSourceFiles}
+            ${${PROJECT_NAME}TestHeaderFiles}
+            ${JagatiDoxArray}
             README.md
             COPYING.md
             .travis.yml

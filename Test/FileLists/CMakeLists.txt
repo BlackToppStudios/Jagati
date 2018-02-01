@@ -43,31 +43,43 @@ project(FileLists_Test_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
-# Don't Download or Verify but setup the Jagati
+# Don't Download or Verify but include and setup the Jagati
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
-
+#IncludeJagatiPackage("Test")
+#IncludeJagatiPackage("StaticFoundation")
 
 # Everything above this line is well tested.
 ########################################################################################################################
 
+# Add all the kinds of source files a robust project might have.
 AddSourceFile("Hello.cpp")
 AddSourceFile("Hello2.cpp")
+
+AddMainSourceFile("Main.cpp")
 
 AddHeaderFile("Hello.h")
 AddHeaderFile("Hello2.h")
 
+AddTestFile("HelloTest.h")
+
 AddJagatiDoxInput("HelloDoc.h")
 AddSwigEntryPoint("HelloSwig.h")
-AddTestClass("HelloTest")
 
-# Can the coverage stuff consume lists correctly?
-ChooseCodeCoverage("ON")
-CreateCoverageTarget(Hello "Hello.cpp")
+# Can the coverage and test stuff consume lists correctly?
+ChooseCodeCoverage("OFF")
+EmitTestCode()
 
-# Need to add default swig file and test
+# Temporary placement until all Jagati packages are upgraded.
+IncludeJagatiPackage("Test") 
+IncludeJagatiPackage("StaticFoundation")
 
+# Add Useful targets
+AddJagatiLibrary()
+AddJagatiExecutable()
+AddTestTarget()
+CreateCoverageTarget(HelloCoverage "Hello.cpp")
 
 # Everything above this line is a reasonable example of use.
 ##########################################################################|#############################################
@@ -75,16 +87,3 @@ CreateCoverageTarget(Hello "Hello.cpp")
 
 # Storing some values in the cache for testing. Testing the values of variables sounds off until you
 # accept that variables are part of the API.
-
-set(${PROJECT_NAME}SourceFiles      "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}SourceFiles for testing,")
-set(${PROJECT_NAME}HeaderFiles      "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}HeaderFiles for testing,")
-set(${PROJECT_NAME}TestClassList    "${${PROJECT_NAME}TestClassList}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}TestClassList for testing,")
-set(${PROJECT_NAME}TestHeaderList   "${${PROJECT_NAME}TestHeaderList}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}TestHeaderList for testing,")
-set(${PROJECT_NAME}SwigFiles        "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL 
-                                    "Lifting ${PROJECT_NAME}SwigFiles for testing,")
-set(JagatiDoxArray                  "${JagatiDoxArray}" CACHE INTERNAL 
-                                    "Lifting JagatiDoxArray for testing,")

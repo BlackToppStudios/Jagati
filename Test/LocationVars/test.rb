@@ -99,7 +99,7 @@ class LocationVars < JagatiTestCase
 
     def test_output_names
         # Test Jagati and Verify Test Tooling with the binary target name.
-        assert_equal('LocationVarsTest_',
+        assert_equal('LocationVarsTest__Main',
                      @cmake.cache.value('LocationVarsTest_BinTarget'),
                      'Jagati Sets ${PROJECT_NAME}_BinTarget sets the binary target name correctly')
         assert_equal(@cmake.cache.value('LocationVarsTest_BinTarget'),
