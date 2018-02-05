@@ -442,6 +442,61 @@ macro(DecideOutputNames)
 endmacro(DecideOutputNames)
 
 ########################################################################################################################
+# IdentifyCPU
+# Clearly CMake knows how to ID the CPU without our help, but there are tricks to it and builtin tools are not as well
+# identified as the could be. Hopefully this overcomes these minor shortfalls and provide a single source of truth for
+# build time CPU determination in the Jagati/Mezzanine.
+#
+# Usage:
+#   # Be the parentmost cmake scope or this has no effect.
+#   IdentifyCPU()
+#
+# Result:
+#   Details about CPU are displayed and the following variables are set:
+#
+#       CpuIsKnown   - ON/OFF
+#       CpuIsX86     - ON/OFF
+#       CpuIsAmd64   - ON/OFF
+#       CpuIsArm     - ON/OFF
+#
+#       If CpuIsKnown is set at least one of the other values will betrueas well, otherwise they will all be OFF.
+
+macro(IdentifyCPU)
+
+    # TODO - This may need to detect more CPU types socorrect optimizations can be enabled when crosscompiling or
+    # targetting older CPUs.
+
+    message(STATUS "Checking CPU information this system.'")
+
+    set(CpuIsKnown OFF)
+    set(CpuIsX86 OFF)
+    set(CpuIsAmd64 OFF)
+    set(CpuIsArm OFF)
+
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+        set(CpuIsKnown ON)
+        set(CpuIsArm ON)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+        set(CpuIsKnown ON)
+        set(CpuIsX86 ON)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)")
+
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "(amd64)|(AMD64)")
+        set(CpuIsKnown ON)
+        set(CpuIsX86 ON)
+        set(CpuIsAmd64 ON)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "(amd64)|(AMD64)")
+
+    message(STATUS "\t'CpuIsKnown' - ${CpuIsKnown}")
+    message(STATUS "\t'CpuIsX86'   - ${CpuIsX86}")
+    message(STATUS "\t'CpuIsAmd64' - ${CpuIsAmd64}")
+    message(STATUS "\t'CpuIsArm'   - ${CpuIsArm}")
+endmacro(IdentifyCPU)
+
+
+########################################################################################################################
 # IdentifyOS
 # Clearly CMake knows how to ID the OS without our help, but there are tricks to it and builtin tools are not as well
 # identified as the could be. Hopefully this overcomes these minor shortfalls and provide a single source of truth for
@@ -712,6 +767,7 @@ endmacro(IdentifyDebug)
 #       # Be sure the variable CompilerDesignNix is set to "ON" or "OFF".
 #       # Be sure that all the CompilerIsXXXX variables are set correctly.
 #       # The easiest way to do both of those is to use IdentifyCompiler().
+#       # Also set the CPU flags set by IdentifyCPU correcting for the platform you are building for.
 #       SetCommonCompilerFlags()
 #
 #   Results:
@@ -771,9 +827,9 @@ macro(SetCommonCompilerFlags)
             set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
 
             # A few checks that are very specific
-            if(Platform64Bit)
+            if(CpuIsAmd64)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
-            endif(Platform64Bit)
+            endif(CpuIsAmd64)
             if(SystemIsLinux)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
             endif(SystemIsLinux)
@@ -785,6 +841,12 @@ macro(SetCommonCompilerFlags)
                     -Wno-documentation-unknown-command -Wno-c++98-compat")
             endif(CompilerIsClang)
         endif(CompilerIsEmscripten)
+
+        if(NOT MEZZ_Debug)
+            # TODO - This needs to respect crosscompiling situations.
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -mtune=native")
+        endif(NOT MEZZ_Debug)
+
         # Removed -Winline it did not seem useful
         # He are some flags suggested for use an why they were not used:
         # -Woverloaded-virtual - What did the author of this think virtual methods were for if not
@@ -922,6 +984,7 @@ macro(StandardJagatiSetup)
     FindGitExecutable()
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
         message(STATUS "Determining platform specific details.")
+        IdentifyCPU()
         IdentifyOS()
         IdentifyCompiler()
         IdentifyDebug()

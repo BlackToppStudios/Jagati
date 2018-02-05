@@ -10,6 +10,16 @@ class CMakeOutput
     attr_reader :stdout
     attr_reader :stderr
 
+    def view_stderr
+        encoding_options = {
+            :invalid            => :replace,
+            :undef              => :replace,
+            :replace            => '',
+            :universal_newline  => true
+        }
+        stdout.join("").encode(Encoding.find('ASCII'), encoding_options)
+    end
+
     ###############################################################
     # Platform stuff
 
@@ -62,46 +72,46 @@ class CMakeOutput
 
     def test_success_count
         error_on_binary
-        stdout.join("")[/$\s+Success \d+/][/\d+/].to_i
+        view_stderr[/$\s+Success \d+/][/\d+/].to_i
     end
 
     def test_warning_count
         error_on_binary
-        stdout.join("")[/$\s+Warning \d+/][/\d+/].to_i
+        view_stderr[/$\s+Warning \d+/][/\d+/].to_i
     end
 
     def test_skipped_count
         error_on_binary
-        stdout.join("")[/$\s+Skipped \d+/][/\d+/].to_i
+        view_stderr[/$\s+Skipped \d+/][/\d+/].to_i
     end
 
     def test_cancelled_count
         error_on_binary
-        stdout.join("")[/$\s+Cancelled \d+/][/\d+/].to_i
+        view_stderr[/$\s+Cancelled \d+/][/\d+/].to_i
     end
 
     def test_inconclusive_count
         error_on_binary
-        stdout.join("")[/$\s+Inconclusive \d+/][/\d+/].to_i
+        view_stderr[/$\s+Inconclusive \d+/][/\d+/].to_i
     end
 
     def test_failed_count
         error_on_binary
-        stdout.join("")[/$\s+Failed \d+/][/\d+/].to_i
+        view_stderr[/$\s+Failed \d+/][/\d+/].to_i
     end
 
     def test_unknown_count
         error_on_binary
-        stdout.join("")[/$\s+Unknown \d+/][/\d+/].to_i
+        view_stderr[/$\s+Unknown \d+/][/\d+/].to_i
     end
 
     def test_not_applicable_count
         error_on_binary
-        stdout.join("")[/$\s+NotApplicable \d+/][/\d+/].to_i
+        view_stderr[/$\s+NotApplicable \d+/][/\d+/].to_i
     end
 
     def test_worst_result
         error_on_binary
-        stdout.join("")[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].split(" ")[-1]
+        view_stderr[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].split(" ")[-1]
     end
 end
