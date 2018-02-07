@@ -74,63 +74,63 @@ class FileLists < JagatiTestCase
         assert_match(/CrossPlatformExport\.h/,
                      cmake.cache.value("StaticFoundationHeaderFiles"),
                      "Expected CrossPlatformExport.h to be in the Mezz_StaticFoundation list of Header files.")
-        assert_match(/DataTypes\.h/, 
+        assert_match(/DataTypes\.h/,
                      cmake.cache.value("StaticFoundationHeaderFiles"),
                      "Expected DataTypes.h to be in the Mezz_StaticFoundation list of Header files.")
-        assert_match(/StaticString\.h/, 
+        assert_match(/StaticString\.h/,
                      cmake.cache.value("StaticFoundationHeaderFiles"),
                      "Expected StaticString.h to be in the Mezz_StaticFoundation list of Header files.")
 
-        assert_match(/AutomaticTestGroup\.h/, 
+        assert_match(/AutomaticTestGroup\.h/,
                      cmake.cache.value("TestHeaderFiles"),
                      "Expected AutomaticTestGroup.h to be in the Mezz_Test list of Header files.")
-        assert_match(/MezzTest\.h/, 
+        assert_match(/MezzTest\.h/,
                      cmake.cache.value("TestHeaderFiles"),
                      "Expected MezzTest.h to be in the Mezz_Test list of Header files.")
-        assert_match(/TestMacros\.h/, 
+        assert_match(/ProcessTools\.h/,
                      cmake.cache.value("TestHeaderFiles"),
-                     "Expected TestMacros.h to be in the Mezz_Test list of Header files.")
+                     "Expected ProcessTools.h to be in the Mezz_Test list of Header files.")
 
         # Verify Static Foundation and Mezz_Test has a few source files that we can get at, like the header tests.
-        assert_match(/RuntimeStatics\.cpp/, 
+        assert_match(/RuntimeStatics\.cpp/,
                      cmake.cache.value("StaticFoundationSourceFiles"),
                      "Expected RuntimeStatics.cpp to be in the Mezz_StaticFoundation list of Header files.")
 
-        assert_match(/AutomaticTestGroup\.cpp/, 
+        assert_match(/AutomaticTestGroup\.cpp/,
                      cmake.cache.value("TestSourceFiles"),
                      "Expected AutomaticTestGroup.cpp to be in the Mezz_Test list of Source files.")
-        assert_match(/MezzTest\.cpp/, 
+        assert_match(/MezzTest\.cpp/,
                      cmake.cache.value("TestSourceFiles"),
                      "Expected MezzTest.cpp to be in the Mezz_Test list of Source files.")
-        assert_match(/TestMacros\.cpp/, 
+        assert_match(/ProcessTools\.cpp/,
                      cmake.cache.value("TestSourceFiles"),
-                     "Expected TestMacros.cpp to be in the Mezz_Test list of Source files.")
+                     "Expected ProcessTools.cpp to be in the Mezz_Test list of Source files.")
 
         # Test Files in Mezz_Test, but there are none in Mezz_StaticFoundation because it can't use Mezz_Test, because
         # it comes below it in package dependencies.
         assert_match(/ConsoleLogicTests\.h/,
                      cmake.cache.value("TestTestHeaderFiles"),
                      "Expected ConsoleLogicTests.h to be in the Mezz_Test list of Test Header files.")
-        assert_match(/StringManipulationTests\.h/, 
+        assert_match(/StringManipulationTests\.h/,
                      cmake.cache.value("TestTestHeaderFiles"),
                      "Expected StringManipulationTests.h to be in the Mezz_Test list of Test Header files.")
-        assert_match(/TestDataTests\.h/, 
+        assert_match(/TestDataTests\.h/,
                      cmake.cache.value("TestTestHeaderFiles"),
                      "Expected TestDataTests.h to be in the Mezz_Test list of Test Header files.")
 
         # Main, Dox and Swig Files in Mezz_StaticFoundation because Mezz_Test has none
-        assert_match(/Tests\.h/, 
+        assert_match(/Tests\.h/,
                      cmake.cache.value("StaticFoundationMainSourceFiles"),
                      "Expected Tests.h to be in the Mezz_StaticFoundation list of Main Sourcefiles.")
-        assert_match(/Tests\.cpp/, 
+        assert_match(/Tests\.cpp/,
                      cmake.cache.value("StaticFoundationMainSourceFiles"),
                      "Expected Tests.cpp to be in the Mezz_StaticFoundation list of Main Source files.")
 
-        assert_match(/SwigConfig\.h/, 
+        assert_match(/SwigConfig\.h/,
                      cmake.cache.value("StaticFoundationSwigFiles"),
                      "Expected SwigConfig.h to be in the Mezz_StaticFoundation list of Swig files.")
 
-        assert_match(/Dox\.h/, 
+        assert_match(/Dox\.h/,
                      cmake.cache.value("JagatiDoxArray"),
                      "Expected Dox.h to be in the Mezz_StaticFoundation list of Main Source files.")
 
