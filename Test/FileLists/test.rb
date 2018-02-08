@@ -81,9 +81,9 @@ class FileLists < JagatiTestCase
                      cmake.cache.value("StaticFoundationHeaderFiles"),
                      "Expected StaticString.h to be in the Mezz_StaticFoundation list of Header files.")
 
-        assert_match(/AutomaticTestGroup\.h/,
+        assert_match(/BenchmarkTestGroup\.h/,
                      cmake.cache.value("TestHeaderFiles"),
-                     "Expected AutomaticTestGroup.h to be in the Mezz_Test list of Header files.")
+                     "Expected BenchmarkTestGroup.h to be in the Mezz_Test list of Header files.")
         assert_match(/MezzTest\.h/,
                      cmake.cache.value("TestHeaderFiles"),
                      "Expected MezzTest.h to be in the Mezz_Test list of Header files.")
@@ -96,9 +96,9 @@ class FileLists < JagatiTestCase
                      cmake.cache.value("StaticFoundationSourceFiles"),
                      "Expected RuntimeStatics.cpp to be in the Mezz_StaticFoundation list of Header files.")
 
-        assert_match(/AutomaticTestGroup\.cpp/,
+        assert_match(/BenchmarkTestGroup\.cpp/,
                      cmake.cache.value("TestSourceFiles"),
-                     "Expected AutomaticTestGroup.cpp to be in the Mezz_Test list of Source files.")
+                     "Expected BenchmarkTestGroup.cpp to be in the Mezz_Test list of Source files.")
         assert_match(/MezzTest\.cpp/,
                      cmake.cache.value("TestSourceFiles"),
                      "Expected MezzTest.cpp to be in the Mezz_Test list of Source files.")

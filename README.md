@@ -183,27 +183,33 @@ This excludes FindGitExecutable because that call depends entirely on external s
 the other functions are listed here and a brief description of the short term plans to test them.
 
    - EnableIOSCrossCompile - Testable by variable extraction
-   - StandardJagatiSetup - ✔
-   - SetProjectVariables - Trivially Testable
-   - FindGitExecutable - Not Testing, too system dependent.
+   - ClaimParentProject - ✔
    - CreateLocationVars - This will need testing later once it accepts external configuration.
    - CreateLocations - Manually tested, automating buys little, low priority.
    - DecideOutputNames - Check that setting the 3 vars works as expected. Trivially testable.
+   - IdentifyCPU - Can be checked by variable.
    - IdentifyOS -  ✔
    - IdentifyCompiler - ✔
    - IdentifyDebug - ✔
-   - ChooseLibraryType - ✔
-   - SetCodeCoverage - ✔
-   - ChooseCodeCoverage - ✔
-   - CreateCoverageTarget - ✔
+   - SetCommonCompilerFlags - Not testable because platform details
+   - SetProjectVariables - Trivially Testable
+   - FindGitExecutable - Not Testing, too system dependent.
+   - StandardJagatiSetup - ✔
    - UseStaticLinking - ✔
-   - AddManualJagatiLibrary - (Tested indirectly by AddJagatiLibrary tests in Libraries tests)
-   - AddJagatiLibrary - ✔ 
-   - AddSourceFile - ✔
+   - ChooseCodeCoverage - ✔
+   - SetCodeCoverage - ✔
    - AddHeaderFile - ✔
+   - AddSourceFile - ✔
+   - AddMainSourceFile - ✔
+   - AddTestFile - ✔
    - AddJagatiDoxInput - ✔
    - AddSwigEntryPoint - ✔
-   - AddTestFile - Need to test error conditions.
+   - AddManualJagatiLibrary - (Tested indirectly by AddJagatiLibrary tests in Libraries tests)
+   - AddJagatiLibrary - ✔ 
+   
+   - ChooseLibraryType - ✔
+   - CreateCoverageTarget - ✔
+   
    - AddJagatiConfig - Testable by variables and by reading file with EmitConfig
    - EmitConfig - testable by reading file
    - AddJagatiCompileOption - testable by reading file with EmitConfig

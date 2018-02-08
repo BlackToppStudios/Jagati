@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2018 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -70,7 +70,7 @@ if(JagatiVersion)
     return()
 else(JagatiVersion)
     set(JagatiVersion "0.2.0")
-    message(STATUS "Preparign Jagati Version: ${JagatiVersion}")
+    message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
 # Break if some fool tries to build in his source directory.
@@ -90,15 +90,18 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ########################################################################################################################
 # Package URLs
-set(Mezz_StaticFoundation_GitURL "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
-set(Mezz_Test_GitURL "https://github.com/BlackToppStudios/Mezz_Test.git")
-set(Mezz_Foundation_GitURL "https://github.com/BlackToppStudios/Mezz_Foundation.git")
+
+# TODO - Move this into an external index file.
+
+set(Mezz_StaticFoundation_GitURL    "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
+set(Mezz_Test_GitURL                "https://github.com/BlackToppStudios/Mezz_Test.git")
+set(Mezz_Foundation_GitURL          "https://github.com/BlackToppStudios/Mezz_Foundation.git")
 
 ########################################################################################################################
 # Other Variables
 
 set(MEZZ_Copyright
-"// © Copyright 2010 - 2017 BlackTopp Studios Inc.\n\
+"// © Copyright 2010 - 2018 BlackTopp Studios Inc.\n\
 /* This file is part of The Mezzanine Engine.\n\
 \n\
     The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
@@ -236,7 +239,7 @@ endmacro(EnableIOSCrossCompile)
 
 ########################################################################################################################
 ########################################################################################################################
-# From here to the next thick banner are macros to set variables in the scope of the calling CMake project that
+# From here to the next thick banner are macros to set variables in the scope of the calling CMake or cache project that
 # all Jagati packages should set. The idea is that every variable needed to link or inspect the source will be cleanly
 # set and easy to inspect, from just the output of CMake and a sample CMakeLists.txt.
 ########################################################################################################################
@@ -402,7 +405,7 @@ endmacro(CreateLocations)
 ########################################################################################################################
 # DecideOutputNames
 #
-# This will create a few variables in the Scope of the calling script that correspond to the name of the Project
+# This will create a few variables in the scope of the calling script orcache that correspond to the name of the project
 # so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
@@ -1092,6 +1095,8 @@ endmacro(SetCodeCoverage)
 ########################################################################################################################
 
 ########################################################################################################################
+# AddHeaderFile
+#
 # Append the give header file to the list of header files for this project.
 #
 # Usage:
@@ -1103,7 +1108,6 @@ endmacro(SetCodeCoverage)
 #   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
 #
 macro(AddHeaderFile FileName)
-    message(STATUS "Considering File : '${FileName}'")
     set(TempHeaderFileToAdd "") # Prepare for adding this as a dox input too
     if(EXISTS "${FileName}")
         # It exists, but is it valid?
@@ -1134,17 +1138,19 @@ or '${${PROJECT_NAME}GenHeadersDir}'.")
 
     list(APPEND ${PROJECT_NAME}HeaderFiles "${TempHeaderFileToAdd}")
     # This was another possible way to do this without forcing the cache, but couldn't force through enough scope
-    # levels. There are good reasons to no cache this, but 
+    # levels. There are good reasons to not cache this, but they don't "it needs to work"
     #if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     #    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
     #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
         "List of Header files for ${PROJECT_NAME}." FORCE)
-    message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
+    message(STATUS "\tHeader File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
     AddJagatiDoxInput("${TempHeaderFileToAdd}") # This can subtly different than the input.
 endmacro(AddHeaderFile FileName)
 
 ########################################################################################################################
+# AddSourceFile
+#
 # Append the given source file to the list of source files for the library part of this project.
 #
 # Usage:
@@ -1182,6 +1188,8 @@ macro(AddSourceFile FileName)
 endmacro(AddSourceFile FileName)
 
 ########################################################################################################################
+# AddMainSourceFile
+#
 # Add the source file to the list of those that are part of the main executable but not the library
 #
 # Usage:
@@ -1227,7 +1235,7 @@ endmacro(AddMainSourceFile FileName)
 # Use this to add test classes to be run with the Mezz_Test Package.
 #
 # Usage:
-#   AddTestClass("TestName")
+#   AddTestFile("TestName.h")
 #
 # Results:
 #   This will create a list containing the names of all the tests added and a with the filenames of all those tests.
@@ -1237,6 +1245,8 @@ endmacro(AddMainSourceFile FileName)
 #
 #   The followings lines will be added to the file ${PROJECT_NAME}_tester.cpp (when emitted byEmitTestCode()) :
 #
+#       A value, TestName, will be inferred from the passed filename but removing directories andfile extensions.
+#
 #       In the header section will be added:
 #           #include "${TestName}.h"
 #
@@ -1244,15 +1254,15 @@ endmacro(AddMainSourceFile FileName)
 #           ${TestName}Tests ${TestName}Instance;
 #           TestInstances["${TestName}"] = &${TestName}Instance;
 #
-#       If you called AddTest("Foo") you would get these lines:
+#       If you called AddTestFile("Foo.h") you would get these lines:
 #           #include "Foo.h"
 #
 #           FooTests FooInstance;
 #           TestInstances["Foo"] = &FooInstance;
 #
-#   You should have a header in your test directory (or other included directory) named exacly what was passed in
-#   with a suffix of ".h". In that file there should be a class named exactly what was passed in with a suffix of
-#   "Tests" that publicly inherits from Mezzanine::Testing::UnitTestGroup.
+#   You should have a header in your test directory named exacly what was passed in. In that file there should be a
+#   class named exactly what was passed in with a suffix of "Tests" that publicly inherits from
+#   Mezzanine::Testing::UnitTestGroup and implements any test methods intended to be executed.
 #
 
 macro(AddTestFile FileName)
@@ -1294,13 +1304,14 @@ endmacro(AddTestFile FileName)
 #
 # Usage:
 #   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
-#   # generated from all past files.
+#   # generated from all passed files.
 #   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
 #   AddJagatiDoxInput("${DoxFiles}")
 #   AddJagatiDoxInput("foo.h")
 #
-# Todo:
-#   This should check paths relative to the project, source dir and dox directory.
+# Results:
+#   The file will be checked for validity and appended to the list JagatiDoxArray.
+#
 
 macro(AddJagatiDoxInput FileName)
     if(EXISTS "${FileName}")
@@ -1448,6 +1459,8 @@ macro(AddJagatiLibrary)
 endmacro(AddJagatiLibrary)
 
 ########################################################################################################################
+# CreateCoverageTarget
+#
 # Attempt to create a target that builds code coverage metadata for a given list of source code or the default lists.
 #
 # Usage:
@@ -1497,10 +1510,20 @@ macro(CreateDefaultCoverageTarget ExecutableName)
 endmacro(CreateDefaultCoverageTarget ExecutableName)
 
 ########################################################################################################################
-# Add the default executable based on the 
+# AddJagatiExecutable
 #
-# PROJECT_NAME
-# AddJagatiExecutable() 
+# Add the default executable based on the Main source list that is linked to the default library made by the other
+# source and header lists.
+#
+# Usage:
+#   # Call this after all source files have been passed into the source list creation macros.
+#   AddJagatiExecutable()
+#
+# Results#
+#   A target named after the conents of variable ${PROJECT_NAME}BinTarget is created with all the files in the list
+#   ${PROJECT_NAME}MainSourceFiles then that target is linked to all the libraries in the JagatiLinkArray.
+#
+
 macro(AddJagatiExecutable)
     add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
     target_link_libraries("${${PROJECT_NAME}BinTarget}" ${JagatiLinkArray})
