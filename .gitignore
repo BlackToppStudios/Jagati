@@ -30,6 +30,7 @@
 # Local Temp Files
 CMakeLists.txt.user*
 *.kate-swp
+.directory
 
 # Doxygen Temp Files
 *.tmp

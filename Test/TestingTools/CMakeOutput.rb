@@ -51,12 +51,16 @@ class CMakeOutput
     end
 
     def check_output_folder_for_file(file)
+        #require 'pry'; binding.pry
         if File.exist?(File.join(@cmake.build_dir, file)) then
             return nil
         else
-            spacer = "\n    "
-            files = Dir[File.join(@cmake.build_dir, "/**/*")] + Dir[File.join(@cmake.source_dir, "/**/*")]
-            raise "Could not find #{file} in output folder, here are contents:#{spacer}#{files.join(spacer)}"
+            indent = "    "
+            spacer = "\n#{indent}"
+            files = Dir[File.join(@cmake.build_dir, "/**/*")] # + Dir[File.join(@cmake.source_dir, "/**/*")]
+            raise "Could not find #{file} in output folder, here are contents:#{spacer}#{files.join(spacer)}\n" +
+                  "Here is the stdout:#{spacer}#{@cmake.stdout.join(indent)}\n" +
+                  "And the stderr:#{spacer}#{@cmake.stderr.join(indent)}"
         end
     end
 
