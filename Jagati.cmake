@@ -877,10 +877,11 @@ macro(SetCommonCompilerFlags)
             #   could be overwritten and errors will arise if the previous value of "a" is needed.
             # C4365 - This is actually a useful warning about conversions changing signedness, but 50+ are thrown from
             #   the std lib for builds as simple as the just Mezz_StaticFoundation.
-            # C4774  - BS warning about some sprintf derivative we never use.
+            # C4774 - BS warning about some sprintf derivative we never use.
+            # C5039 - BS warning thrown in the bowels of never included windows headers.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
-                /wd4987 /wd4365 /wd4774 /wd4623"
+                /wd4987 /wd4365 /wd4774 /wd4623 /wd5039"
             )
         else(CompilerIsMsvc)
             message(FATAL_ERROR
