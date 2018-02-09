@@ -21,12 +21,16 @@ class CMake
         attr_accessor :generator
     end
 
-    def initialize(source_dir, build_dir = "#{source_dir}/build")
+    def initialize(source_dir, build_dir = smart_build_dir(source_dir))
         @source_dir = Pathname.new(source_dir).realpath
         FileUtils::mkdir_p build_dir
         @build_dir = Pathname.new(build_dir).realpath
         @invoked = false
         clear_arguments
+    end
+
+    def smart_build_dir(source_dir)
+        File.join(source_dir, "..", "builds", source_dir + "-build")
     end
 
     def clear_build_dir
@@ -91,7 +95,6 @@ class CMake
         err.slice!(/From.*FETCH_HEAD\n/m) # Nuke git checkout messages
         err.slice!(/CMake.*MEZZ_PackageDirectory.*StandardJagatiSetup\)\n\n\n/m) # cut out MEZZ_PackageDirectory Error
         unless err.empty? then
-            #require 'pry'; binding.pry
             raise "A CMake Error Occurred:\n" + stderr.join 
         end
     end

@@ -33,7 +33,7 @@ class Mezz_PackageDirectory < JagatiTestCase
         cmake = run_cmake
 
         # Does the Jagati pick a good location in the Build directory?
-        expected_dir = "#{Dir.lpwd}/#{@source_dir}/build/JagatiPackages"
+        expected_dir = "#{Dir.lpwd}/builds/#{@source_dir}-build/JagatiPackages"
         assert_equal(expected_dir, cmake.cache.value('MEZZ_PackageDirectory'), 'Has sane default package dir')
 
         # Does the warning look good?

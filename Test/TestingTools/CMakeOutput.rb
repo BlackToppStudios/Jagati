@@ -54,8 +54,9 @@ class CMakeOutput
         if File.exist?(File.join(@cmake.build_dir, file)) then
             return nil
         else
-            files = Dir[File.join(@cmake.build_dir, "/**/*")].join("\n    ")
-            raise "Could not find #{file} in output folder, here are contents:\n    #{files}"
+            spacer = "\n    "
+            files = Dir[File.join(@cmake.build_dir, "/**/*")] + Dir[File.join(@cmake.source_dir, "/**/*")]
+            raise "Could not find #{file} in output folder, here are contents:#{spacer}#{files.join(spacer)}"
         end
     end
 

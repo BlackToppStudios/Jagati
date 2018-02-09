@@ -128,9 +128,6 @@ class FileLists < JagatiTestCase
                      cmake.cache.value("JagatiDoxArray"),
                      "Expected Dox.h to be in the Mezz_StaticFoundation list of Main Source files.")
 
-        #require 'pry'; binding.pry
-
-
     end
 
 end
