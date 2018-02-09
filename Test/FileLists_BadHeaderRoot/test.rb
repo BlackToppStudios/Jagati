@@ -2,7 +2,7 @@
 
 class FileLists_BadHeaderRoot < JagatiTestCase
     def test_file_lists
-        cmake = run_cmake_and_load_cache :should_fail # The jagati rejects Hello2.h because its missing
+        cmake = run_cmake_no_dox_and_load_cache :should_fail # The jagati rejects Hello2.h because its missing
 
         # The Good Files should still work
         assert_match("src/Hello.cpp", cmake.jagati.source_file_list, "Source File List missing Hello.cpp")
@@ -15,7 +15,7 @@ class FileLists_BadHeaderRoot < JagatiTestCase
         assert_match("HelloTest", cmake.jagati.test_class_list, "Jagati Test class File List missing HelloTest")
 
         # But the one with the misplaced file should fail.
-        assert_match(/outside.*header.*dir/, cmake.stderr.join, "Reports missing when header is misplaced")
+        assert_match(/outside.*header.*dir/m, cmake.stderr.join, "Reports missing when header is misplaced")
 
     end
 end

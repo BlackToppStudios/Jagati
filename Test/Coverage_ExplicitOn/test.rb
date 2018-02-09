@@ -2,7 +2,9 @@
 # is part of a trio of coverage tests, the other test ExplicitOff and NotSet.
 
 class Coverage_ExplicitOn < JagatiTestCase
+
     def test_explicit_on
+        if Gem.win_platform? then skip "Coverage not well supported on windows" end
         cmake = run_cmake_and_load_cache
 
         # When turned on and the platform supports it coverage should be enabled.

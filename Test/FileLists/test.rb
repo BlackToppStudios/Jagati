@@ -3,13 +3,7 @@
 
 class FileLists < JagatiTestCase
     def test_file_lists
-
-        # Skip some things that might slow down a full build
-        cmake = CMake.new(self.class.to_s)
-        cmake.add_argument("MEZZ_BuildDoxygen", "OFF")
-        cmake.invoke
-        cmake.cache.load_cache
-        cmake.fail_if_error
+        cmake = run_cmake_no_dox_and_load_cache
 
         # Some Tests of the tools the test suite provides:
         assert_equal(cmake.cache.value('FileLists_Test_SourceFiles'),

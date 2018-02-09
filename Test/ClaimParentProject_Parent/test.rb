@@ -3,7 +3,7 @@
 
 class ClaimParentProject_Parent < JagatiTestCase
     def test_ours_first
-        cmake = run_cmake_and_load_cache
+        cmake = run_cmake_no_dox_and_load_cache
 
         assert_equal("ClaimParentProject_Ours_Test",
                      cmake.cache.value('ParentProject'),

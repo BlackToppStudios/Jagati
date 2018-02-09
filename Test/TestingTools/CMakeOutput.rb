@@ -42,24 +42,43 @@ class CMakeOutput
         "#{executable_prefix}#{@jagati.test_target_name}#{executable_suffix}"
     end
 
+    def check_binary_command
+        check_output_folder_for_file(binary_command)
+    end
+
+    def check_test_command
+        check_output_folder_for_file(test_command)
+    end
+
+    def check_output_folder_for_file(file)
+        if File.exist?(File.join(@cmake.build_dir, file)) then
+            return nil
+        else
+            files = Dir[File.join(@cmake.build_dir, "/**")].join("\n    ")
+            raise "Could not find #{file} in output folder, here are contents:\n    #{files}"
+        end
+    end
+
     ###############################################################
     # Command invocations
 
-    def run_binary
+    def run_command(command)
         Dir.chdir(@cmake.build_dir) {
-            stdin, stdout, stderr = Open3.popen3(binary_command)
+            stdin, stdout, stderr = Open3.popen3(command)
             @stdout = stdout.readlines
             @stderr = stderr.readlines
         }
+    end
+
+    def run_binary
+        check_binary_command
+        run_command(binary_command)
         @last_run = :binary
     end
 
     def run_tests
-        Dir.chdir(@cmake.build_dir) {
-            stdin, stdout, stderr = Open3.popen3(test_command)
-            @stdout = stdout.readlines
-            @stderr = stderr.readlines
-        }
+        check_test_command
+        run_command(test_command)
         @last_run = :tests
     end
 

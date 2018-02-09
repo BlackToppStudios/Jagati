@@ -2,7 +2,7 @@
 
 class FileLists_BadMainSrcRoot < JagatiTestCase
     def test_file_lists
-        cmake = run_cmake_and_load_cache :should_fail # The jagati rejects Hello.cpp because its mis-located
+        cmake = run_cmake_no_dox_and_load_cache :should_fail # The jagati rejects Hello.cpp because its mis-located
 
         # The Good Files should still work
         assert_match("src/Hello2.cpp", cmake.jagati.source_file_list, "Source File List missing Hello2.cpp")
@@ -16,7 +16,7 @@ class FileLists_BadMainSrcRoot < JagatiTestCase
         assert_match("HelloTest", cmake.jagati.test_class_list, "Jagati Test class File List missing HelloTest")
 
         # But the one in the wrong folder should fail.
-        assert_match(/outside.*source.*dir/, cmake.stderr.join, "Main Source reports misplaced file")
+        assert_match(/outside.*source.*dir/m, cmake.stderr.join, "Main Source reports misplaced file")
 
     end
 end

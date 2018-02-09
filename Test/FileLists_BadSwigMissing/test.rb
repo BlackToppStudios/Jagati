@@ -2,7 +2,7 @@
 
 class FileLists_BadSwigMissing < JagatiTestCase
     def test_file_lists
-        cmake = run_cmake_and_load_cache :should_fail # The jagati rejects HelloSwig.h because its missing
+        cmake = run_cmake_no_dox_and_load_cache :should_fail # The jagati rejects HelloSwig.h because its missing
 
         # The Good Files should still work
         assert_match("src/Hello.cpp", cmake.jagati.source_file_list, "Source File List missing Hello.cpp")
@@ -16,7 +16,7 @@ class FileLists_BadSwigMissing < JagatiTestCase
         assert_match("HelloTest", cmake.jagati.test_class_list, "Jagati Test class File List missing HelloTest")
 
         # But the one with the missing file should fail.
-        assert_match(/Could.*not.*find.*swig.*directory/, cmake.stderr.join, "Reports missing when swig missing")
+        assert_match(/Could.*not.*find.*swig.*directory/m, cmake.stderr.join, "Reports missing when swig missing")
 
     end
 end
