@@ -1883,7 +1883,7 @@ function(GitUpdatePackage PackageName)
             ERROR_VARIABLE StdErr
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-        message(STATUS "\tCloneing with git")
+        message(STATUS "\tCloning with git")
         file(MAKE_DIRECTORY "${MEZZ_PackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${MEZZ_PackageDirectory}
