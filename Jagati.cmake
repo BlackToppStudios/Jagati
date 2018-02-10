@@ -64,7 +64,7 @@
 ########################################################################################################################
 # Basic Sanity Checks the Jagati enforces
 
-# Prevent The jagati from being loaded twice.
+# Prevent the Jagati from being loaded twice.
 if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
@@ -251,7 +251,7 @@ endmacro(EnableIOSCrossCompile)
 # This is used to determine what the parent-most project is. Whichever project calls this first will be presumed to be
 # the parent-most scope and be the only one that doesn't set all of it's variables in its parent's scope.
 #
-# This is also used to initialize a few internal variable that need to only be initilized once.
+# This is also used to initialize a few internal variables that need to only be initilized once.
 #
 # Usage:
 #   # Be certain to call project() before calling this.
@@ -259,11 +259,11 @@ endmacro(EnableIOSCrossCompile)
 #   ClaimParentProject()
 #
 # Result:
-#   The ParentProject variable will all be set, made available, printed and other Jagati projects
+#   The ParentProject variable will all be set, made available, printed, and other Jagati projects
 #   will know not to pollute your namespace:
 #
-#   This also initializes a the following which are use by sother functions and macros in the
-#   jagati and need to be initialized at the root level.
+#   This also initializes a the following which are use by other functions and macros in the
+#   Jagati and need to be initialized at the root level.
 #       JagatiLinkArray
 
 macro(ClaimParentProject)
@@ -280,7 +280,7 @@ endmacro(ClaimParentProject)
 ########################################################################################################################
 # CreateLocationVars
 #
-# This will create a number of variables in the Scope of the calling script that correspond to the name of the Project
+# This will create a number of variables in the scope of the calling script that correspond to the name of the project
 # so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
@@ -405,7 +405,7 @@ endmacro(CreateLocations)
 ########################################################################################################################
 # DecideOutputNames
 #
-# This will create a few variables in the scope of the calling script orcache that correspond to the name of the project
+# This will create a few variables in the scope of the calling script or cache that correspond to the name of the project
 # so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
@@ -466,10 +466,10 @@ endmacro(DecideOutputNames)
 
 macro(IdentifyCPU)
 
-    # TODO - This may need to detect more CPU types socorrect optimizations can be enabled when crosscompiling or
+    # TODO - This may need to detect more CPU types so correct optimizations can be enabled when crosscompiling or
     # targetting older CPUs.
 
-    message(STATUS "Checking CPU information this system.'")
+    message(STATUS "Checking CPU information this system.")
 
     set(CpuIsKnown OFF)
     set(CpuIsX86 OFF)
@@ -606,7 +606,7 @@ endmacro(IdentifyOS)
 # If this fails to detect the compiler this reports a message with status of FATAL_ERROR which may terminate CMake.
 #
 # Usage:
-#   # Be the parentmost cmake scope or this has no effect
+#   # Be the parentmost cmake scope or this has no effect.
 #   IdentifyCompiler()
 #
 # Result:
@@ -734,7 +734,7 @@ endmacro(IdentifyCompiler)
 # settings and notify the code and other build settings that care.
 #
 # Usage:
-#   # Be the parentmost cmake scope or this has no effect
+#   # Be the parentmost cmake scope or this has no effect.
 #   IdentifyDebug()
 #
 # Result:
@@ -781,7 +781,7 @@ endmacro(IdentifyDebug)
 #           Enable Position independent code or otherwise fix linker issues.
 #           Turn on C++14.
 #
-#       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries
+#       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries.
 #
 
 macro(SetCommonCompilerFlags)
@@ -816,7 +816,7 @@ macro(SetCommonCompilerFlags)
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
         -Wstrict-overflow=2 -Wundef")
 
-        # Emscripten is a unique beast
+        # Emscripten is a unique beast.
         if(CompilerIsEmscripten)
             # The same warnings as clang.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-documentation-unknown-command -Wno-c++98-compat")
@@ -829,7 +829,7 @@ macro(SetCommonCompilerFlags)
             list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
             set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
 
-            # A few checks that are very specific
+            # A few checks that are very specific.
             if(CpuIsAmd64 AND Platform64Bit)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
             endif(CpuIsAmd64 AND Platform64Bit)
@@ -850,13 +850,13 @@ macro(SetCommonCompilerFlags)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -mtune=native")
         endif(NOT MEZZ_Debug)
 
-        # Removed -Winline it did not seem useful
+        # Removed -Winline it did not seem useful.
         # He are some flags suggested for use an why they were not used:
         # -Woverloaded-virtual - What did the author of this think virtual methods were for if not
         #                        to be overloaded. This disagrees with explicit design decisions.
         # -Wmisleading-indentation - Help find errors revolving around tabs and control flow. I
         #                            want to enable this, but not until GCC 6.
-        # -DDEBUG_DIRECTOR_EXCEPTION  # Used to make swig emit more
+        # -DDEBUG_DIRECTOR_EXCEPTION  # Used to make swig emit more.
     else(CompilerDesignNix)
         if(CompilerIsMsvc)
             # Used:
@@ -898,7 +898,7 @@ endmacro(SetCommonCompilerFlags)
 ########################################################################################################################
 # SetProjectVariables
 #
-# Clear a few lists for storing thinks like header, source and doxygen input files.
+# Clear a few lists for storing thinks like header, source, and doxygen input files.
 #
 #   Usage:
 #       # Call this anytime or just let StandardJagatiSetup do it.
@@ -911,9 +911,9 @@ endmacro(SetCommonCompilerFlags)
 #
 #       ${PROJECT_NAME}HeaderFiles     - A variable intended to be used for storing a list of conventional .h files.
 #       ${PROJECT_NAME}SourceFiles     - Another variable for storing a list of files, any C++ source files.
-#       ${PROJECT_NAME}TestClassList   - A list classes that will be used in tests
-#       ${PROJECT_NAME}TestHeaderFiles  - A list of header and other files to go into the test executable.
-#       ${PROJECT_NAME}SwigFiles       - The list of all files that should be s
+#       ${PROJECT_NAME}TestClassList   - A list classes that will be used in tests.
+#       ${PROJECT_NAME}TestHeaderFiles - A list of header and other files to go into the test executable.
+#       ${PROJECT_NAME}SwigFiles       - The list of all files that are generated by SWIG.
 #
 #       JagatiDoxArray - This list exist only one build process and it will contain the list of Doxygen input files.
 #
@@ -948,7 +948,7 @@ endmacro(SetProjectVariables)
 #   FindGitExecutable()
 #
 # Result:
-#   If not already set this will put the git executable into the variable MEZZ_GitExecutable
+#   If not already set this will put the git executable into the variable MEZZ_GitExecutable.
 #
 
 macro(FindGitExecutable)
@@ -1045,7 +1045,7 @@ endfunction(UseStaticLinking TrueForStatic)
 #
 # Result:
 #   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed.
-#   Additionally a variable named CompilerCodeCoverage
+#   Additionally a variable named CompilerCodeCoverage.
 #
 
 function(Internal_ChooseCodeCoverage TrueForEnabled)
@@ -1082,7 +1082,7 @@ endmacro(ChooseCodeCoverage TrueForEnabled)
 #
 # Result:
 #   Flags will be added to the build that enable code coverage if present otherwise a warning will be printed.
-#   Additionally a variable named CompilerCodeCoverage
+#   Additionally a variable named CompilerCodeCoverage.
 #
 
 macro(SetCodeCoverage)
@@ -1102,28 +1102,28 @@ endmacro(SetCodeCoverage)
 #
 # Usage:
 #   # Call it and pass the name of the header file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
+#   # of the StandardJagatiSetup.
 #   AddHeaderFile("Hello.h")
 #
 # Result:
-#   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended
+#   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended.
 #
 macro(AddHeaderFile FileName)
-    set(TempHeaderFileToAdd "") # Prepare for adding this as a dox input too
+    set(TempHeaderFileToAdd "") # Prepare for adding this as a dox input too.
     if(EXISTS "${FileName}")
         # It exists, but is it valid?
         if("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-            # Found it in the include dir
+            # Found it in the include dir.
             set(TempHeaderFileToAdd "${FileName}")
         elseif("${FileName}" MATCHES "${${PROJECT_NAME}GenHeadersDir}")
-            # Found it in the generated include dir
+            # Found it in the generated include dir.
             set(TempHeaderFileToAdd "${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
             message(SEND_ERROR "Found'${FileName}' outside header directory, move to '${${PROJECT_NAME}IncludeDir}'.\
 or '${${PROJECT_NAME}GenHeadersDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the header folder
+        # File does not exist, so lets search for it in the header folder.
         if(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
             # Found It! Add to list
             set(TempHeaderFileToAdd "${${PROJECT_NAME}IncludeDir}${FileName}")
@@ -1139,7 +1139,7 @@ or '${${PROJECT_NAME}GenHeadersDir}'.")
 
     list(APPEND ${PROJECT_NAME}HeaderFiles "${TempHeaderFileToAdd}")
     # This was another possible way to do this without forcing the cache, but couldn't force through enough scope
-    # levels. There are good reasons to not cache this, but they don't "it needs to work"
+    # levels. There are good reasons to not cache this, but they don't "it needs to work".
     #if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     #    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
     #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -1156,26 +1156,26 @@ endmacro(AddHeaderFile FileName)
 #
 # Usage:
 #   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
+#   # of the StandardJagatiSetup.
 #   AddSourceFile("Hello.cpp")
 #
 # Result:
-#   The variable ${PROJECT_NAME}SourceFiles in the parent scope will have the file appended
+#   The variable ${PROJECT_NAME}SourceFiles in the parent scope will have the file appended.
 #
 
 macro(AddSourceFile FileName)
     if(EXISTS "${FileName}")
         # It exists but does its location make sense?
         if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-            # Found it in the Source dir
+            # Found it in the Source dir.
             list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
             message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
+        # File does not exist, so lets search for it in the source folder.
         if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
-            # Found It! Add to list
+            # Found It! Add to list.
             list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
             # Not Found bail.
@@ -1191,22 +1191,22 @@ endmacro(AddSourceFile FileName)
 ########################################################################################################################
 # AddMainSourceFile
 #
-# Add the source file to the list of those that are part of the main executable but not the library
+# Add the source file to the list of those that are part of the main executable but not the library.
 #
 # Usage:
 #   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
+#   # of the StandardJagatiSetup.
 #   AddMainSourceFile("Main.cpp")
 #
 # Result:
-#   The variable ${PROJECT_NAME}MainSourceFiles in the parent scope will have the file appended
+#   The variable ${PROJECT_NAME}MainSourceFiles in the parent scope will have the file appended.
 #
 
 macro(AddMainSourceFile FileName)
     if(EXISTS "${FileName}")
         # It exists but does its location make sense?
         if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-            # Found it in the Source dir
+            # Found it in the Source dir.
             list(APPEND ${PROJECT_NAME}MainSourceFiles "${FileName}")
         elseif("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
             # Allow stuff in the Test directory but don't advertise it loudly.
@@ -1215,9 +1215,9 @@ macro(AddMainSourceFile FileName)
             message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
+        # File does not exist, so lets search for it in the source folder.
         if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
-            # Found It! Add to list
+            # Found It! Add to list.
             list(APPEND ${PROJECT_NAME}MainSourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
             # Not Found bail.
@@ -1270,15 +1270,15 @@ macro(AddTestFile FileName)
     if(EXISTS "${FileName}")
         # It exists but does its location make sense?
         if("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
-            # Found it in the Test dir
+            # Found it in the Test dir.
             list(APPEND ${PROJECT_NAME}TestHeaderFiles "${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
             message(SEND_ERROR "Found'${FileName}' outside test directory, move to '${${PROJECT_NAME}TestDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}TestDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
+        # File does not exist, so lets search for it in the source folder.
         if(EXISTS "${${PROJECT_NAME}TestDir}${FileName}")
-            # Found It! Add to list
+            # Found It! Add to list.
             list(APPEND ${PROJECT_NAME}TestHeaderFiles "${${PROJECT_NAME}TestDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}TestDir}${FileName}")
             # Not Found bail.
@@ -1301,7 +1301,7 @@ endmacro(AddTestFile FileName)
 # AddJagatiDoxInput
 #
 # Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the 
-# file is relative to the dox dir for this project
+# file is relative to the dox dir for this project.
 #
 # Usage:
 #   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
@@ -1316,12 +1316,12 @@ endmacro(AddTestFile FileName)
 
 macro(AddJagatiDoxInput FileName)
     if(EXISTS "${FileName}")
-        # File exists So we need to check if it is in the right folder
+        # File exists So we need to check if it is in the right folder.
         if("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
             # File is good it is in the Dox dir.
             list(APPEND JagatiDoxArray "${FileName}")
         elseif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
-            # Found it in the include dir
+            # Found it in the include dir.
             list(APPEND JagatiDoxArray "${FileName}")
         elseif("${FileName}" MATCHES "${${PROJECT_NAME}GenHeadersDir}")
             # Found it in the generated include dir
@@ -1331,9 +1331,9 @@ macro(AddJagatiDoxInput FileName)
  and '${${PROJECT_NAME}IncludeDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}DoxDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the dox folder
+        # File does not exist, so lets search for it in the dox folder.
         if(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
-            # Found It! Add to DoxArray
+            # Found It! Add to DoxArray.
             list(APPEND JagatiDoxArray "${${PROJECT_NAME}DoxDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
             # Not Found anywhere, bail.
@@ -1351,11 +1351,11 @@ endmacro(AddJagatiDoxInput FileName)
 #
 # Usage:
 #   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
-#   # of the StandardJagatiSetup
+#   # of the StandardJagatiSetup.
 #   AddSwigEntryPoint("Hello.h")
 #
 # Result:
-#   The variable ${PROJECT_NAME}SwigFiles in the parent scope will have the file appended
+#   The variable ${PROJECT_NAME}SwigFiles in the parent scope will have the file appended.
 #
 # Todo:
 #   This should check paths relative to the project, source dir and swig directory.
@@ -1364,15 +1364,15 @@ macro(AddSwigEntryPoint FileName)
     if(EXISTS "${FileName}")
         # It exists but does its location make sense?
         if("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
-            # Found it in the Swig dir
+            # Found it in the Swig dir.
             list(APPEND ${PROJECT_NAME}SwigFiles "${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
             message(SEND_ERROR "Found'${FileName}' outside swig directory, move to '${${PROJECT_NAME}SwigDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}SwigDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the source folder
+        # File does not exist, so lets search for it in the source folder.
         if(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
-            # Found It! Add to list
+            # Found It! Add to list.
             list(APPEND ${PROJECT_NAME}SwigFiles "${${PROJECT_NAME}SwigDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}SwigDir}${FileName}")
             # Not Found bail.
@@ -1397,7 +1397,7 @@ endmacro(AddSwigEntryPoint FileName)
 #
 # Add to a variable that contains an array of all the Jagati Linkable Libraries provided by loaded packages. This
 # doesn't create a library it just adds one to Jagati tracking. Avoid using this unless what you need to to is well
-# outside the normals bounds of package creation
+# outside the normals bounds of package creation.
 #
 # Usage:
 #   # Be certain to call project before calling this.
@@ -1579,8 +1579,8 @@ endmacro(AddJagatiExecutable)
 #   This also writes to the variable "JagatiConfigRemarks" in the parentmost scope as a temporary.
 #
 
-# This is an implementation Detail of AddJagatiConfig, This is needed because macro parameters are neither variables, nor
-# constants and cannot be used in if statements checking implicit truthiness.
+# This is an implementation detail of AddJagatiConfig. This is needed because macro parameters are neither variables, nor
+# constants, and cannot be used in if statements checking implicit truthiness.
 function(Internal_SetRemarks HowToSet)
     if(HowToSet)
         set(JagatiConfigRemarks "" PARENT_SCOPE)
@@ -1612,7 +1612,7 @@ endmacro(AddJagatiConfig Name Value RemarkBool)
 #   AddJagatiCompileOption("VariableName" "Help text." TruthyDefaultValue)
 #
 # Results:
-#   This will create a variable named after thee string in the first parameter. This variable will
+#   This will create a variable named after the string in the first parameter. This variable will
 #   be added to the config file for the current project and as a CMake Option in the GUI (or command
 #   prompt).
 
@@ -1651,7 +1651,7 @@ macro(EmitConfig)
     set(DoxygenElse "\n\n#else // DOXYGEN\n")
     set(ConfigFooter "\n\n#endif // DOXYGEN\n\n#endif\n")
 
-    # Assemble the content and notify correct scopes
+    # Assemble the content and notify correct scopes.
     set(${PROJECT_NAME}ConfigContent
         "${ConfigHeader}${${PROJECT_NAME}JagatiConfig}${DoxygenElse}${${PROJECT_NAME}JagatiConfigRaw}${ConfigFooter}"
     )
@@ -1659,7 +1659,7 @@ macro(EmitConfig)
         set(${PROJECT_NAME}ConfigContent "${${PROJECT_NAME}ConfigContent}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
-    # Write the file and notify correct scopes
+    # Write the file and notify correct scopes.
     set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}GenHeadersDir}${PROJECT_NAME}Config.h")
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
         set(${PROJECT_NAME}ConfigFilename "${${PROJECT_NAME}ConfigFilename}" PARENT_SCOPE)
@@ -1686,7 +1686,7 @@ endmacro(EmitConfig)
 #
 # Results:
 #       A file called ${PROJECT_NAME}_tester.cpp is emitted int the build output directory. This can be used to generate
-#   a unit test executable
+#   a unit test executable.
 #
 
 macro(EmitTestCode)
@@ -1698,7 +1698,7 @@ macro(EmitTestCode)
     endforeach(OneHeader ${${PROJECT_NAME}TestHeaderFiles})
     set(TestsIncludes "${TestsIncludes}\n\n// End Dynamically Included Headers")
 
-    # The main function
+    # The main function.
     set(TestsMainHeader
         "\n\nint main (int argc, char** argv)\n{\n    Mezzanine::Testing::CoreTestGroup TestInstances;\n\n"
     )
@@ -1716,7 +1716,7 @@ macro(EmitTestCode)
         "    return Mezzanine::Int32(Mezzanine::Testing::MainImplementation(argc, argv, TestInstances)); \n}\n\n"
     )
 
-    # Connect everything
+    # Connect everything.
     set(${PROJECT_NAME}TestsContent
         "${TestsHeader}${TestsIncludes}${TestsMainHeader}${TestsInit}${TestsMainFooter}"
     )
@@ -1737,11 +1737,11 @@ endmacro(EmitTestCode)
 # Create a test target that makes and executable to run all the tests added so far.
 #
 # Usage:
-#   # Must call AddJagatiLibrary or AddManualJagatiLibrary first, because this uses ${${PROJECT_NAME}LibTarget}
+#   # Must call AddJagatiLibrary or AddManualJagatiLibrary first, because this uses ${${PROJECT_NAME}LibTarget}.
 #   AddTestTarget()
 #
 # Results:
-#   Create a test executable target named ${${PROJECT_NAME}TestTarget}
+#   Create a test executable target named ${${PROJECT_NAME}TestTarget}.
 #
 
 macro(AddTestTarget)
@@ -1769,7 +1769,7 @@ endmacro(AddTestTarget)
 #   AddTestDirectory("TestDirectory")
 #
 # Results:
-#   This call add test for each header in the passed directory
+#   This call add test for each header in the passed directory.
 #
 
 macro(AddTestDirectory TestDir)
@@ -1811,7 +1811,7 @@ endfunction(ShowList)
 # will see.
 #
 # Usage:
-#   # Call after creating all the default files and populating the default source file lists
+#   # Call after creating all the default files and populating the default source file lists.
 #   # ${${PROJECT_NAME}HeaderFiles}, ${${PROJECT_NAME}SourceFiles}, ${${PROJECT_NAME}SwigFiles},
 #   # ${${PROJECT_NAME}ConfigFilename}, ${${PROJECT_NAME}DoxFiles}README.md, COPYING.md, .travis.yml, appveyor.yml,
 #   # and codecov.yml.
