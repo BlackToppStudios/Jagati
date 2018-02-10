@@ -33,7 +33,7 @@ dependencies. Our thinking is that some enforced opinions will make working with
 
 Any opinion can be avoided by using the less restrictive CMake syntax. Some things are impossible to do using just the
 Jagati, in these case then of course use normal CMake constructs. If you just want to change how one of the assumptions
-works consider if that worth the cost of losing integration with other packages.
+works consider if that is worth the cost of losing integration with other packages.
 
 Here is a (partial) summary of opinions
 
@@ -132,7 +132,7 @@ You have skipped tests. Run with --verbose for details.
 ## Current Test Coverage
 
 Tests can be a good source of examples. Each test case occupies its own subdirectory in the Test/ directory. Each 
-directory has a test.rb file with some (hopefully) simple to read ruby code that scrapes cmake caches and other files
+directory has a test.rb file with some (hopefully) simple to read ruby code that scrapes CMake caches and other files
 CMake leaves around to verify the Jagati works. This is a brief summary of each test that might be a decent example (The
 best is FileLists):
 
