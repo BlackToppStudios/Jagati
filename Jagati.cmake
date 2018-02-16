@@ -819,7 +819,8 @@ macro(SetCommonCompilerFlags)
         # Emscripten is a unique beast.
         if(CompilerIsEmscripten)
             # The same warnings as clang.
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-documentation-unknown-command -Wno-c++98-compat")
+            set(CMAKE_CXX_FLAGS "-s DISABLE_EXCEPTION_CATCHING=0 ${CMAKE_CXX_FLAGS} -Weverything \
+            -Wno-documentation-unknown-command -Wno-c++98-compat")
 
             # This is exe on windows and nothing on most platforms, but without this emscripten output is... wierd.
             set(CMAKE_EXECUTABLE_SUFFIX ".js")
