@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.2.0")
+    set(JagatiVersion "0.21.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -260,11 +260,8 @@ endmacro(EnableIOSCrossCompile)
 #
 # Result:
 #   The ParentProject variable will all be set, made available, printed, and other Jagati projects
-#   will know not to pollute your namespace:
+#   will know not to pollute your namespace.
 #
-#   This also initializes a the following which are use by other functions and macros in the
-#   Jagati and need to be initialized at the root level.
-#       JagatiLinkArray
 
 macro(ClaimParentProject)
     if(ParentProject)
@@ -273,7 +270,6 @@ macro(ClaimParentProject)
     else(ParentProject)
         message(STATUS "Claiming '${PROJECT_NAME}' as the Parent Project.")
         set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
-        set(JagatiLinkArray ""  CACHE INTERNAL "Am empty list of names to link against")
     endif(ParentProject)
 endmacro(ClaimParentProject)
 
@@ -352,24 +348,24 @@ macro(CreateLocationVars)
     endif(NOT "${MEZZ_PackageDirectory}" MATCHES "^.*/$")
 
     #######################################
-    message(STATUS "\tVariables for '${PROJECT_NAME}'")
+    message(STATUS "Variables for '${PROJECT_NAME}'")
 
-    message(STATUS "\t\tDerived Output folders")
-    message(STATUS "\t\t\t'${PROJECT_NAME}BinaryDir' - ${${PROJECT_NAME}BinaryDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}GenHeadersDir' - ${${PROJECT_NAME}GenHeadersDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}GenSourceDir' - ${${PROJECT_NAME}GenSourceDir}")
+    message(STATUS "Derived Output folders")
+    message(STATUS "'${PROJECT_NAME}BinaryDir' - ${${PROJECT_NAME}BinaryDir}")
+    message(STATUS "'${PROJECT_NAME}GenHeadersDir' - ${${PROJECT_NAME}GenHeadersDir}")
+    message(STATUS "'${PROJECT_NAME}GenSourceDir' - ${${PROJECT_NAME}GenSourceDir}")
 
-    message(STATUS "\t\tDerived Input folders")
-    message(STATUS "\t\t\t'${PROJECT_NAME}RootDir' - ${${PROJECT_NAME}RootDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}DoxDir' - ${${PROJECT_NAME}DoxDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}IncludeDir' - ${${PROJECT_NAME}IncludeDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}LibDir' - ${${PROJECT_NAME}LibDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}SourceDir' - ${${PROJECT_NAME}SourceDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}SwigDir' - ${${PROJECT_NAME}SwigDir}")
-    message(STATUS "\t\t\t'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
+    message(STATUS "Derived Input folders")
+    message(STATUS "'${PROJECT_NAME}RootDir' - ${${PROJECT_NAME}RootDir}")
+    message(STATUS "'${PROJECT_NAME}DoxDir' - ${${PROJECT_NAME}DoxDir}")
+    message(STATUS "'${PROJECT_NAME}IncludeDir' - ${${PROJECT_NAME}IncludeDir}")
+    message(STATUS "'${PROJECT_NAME}LibDir' - ${${PROJECT_NAME}LibDir}")
+    message(STATUS "'${PROJECT_NAME}SourceDir' - ${${PROJECT_NAME}SourceDir}")
+    message(STATUS "'${PROJECT_NAME}SwigDir' - ${${PROJECT_NAME}SwigDir}")
+    message(STATUS "'${PROJECT_NAME}TestDir' - ${${PROJECT_NAME}TestDir}")
 
-    message(STATUS "\t\tMEZZ_PackageDirectory - ${MEZZ_PackageDirectory}")
-    message(STATUS "\t\tENV{MEZZ_PACKAGE_DIR} - ${MEZZ_PackageDirectory}")
+    message(STATUS "MEZZ_PackageDirectory - ${MEZZ_PackageDirectory}")
+    message(STATUS "ENV{MEZZ_PACKAGE_DIR} - ${MEZZ_PackageDirectory}")
 endmacro(CreateLocationVars)
 
 ########################################################################################################################
@@ -405,8 +401,8 @@ endmacro(CreateLocations)
 ########################################################################################################################
 # DecideOutputNames
 #
-# This will create a few variables in the scope of the calling script or cache that correspond to the name of the project
-# so that they can readily be referenced from other project including the caller as a subproject.
+# This will create a few variables in the scope of the calling script or cache that correspond to the name of the
+# project so that they can readily be referenced from other project including the caller as a subproject.
 #
 # Usage:
 #   # Be certain to call project before calling this.
@@ -427,21 +423,21 @@ macro(DecideOutputNames)
     else(${PROJECT_NAME}BinTarget)
         set(${PROJECT_NAME}BinTarget "${PROJECT_NAME}_Main" CACHE INTERNAL "" FORCE)
     endif(${PROJECT_NAME}BinTarget)
-    message(STATUS "\t'${PROJECT_NAME}BinTarget' - ${${PROJECT_NAME}BinTarget}")
+    message(STATUS "'${PROJECT_NAME}BinTarget'  - ${${PROJECT_NAME}BinTarget}")
 
     if(${PROJECT_NAME}LibTarget)
         set(${PROJECT_NAME}LibTarget "${${PROJECT_NAME}LibTarget}" CACHE INTERNAL "" FORCE)
     else(${PROJECT_NAME}LibTarget)
         set(${PROJECT_NAME}LibTarget "${PROJECT_NAME}" CACHE INTERNAL "" FORCE)
     endif(${PROJECT_NAME}LibTarget)
-    message(STATUS "\t'${PROJECT_NAME}LibTarget' - ${${PROJECT_NAME}LibTarget}")
+    message(STATUS "'${PROJECT_NAME}LibTarget'  - ${${PROJECT_NAME}LibTarget}")
 
     if(${PROJECT_NAME}TestTarget)
         set(${PROJECT_NAME}TestTarget "${${PROJECT_NAME}TestTarget}" CACHE INTERNAL "" FORCE)
     else(${PROJECT_NAME}TestTarget)
         set(${PROJECT_NAME}TestTarget "${PROJECT_NAME}_Tester" CACHE INTERNAL "" FORCE)
     endif(${PROJECT_NAME}TestTarget)
-    message(STATUS "\t'${PROJECT_NAME}TestTarget' - ${${PROJECT_NAME}TestTarget}")
+    message(STATUS "'${PROJECT_NAME}TestTarget' - ${${PROJECT_NAME}TestTarget}")
 endmacro(DecideOutputNames)
 
 ########################################################################################################################
@@ -492,10 +488,10 @@ macro(IdentifyCPU)
         set(CpuIsAmd64 ON)
     endif(CMAKE_SYSTEM_PROCESSOR MATCHES "(amd64)|(AMD64)")
 
-    message(STATUS "\t'CpuIsKnown' - ${CpuIsKnown}")
-    message(STATUS "\t'CpuIsX86'   - ${CpuIsX86}")
-    message(STATUS "\t'CpuIsAmd64' - ${CpuIsAmd64}")
-    message(STATUS "\t'CpuIsArm'   - ${CpuIsArm}")
+    message(STATUS "'CpuIsKnown' - ${CpuIsKnown}")
+    message(STATUS "'CpuIsX86'   - ${CpuIsX86}")
+    message(STATUS "'CpuIsAmd64' - ${CpuIsAmd64}")
+    message(STATUS "'CpuIsArm'   - ${CpuIsArm}")
 endmacro(IdentifyCPU)
 
 
@@ -526,7 +522,7 @@ endmacro(IdentifyCPU)
 
 macro(IdentifyOS)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "\tDetecting OS:")
+        message(STATUS "Detecting OS:")
 
         set(SystemIsLinux OFF)
         set(SystemIsWindows OFF)
@@ -534,53 +530,47 @@ macro(IdentifyOS)
         set(SystemIsIOS OFF)
 
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-            message(STATUS "\t\tDetected OS as 'Linux'.")
+            message(STATUS "Detected OS as 'Linux'.")
             set(SystemIsLinux ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-            message(STATUS "\t\tDetected OS as 'Windows'.")
+            message(STATUS "Detected OS as 'Windows'.")
             set(SystemIsWindows ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-            message(STATUS "\t\tDetected OS as 'Mac OS X'.")
+            message(STATUS "Detected OS as 'Mac OS X'.")
             set(SystemIsMacOSX ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-
         if("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
-            message(STATUS "\t\tDetected OS as 'iOS'.")
+            message(STATUS "Detected OS as 'iOS'.")
             set(SystemIsIOS ON)
         endif("${CMAKE_SYSTEM_NAME}" STREQUAL "AppleIOS")
-
-        message(STATUS "\t\tLinux: ${SystemIsLinux}")
-        message(STATUS "\t\tWindows: ${SystemIsWindows}")
-        message(STATUS "\t\tMacOSX: ${SystemIsMacOSX}")
-        message(STATUS "\t\tiOS: ${SystemIsIOS}")
+        message(STATUS "'SystemIsLinux'   - ${SystemIsLinux}")
+        message(STATUS "'SystemIsWindows' - ${SystemIsWindows}")
+        message(STATUS "'SystemIsMacOSX'  - ${SystemIsMacOSX}")
+        message(STATUS "'SystemIsIOS'     - ${SystemIsIOS}")
 
         if(SystemIsLinux)
-            message(STATUS "\t\tSetting specific variables for 'Linux'.")
+            message(STATUS "Setting specific variables for 'Linux'.")
             set(CatCommand "cat")
             set(PlatformDefinition "LINUX")
         endif(SystemIsLinux)
-
         if(SystemIsWindows)
-            message(STATUS "\t\tSetting specific variables for 'Windows'.")
+            message(STATUS "Setting specific variables for 'Windows'.")
             set(CatCommand "type")
             set(PlatformDefinition "WINDOWS")
         endif(SystemIsWindows)
-
         if(SystemIsMacOSX)
-            message(STATUS "\t\tSetting specific variables for 'Mac OS X'.")
+            message(STATUS "Setting specific variables for 'Mac OS X'.")
             set(CatCommand "cat")
             set(PlatformDefinition "MACOSX")
         endif(SystemIsMacOSX)
-
         if(SystemIsIOS)
-            message(STATUS "\t\tSetting specific variables for 'iOS'.")
+            message(STATUS "Setting specific variables for 'iOS'.")
             set(CatCommand "cat")
             set(PlatformDefinition "IOS")
         endif(SystemIsIOS)
+        message(STATUS "'CatCommand' - ${CatCommand}")
 
         set(Platform32Bit OFF)
         set(Platform64Bit OFF)
@@ -592,6 +582,8 @@ macro(IdentifyOS)
             message(STATUS "Detected a 32 bit platform.")
             set(Platform32Bit ON)
         endif("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+        message(STATUS "'Platform64Bit' - ${Platform64Bit}")
+        message(STATUS "'Platform32Bit' - ${Platform32Bit}")
 
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(IdentifyOS)
@@ -628,7 +620,7 @@ endmacro(IdentifyOS)
 
 macro(IdentifyCompiler)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "\tDetecting Compiler:")
+        message(STATUS "Detecting Compiler:")
 
         # If compiler ID is unset set try to guess it
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "")
@@ -637,7 +629,7 @@ macro(IdentifyCompiler)
             endif(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "")
 
-        message(STATUS "\t\tCMAKE_CXX_COMPILER_ID: '${CMAKE_CXX_COMPILER_ID}'")
+        message(STATUS "CMAKE_CXX_COMPILER_ID: '${CMAKE_CXX_COMPILER_ID}'")
 
         set(CompilerIsGCC OFF)
         set(CompilerIsClang OFF)
@@ -653,7 +645,7 @@ macro(IdentifyCompiler)
         set(CompilerDetected OFF)
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-            message(STATUS "\t\tDetected compiler as 'GCC'.")
+            message(STATUS "Detected compiler as 'GCC'.")
             set(CompilerIsGCC ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
@@ -661,7 +653,7 @@ macro(IdentifyCompiler)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            message(STATUS "\t\tDetected compiler as 'AppleClang' using Clang settings.")
+            message(STATUS "Detected compiler as 'AppleClang' using Clang settings.")
             set(CompilerIsClang ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
@@ -669,7 +661,7 @@ macro(IdentifyCompiler)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-            message(STATUS "\t\tDetected compiler as 'Clang'.")
+            message(STATUS "Detected compiler as 'Clang'.")
             set(CompilerIsClang ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
@@ -677,21 +669,21 @@ macro(IdentifyCompiler)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-            message(STATUS "\t\tDetected compiler as 'Intel'.")
+            message(STATUS "Detected compiler as 'Intel'.")
             set(CompilerIsIntel ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Emscripten")
-            message(STATUS "\t\tDetected compiler as 'Emscripten'.")
+            message(STATUS "Detected compiler as 'Emscripten'.")
             set(CompilerIsEmscripten ON)
             set(CompilerDesignNix ON)
             set(CompilerDetected ON)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Emscripten")
 
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-            message(STATUS "\t\tDetected compiler as 'MSVC'.")
+            message(STATUS "Detected compiler as 'MSVC'.")
             set(CompilerIsMsvc ON)
             set(CompilerDesignMS ON)
             set(CompilerDetected ON)
@@ -708,15 +700,15 @@ macro(IdentifyCompiler)
         endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "${CMAKE_GENERATOR}" STREQUAL "Xcode")
 
         if(CompilerDesignNix)
-            message(STATUS "\t\tPresuming *nix style compiler.")
+            message(STATUS "Presuming *nix style compiler.")
         endif(CompilerDesignNix)
 
         if(CompilerDesignMS)
-            message(STATUS "\t\tPresuming ms style compiler.")
+            message(STATUS "Presuming ms style compiler.")
         endif(CompilerDesignMS)
 
         if(NOT CompilerDetected)
-            message(FATAL_ERROR "\t\tCompiler not detected, Exiting! This can be supressed by removing check in the\
+            message(FATAL_ERROR "Compiler not detected, Exiting! This can be supressed by removing check in the\
             Jagati macro IdentifyCompiler.")
         endif(NOT CompilerDetected)
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -745,16 +737,16 @@ endmacro(IdentifyCompiler)
 
 macro(IdentifyDebug)
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "\tDetecting Debug:")
-        message(STATUS "\t\tCMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
+        message(STATUS "Detecting Debug:")
+        message(STATUS "CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
 
         set(CompilerDebug OFF)
 
         if("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
-            message(STATUS "\t\tDetected compiler as creating debug data.")
+            message(STATUS "Detected compiler as creating debug data.")
             set(CompilerDebug ON)
         else("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
-            message(STATUS "\t\tDetected compiler as skipping debug data.")
+            message(STATUS "Detected compiler as skipping debug data.")
         endif("${CMAKE_BUILD_TYPE}" MATCHES "[Dd][Ee][Bb]")
 
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
@@ -781,10 +773,23 @@ endmacro(IdentifyDebug)
 #           Enable Position independent code or otherwise fix linker issues.
 #           Turn on C++14.
 #
-#       JagatiLinkArray - This variable is set with extra items to link against for use target_link_libraries.
-#
+#       These platforms specific variables are set with flags that the linker might care about that need to be passed on
+#       the command line to the linker in some very specific order:
+#           LinkSuffix
+#           LinkPrefix
 
 macro(SetCommonCompilerFlags)
+
+    if(LinkSuffix)
+    else(LinkSuffix)
+        set(LinkSuffix "")
+    endif(LinkSuffix)
+
+    if(LinkPrefix)
+    else(LinkPrefix)
+        set(LinkPrefix "")
+    endif(LinkPrefix)
+
     if(CompilerDesignNix)
 
         # These warnings work will work on all nix style compilers. Here are the most important flags:
@@ -827,8 +832,8 @@ macro(SetCommonCompilerFlags)
         else(CompilerIsEmscripten)
             # Store thread library link information for later.
             find_package(Threads)
-            list(APPEND JagatiLinkArray ${CMAKE_THREAD_LIBS_INIT})
-            set(JagatiLinkArray "${JagatiLinkArray}"  CACHE INTERNAL "" FORCE)
+            set(LinkSuffix ${CMAKE_THREAD_LIBS_INIT})
+            set(LinkSuffix "${LinkSuffix}"  CACHE INTERNAL "" FORCE)
 
             # A few checks that are very specific.
             if(CpuIsAmd64 AND Platform64Bit)
@@ -884,6 +889,8 @@ macro(SetCommonCompilerFlags)
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
                 /wd4987 /wd4365 /wd4774 /wd4623 /wd5039"
             )
+            set(LinkPrefix "/link")
+            set(LinkPrefix "${LinkPrefix}"  CACHE INTERNAL "" FORCE)
         else(CompilerIsMsvc)
             message(FATAL_ERROR
                 "Your compiler is not GCC compatible and not MSVC... Add this mysterious software's flags here."
@@ -892,7 +899,7 @@ macro(SetCommonCompilerFlags)
     endif(CompilerDesignNix)
 
     if("${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        message(STATUS "\tC++ compiler and linker flags: ${CMAKE_CXX_FLAGS}")
+        message(STATUS "C++ compiler and linker flags: ${CMAKE_CXX_FLAGS}")
     endif("${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(SetCommonCompilerFlags)
 
@@ -1146,7 +1153,7 @@ or '${${PROJECT_NAME}GenHeadersDir}'.")
     #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
         "List of Header files for ${PROJECT_NAME}." FORCE)
-    message(STATUS "\tHeader File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
+    message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
     AddJagatiDoxInput("${TempHeaderFileToAdd}") # This can subtly different than the input.
 endmacro(AddHeaderFile FileName)
 
@@ -1406,20 +1413,35 @@ endmacro(AddSwigEntryPoint FileName)
 #   AddManualJagatiLibrary("LinkTarget")
 #
 # Result:
-#   The passed file will be added to a list of libaries. This list can be Accessed through the variable:
-#       JagatiLinkArray
+#   The passed file will be added to a list of libaries. This list can be accessed through the variable:
+#       JagatiLinkLibraryArray
+#
+#   A list of link directories will be kept that will provide paths for the compiler to search and these will be in the
+#   variable:
+#       JagatiLinkDirArray
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
 #
 
 macro(AddManualJagatiLibrary TargetName)
-    list(APPEND JagatiLinkArray "${TargetName}")
+    if(CompilerDesignMS)
+        list(APPEND JagatiLinkDirArray "/LIBPATH:${${PROJECT_NAME}BinaryDir}")
+    else(CompilerDesignMS)
+        list(APPEND JagatiLinkDirArray "-I${${PROJECT_NAME}BinaryDir}")
+    endif(CompilerDesignMS)
+    list(REMOVE_DUPLICATES JagatiLinkDirArray)
+
+    list(APPEND JagatiLinkLibraryArray "${TargetName}")
+    list(REMOVE_DUPLICATES JagatiLinkLibraryArray)
+
     set(${PROJECT_NAME}Lib "${TargetName}" CACHE INTERNAL "" FORCE)
-    message(STATUS "\tLib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiLinkArray "${JagatiLinkArray}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+    set(JagatiLinkDirArray "${JagatiLinkDirArray}"  CACHE INTERNAL "" FORCE)
+    set(JagatiLinkLibraryArray "${JagatiLinkLibraryArray}"  CACHE INTERNAL "" FORCE)
+
+    message(STATUS "Link dirs: 'JagatiLinkDirArray'    - ${JagatiLinkDirArray}")
+    message(STATUS "Link libs: 'JagatiLinkLibraryArray'- ${JagatiLinkLibraryArray}")
+    message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
 endmacro(AddManualJagatiLibrary FileName)
 
 ########################################################################################################################
@@ -1434,8 +1456,10 @@ endmacro(AddManualJagatiLibrary FileName)
 #   AddJagatiLibrary()
 #
 # Result:
-#   The passed file will be added to a list of libaries. This list can be Accessed through the variable:
-#       JagatiLinkArray
+#   The passed file will be added to a list of libaries and the current binary output dir will be included in the linker
+#   search list. These lists can be accessed through the variable:
+#       JagatiLinkLibraryArray
+#       JagatiLinkDirArray
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
@@ -1449,9 +1473,14 @@ macro(AddJagatiLibrary)
         "${${PROJECT_NAME}HeaderFiles}"
         "${${PROJECT_NAME}SourceFiles}"
     )
-    target_link_libraries("${${PROJECT_NAME}LibTarget}" ${JagatiLinkArray})
-    target_compile_definitions("${${PROJECT_NAME}LibTarget}" PRIVATE -DMEZZ_EXPORT_LIB)
     AddManualJagatiLibrary("${${PROJECT_NAME}LibTarget}")
+    target_compile_definitions("${${PROJECT_NAME}LibTarget}" PRIVATE -DMEZZ_EXPORT_LIB)
+
+    set(LocalLinkArray "${JagatiLinkLibraryArray}")
+    list(REMOVE_ITEM LocalLinkArray "${${PROJECT_NAME}LibTarget}")
+    target_link_libraries("${${PROJECT_NAME}LibTarget}"
+        ${LinkPrefix};${JagatiLinkDirArray};${LocalLinkArray};${LinkSuffix})
+
     install(
         TARGETS "${${PROJECT_NAME}LibTarget}"
         COMPONENT ${LibraryInstallationComponent}
@@ -1523,14 +1552,15 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 #
 # Results#
 #   A target named after the conents of variable ${PROJECT_NAME}BinTarget is created with all the files in the list
-#   ${PROJECT_NAME}MainSourceFiles then that target is linked to all the libraries in the JagatiLinkArray.
+#   ${PROJECT_NAME}MainSourceFiles then that target is linked to all the libraries in the JagatiLinkLibraryArray and 
+#   will include .
 #
 
 macro(AddJagatiExecutable)
     add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
-    target_link_libraries("${${PROJECT_NAME}BinTarget}" ${JagatiLinkArray})
+    target_link_libraries("${${PROJECT_NAME}BinTarget}" 
+        ${LinkPrefix};${JagatiLinkDirArray};${JagatiLinkLibraryArray};${LinkSuffix})
 endmacro(AddJagatiExecutable)
-
 
 
 ########################################################################################################################
@@ -1747,19 +1777,17 @@ endmacro(EmitTestCode)
 
 macro(AddTestTarget)
     get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-    message(STATUS "Include dirs for ${CMAKE_CURRENT_SOURCE_DIR}:")
-    foreach(dir ${dirs})
-        message(STATUS "\t'${dir}'")
-    endforeach(dir ${dirs})
+    ShowList("Include dirs for ${CMAKE_CURRENT_SOURCE_DIR}" "" "${dirs}")
 
-    message(STATUS "Adding tester target - ${${PROJECT_NAME}TestTarget} - ${JagatiLinkArray}")
+    message(STATUS "Adding tester target - ${${PROJECT_NAME}TestTarget} - ${JagatiLinkLibraryArray}")
     add_executable(
         ${${PROJECT_NAME}TestTarget}
         "${${PROJECT_NAME}TestHeaderFiles}"
         "${${PROJECT_NAME}TesterFilename}"
         "${${PROJECT_NAME}SourceFiles}"
     )
-    target_link_libraries(${${PROJECT_NAME}TestTarget} ${JagatiLinkArray})
+    target_link_libraries(${${PROJECT_NAME}TestTarget}
+        ${LinkPrefix};${JagatiLinkDirArray};${JagatiLinkLibraryArray};${LinkSuffix})
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
 
@@ -1876,7 +1904,7 @@ function(GitUpdatePackage PackageName)
     set(StdErr "")
     message(STATUS "Updating ${PackageName}...")
     if(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-        message(STATUS "\tPulling with git")
+        message(STATUS "Pulling with git")
         execute_process(
             WORKING_DIRECTORY ${TargetPackageSourceDir}
             COMMAND ${MEZZ_GitExecutable} pull ${${PackageName}_GitURL}
@@ -1884,7 +1912,7 @@ function(GitUpdatePackage PackageName)
             ERROR_VARIABLE StdErr
         )
     else(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-        message(STATUS "\tCloning with git")
+        message(STATUS "Cloning with git")
         file(MAKE_DIRECTORY "${MEZZ_PackageDirectory}")
         execute_process(
             WORKING_DIRECTORY ${MEZZ_PackageDirectory}
@@ -1893,8 +1921,8 @@ function(GitUpdatePackage PackageName)
             ERROR_VARIABLE StdErr
         )
     endif(EXISTS "${TargetPackageSourceDir}CMakeLists.txt")
-    message(STATUS "\tOutput: ${StdOut}")
-    message(STATUS "\tError Text: ${StdErr}")
+    message(STATUS "Output: ${StdOut}")
+    message(STATUS "Error Text: ${StdErr}")
     message(STATUS "Updating ${PackageName} completed successfully.")
 endfunction(GitUpdatePackage PackageName)
 
