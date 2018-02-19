@@ -7,13 +7,14 @@
 if [ -z "${MEZZ_PACKAGE_DIR+x}" ] ; then
     echo "MEZZ_PACKAGE_DIR unset not copying Jagati to other projects"
 else
-    echo "MEZZ_PACKAGE_DIR set to $MEZZ_PACKAGE_DIR, copy to Mezz_Test-build and Mezz_StaticFoundation-build"
+    echo "MEZZ_PACKAGE_DIR set to $MEZZ_PACKAGE_DIR, copy to default build dirs"
 
-    cp ../Jagati.cmake $MEZZ_PACKAGE_DIR/Mezz_Test-build/
-    cp ../Jagati.cmake $MEZZ_PACKAGE_DIR/Mezz_StaticFoundation-build/
+    cp -v ../Jagati.cmake $MEZZ_PACKAGE_DIR/Mezz_Test-build/
+    cp -v ../Jagati.cmake $MEZZ_PACKAGE_DIR/Mezz_StaticFoundation-build/
+    cp -v ../Jagati.cmake $MEZZ_PACKAGE_DIR/Mezz_Foundation-build/
 fi
 
-cp ../Jagati.cmake FileLists/build/JagatiPackages//Mezz_Test-build/
-cp ../Jagati.cmake FileLists/build/JagatiPackages//Mezz_StaticFoundation-build/
-cp ../Jagati.cmake Mezz_PackageDirectory/build/foo/Mezz_Test-build/
-cp ../Jagati.cmake Mezz_PackageDirectory/build/foo/Mezz_StaticFoundation-build/
+#cp ../Jagati.cmake builds/Mezz_Test-build/
+#cp ../Jagati.cmake builds/Mezz_StaticFoundation-build/
+#cp ../Jagati.cmake builds/Mezz_PackageDirectory/foo/Mezz_Test-build/
+#cp ../Jagati.cmake builds/Mezz_PackageDirectory/foo/Mezz_StaticFoundation-build/
