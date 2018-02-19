@@ -1426,7 +1426,7 @@ endmacro(AddSwigEntryPoint FileName)
 
 macro(AddManualJagatiLibrary TargetName)
     if(CompilerDesignMS)
-        list(APPEND JagatiLinkDirArray "/LIBPATH:${${PROJECT_NAME}BinaryDir}")
+        #list(APPEND JagatiLinkDirArray "/LIBPATH:${${PROJECT_NAME}BinaryDir}")
     else(CompilerDesignMS)
         list(APPEND JagatiLinkDirArray "-I${${PROJECT_NAME}BinaryDir}")
     endif(CompilerDesignMS)
