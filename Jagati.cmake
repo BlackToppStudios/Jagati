@@ -889,8 +889,8 @@ macro(SetCommonCompilerFlags)
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
                 /wd4987 /wd4365 /wd4774 /wd4623 /wd5039"
             )
-            set(LinkPrefix "/link")
-            set(LinkPrefix "${LinkPrefix}"  CACHE INTERNAL "" FORCE)
+            #set(LinkPrefix "/link")
+            #set(LinkPrefix "${LinkPrefix}"  CACHE INTERNAL "" FORCE)
         else(CompilerIsMsvc)
             message(FATAL_ERROR
                 "Your compiler is not GCC compatible and not MSVC... Add this mysterious software's flags here."
@@ -1479,7 +1479,7 @@ macro(AddJagatiLibrary)
     set(LocalLinkArray "${JagatiLinkLibraryArray}")
     list(REMOVE_ITEM LocalLinkArray "${${PROJECT_NAME}LibTarget}")
     target_link_libraries("${${PROJECT_NAME}LibTarget}"
-        ${LinkPrefix};${JagatiLinkDirArray};${LocalLinkArray};${LinkSuffix})
+        ${LinkPrefix};${LocalLinkArray};${JagatiLinkDirArray};${LinkSuffix})
 
     install(
         TARGETS "${${PROJECT_NAME}LibTarget}"
@@ -1559,7 +1559,7 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 macro(AddJagatiExecutable)
     add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
     target_link_libraries("${${PROJECT_NAME}BinTarget}" 
-        ${LinkPrefix};${JagatiLinkDirArray};${JagatiLinkLibraryArray};${LinkSuffix})
+        ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
 endmacro(AddJagatiExecutable)
 
 
@@ -1787,7 +1787,7 @@ macro(AddTestTarget)
         "${${PROJECT_NAME}SourceFiles}"
     )
     target_link_libraries(${${PROJECT_NAME}TestTarget}
-        ${LinkPrefix};${JagatiLinkDirArray};${JagatiLinkLibraryArray};${LinkSuffix})
+        ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
 
