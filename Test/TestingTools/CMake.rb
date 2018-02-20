@@ -26,6 +26,8 @@ class CMake
         FileUtils::mkdir_p build_dir
         @build_dir = Pathname.new(build_dir).realpath
         @invoked = false
+        @stdout = []
+        @stderr = []
         clear_arguments
     end
 
@@ -67,8 +69,8 @@ class CMake
         clear_build_dir
         Dir.chdir(@build_dir) {
             stdin, stdout, stderr = Open3.popen3(invocation_string)
-            @stdout = stdout.readlines
-            @stderr = stderr.readlines
+            @stdout += stdout.readlines
+            @stderr += stderr.readlines
         }
         @invoked = true
     end
@@ -111,8 +113,8 @@ class CMake
         invoke unless invoked?
         Dir.chdir(@build_dir) {
             stdin, stdout, stderr = Open3.popen3(build_string)
-            @stdout = stdout.readlines
-            @stderr = stderr.readlines
+            @stdout += stdout.readlines
+            @stderr += stderr.readlines
         }
         @invoked
     end
