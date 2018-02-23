@@ -88,7 +88,7 @@ pipeline {
                 stage('windows7Mingw32') {
                     agent { label "windows7Mingw32" }
                     steps {
-                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' 
+                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' }
                     }
                 }
                 stage('windows7Mingw64') {
