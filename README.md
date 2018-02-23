@@ -15,14 +15,14 @@ with other libraries, but isn't intended for this purpose yet.
 
 # Build Status
 
-The current Jenkins (Ubuntu Linux, Fedora, Rasberry Pi, Mac) build status is:
-[![Build Status](http://blacktopp.ddns.net:8080/job/Jagati/badge/icon)](http://blacktopp.ddns.net:8080/job/Jagati/)
-
 The current Travis CI (Apple and Old Ubuntu) build status is:
 [![Build Status](https://travis-ci.org/BlackToppStudios/Jagati.svg?branch=master)](https://travis-ci.org/BlackToppStudios/Jagati)
 
 The current Appveyor (Windows) build status is:
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/BlackToppStudios/Jagati?branch=master&svg=true)](https://ci.appveyor.com/project/Sqeaky/Jagati)
+
+The current Jenkins, which covers Linux (Emscripten, Rasberry Pi, Ubuntu and Fedora), old Mac OS X (High Sierra) and old windows (7 64 bit msvc and mingw), build status is available on the [BTS Jenkins Instance](http://blacktopp.ddns.net:8080/blue/organizations/jenkins/Jagati/activity). The current status is: [![Build Status](http://blacktopp.ddns.net:8080/job/Jagati/job/master/badge/icon)](http://blacktopp.ddns.net:8080/blue/organizations/jenkins/Jagati/activity)
+
 
 # Opinions 
 

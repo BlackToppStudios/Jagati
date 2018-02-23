@@ -58,7 +58,7 @@ pipeline {
                 stage('MacOSSierra') {
                     agent { label "MacOSSierra" }
                     steps {
-                        dir('Test') { sh 'export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja' }
+                        dir('Test') { sh """export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja""" }
                     }
                 }
                 stage('RaspianJessie') {
