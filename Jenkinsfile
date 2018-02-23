@@ -88,21 +88,13 @@ pipeline {
                 stage('windows7Mingw32') {
                     agent { label "windows7Mingw32" }
                     steps {
-                        dir('Test') {
-                            bat """
-                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
-                            """
-                        }
+                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' 
                     }
                 }
                 stage('windows7Mingw64') {
                     agent { label "windows7Mingw64" }
                     steps {
-                        dir('Test') {
-                            bat """
-                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
-                            """
-                        }
+                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' }
                     }
                 }
                 stage('windows7msvc') {
@@ -110,7 +102,7 @@ pipeline {
                     steps {
                         dir('Test') {
                             bat """
-                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
+                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
                             """
                         }
                     }
