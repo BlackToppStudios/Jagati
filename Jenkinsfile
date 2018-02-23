@@ -1,81 +1,112 @@
 #!groovy
 
-try {
-    stage('Checkout') {
-        parallel FedoraGcc: { node('FedoraGcc') {
-            checkout scm
-        } },
-        MacOSSierra: { node('MacOSSierra') {
-            checkout scm
-        } },
-        RaspianJessie: { node('RaspianJessie') {
-            checkout scm
-        } },
-        UbuntuClang: { node('UbuntuClang') {
-            checkout scm
-        } },
-        UbuntuEmscripten: { node('UbuntuEmscripten') {
-            checkout scm
-        } },
-        UbuntuGcc: { node('UbuntuGcc') {
-            checkout scm
-        } },
-        windows7Mingw32: { node('windows7Mingw32') {
-            checkout scm
-        } },
-        windows7Mingw64: { node('windows7Mingw64') {
-            checkout scm
-        } },
-        windows7msvc: { node('windows7msvc') {
-            checkout scm
-        } }
+pipeline {
+    agent none
+    options {
+        buildDiscarder(logRotator(numToKeepStr:'30'))
     }
-
-    stage('Test') {
-        parallel FedoraGcc: { node('FedoraGcc') {
-            dir('Test') { sh 'ruby RootTest.rb' }
-        } },
-        MacOSSierra: { node('MacOSSierra') {
-            dir('Test') { sh 'export PATH=$PATH:/usr/local/bin/ && ruby RootTest.rb' }
-        } },
-        RaspianJessie: { node('RaspianJessie') {
-            dir('Test') { sh 'ruby RootTest.rb' }
-        } },
-        UbuntuClang: { node('UbuntuClang') {
-            dir('Test') { sh 'ruby RootTest.rb' }
-        } },
-        UbuntuEmscripten: { node('UbuntuEmscripten') {
-            dir('Test') { sh 'ruby RootTest.rb' }
-        } },
-        UbuntuGcc: { node('UbuntuGcc') {
-            dir('Test') { sh 'ruby RootTest.rb' }
-        } },
-        windows7Mingw32: { node('windows7Mingw32') {
-            dir('Test') { bat 'ruby RootTest.rb -G "MinGW Makefiles"' }
-        } },
-        windows7Mingw64: { node('windows7Mingw64') {
-            dir('Test') { bat 'ruby RootTest.rb -G "MinGW Makefiles"' }
-        } },
-        windows7msvc: { node('windows7msvc') {
-            dir('Test') {
-                bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G "Visual Studio 15 2017 Win64"'
+    stages {
+        stage('Checkout') {
+            parallel {
+                stage('FedoraGcc') {
+                    agent { label "FedoraGcc" }
+                    steps { checkout scm }
+                }
+                stage('MacOSSierra') {
+                    agent { label "MacOSSierra" }
+                    steps { checkout scm }
+                }
+                stage('RaspianJessie') {
+                    agent { label "RaspianJessie" }
+                    steps { checkout scm }
+                }
+                stage('UbuntuClang') {
+                    agent { label "UbuntuClang" }
+                    steps { checkout scm }
+                }
+                stage('UbuntuEmscripten') {
+                    agent { label "UbuntuEmscripten" }
+                    steps { checkout scm }
+                }
+                stage('UbuntuGcc') {
+                    agent { label "UbuntuGcc" }
+                    steps { checkout scm }
+                }
+                stage('windows7Mingw32') {
+                    agent { label "windows7Mingw32" }
+                    steps { checkout scm }
+                }
+                stage('windows7Mingw64') {
+                    agent { label "windows7Mingw64" }
+                    steps { checkout scm }
+                }
+                stage('windows7msvc') {
+                    agent { label "windows7msvc" }
+                    steps { checkout scm }
+                }
             }
-        } }
-    }
+        } // Checkout
 
-    stage('SendMail') {
-        notifyMail("Success!", "Testing of Jagati Successful.")
-    }
-}
-catch(buildException) {
-    notifyMail("Failure!", "Build of Jagati Failed!\nException: ${buildException}")
-    throw buildException
-}
+        stage('Test') {
+            parallel {
+                stage('FedoraGcc') {
+                    agent { label "FedoraGcc" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('MacOSSierra') {
+                    agent { label "MacOSSierra" }
+                    steps {
+                        dir('Test') { sh 'export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('RaspianJessie') {
+                    agent { label "RaspianJessie" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('UbuntuClang') {
+                    agent { label "UbuntuClang" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                     }
+                }
+                //stage('UbuntuEmscripten') {
+                //    agent { label "UbuntuEmscripten" }
+                //    steps {
+                //        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                //    }
+                //}
+                stage('UbuntuGcc') {
+                    agent { label "UbuntuGcc" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('windows7Mingw32') {
+                    agent { label "windows7Mingw32" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('windows7Mingw64') {
+                    agent { label "windows7Mingw64" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('windows7msvc') {
+                    agent { label "windows7msvc" }
+                    steps {
+                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+            }
+        } // BuildTest-Debug
 
-def notifyMail (def Status, def ExtraInfo) {
-    mail to: 'sqeaky@blacktoppstudios.com, makoenergy@blacktoppstudios.com',
-         subject: "${Status} - ${env.JOB_NAME}",
-         body: "${Status} - ${env.JOB_NAME} - Jenkins Build ${env.BUILD_NUMBER}\n\n" +
-               "${ExtraInfo}\n\n" +
-               "Check console output at $BUILD_URL to view the results."
+
+    } // Stages
+
 }
