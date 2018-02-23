@@ -88,19 +88,31 @@ pipeline {
                 stage('windows7Mingw32') {
                     agent { label "windows7Mingw32" }
                     steps {
-                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') {
+                            bat """
+                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
+                            """
+                        }
                     }
                 }
                 stage('windows7Mingw64') {
                     agent { label "windows7Mingw64" }
                     steps {
-                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') {
+                            bat """
+                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
+                            """
+                        }
                     }
                 }
                 stage('windows7msvc') {
                     agent { label "windows7msvc" }
                     steps {
-                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') {
+                            bat """
+                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && sh 'ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
+                            """
+                        }
                     }
                 }
             }
