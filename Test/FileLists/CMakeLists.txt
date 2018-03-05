@@ -47,8 +47,8 @@ message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VER
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
-#IncludeJagatiPackage("Test")
-#IncludeJagatiPackage("StaticFoundation")
+IncludeJagatiPackage("Test")
+IncludeJagatiPackage("StaticFoundation")
 
 # Everything above this line is well tested.
 ########################################################################################################################
@@ -70,10 +70,6 @@ AddSwigEntryPoint("HelloSwig.h")
 # Can the coverage and test stuff consume lists correctly?
 ChooseCodeCoverage("OFF")
 EmitTestCode()
-
-# Temporary placement until all Jagati packages are upgraded.
-IncludeJagatiPackage("Test") 
-IncludeJagatiPackage("StaticFoundation")
 
 # Add Useful targets
 AddJagatiLibrary()
