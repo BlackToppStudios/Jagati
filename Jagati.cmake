@@ -773,22 +773,8 @@ endmacro(IdentifyDebug)
 #           Enable Position independent code or otherwise fix linker issues.
 #           Turn on C++14.
 #
-#       These platforms specific variables are set with flags that the linker might care about that need to be passed on
-#       the command line to the linker in some very specific order:
-#           LinkSuffix
-#           LinkPrefix
 
 macro(SetCommonCompilerFlags)
-
-    if(LinkSuffix)
-    else(LinkSuffix)
-        set(LinkSuffix "")
-    endif(LinkSuffix)
-
-    if(LinkPrefix)
-    else(LinkPrefix)
-        set(LinkPrefix "")
-    endif(LinkPrefix)
 
     if(CompilerDesignNix)
 
@@ -833,10 +819,7 @@ macro(SetCommonCompilerFlags)
             # Store thread library link information for later.
             set(THREADS_PREFER_PTHREAD_FLAG ON)
             find_package(Threads)
-            #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
-            #set(LinkSuffix ${CMAKE_THREAD_LIBS_INIT})
-            #set(LinkSuffix "${LinkSuffix}"  CACHE INTERNAL "" FORCE)
 
             # A few checks that are very specific.
             if(CpuIsAmd64 AND Platform64Bit)
@@ -892,8 +875,6 @@ macro(SetCommonCompilerFlags)
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
                 /wd4987 /wd4365 /wd4774 /wd4623 /wd5039"
             )
-            #set(LinkPrefix "/link")
-            #set(LinkPrefix "${LinkPrefix}"  CACHE INTERNAL "" FORCE)
         else(CompilerIsMsvc)
             message(FATAL_ERROR
                 "Your compiler is not GCC compatible and not MSVC... Add this mysterious software's flags here."
@@ -1419,31 +1400,18 @@ endmacro(AddSwigEntryPoint FileName)
 #   The passed file will be added to a list of libaries. This list can be accessed through the variable:
 #       JagatiLinkLibraryArray
 #
-#   A list of link directories will be kept that will provide paths for the compiler to search and these will be in the
-#   variable:
-#       JagatiLinkDirArray
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
 #
 
 macro(AddManualJagatiLibrary TargetName)
-    if(CompilerDesignMS)
-        #list(APPEND JagatiLinkDirArray "/LIBPATH:${${PROJECT_NAME}BinaryDir}")
-        set(JagatiLinkDirArray "${JagatiLinkDirArray}")
-    else(CompilerDesignMS)
-        list(APPEND JagatiLinkDirArray "-I${${PROJECT_NAME}BinaryDir}")
-    endif(CompilerDesignMS)
-    list(REMOVE_DUPLICATES JagatiLinkDirArray)
-
     list(APPEND JagatiLinkLibraryArray "${TargetName}")
     list(REMOVE_DUPLICATES JagatiLinkLibraryArray)
 
     set(${PROJECT_NAME}Lib "${TargetName}" CACHE INTERNAL "" FORCE)
-    set(JagatiLinkDirArray "${JagatiLinkDirArray}"  CACHE INTERNAL "" FORCE)
     set(JagatiLinkLibraryArray "${JagatiLinkLibraryArray}"  CACHE INTERNAL "" FORCE)
 
-    message(STATUS "Link dirs: 'JagatiLinkDirArray'    - ${JagatiLinkDirArray}")
     message(STATUS "Link libs: 'JagatiLinkLibraryArray'- ${JagatiLinkLibraryArray}")
     message(STATUS "Lib variable: '${PROJECT_NAME}lib' - ${${PROJECT_NAME}lib}")
 endmacro(AddManualJagatiLibrary FileName)
@@ -1463,7 +1431,6 @@ endmacro(AddManualJagatiLibrary FileName)
 #   The passed file will be added to a list of libaries and the current binary output dir will be included in the linker
 #   search list. These lists can be accessed through the variable:
 #       JagatiLinkLibraryArray
-#       JagatiLinkDirArray
 #
 #   This will also create a variable call ${PROJECT_NAME}lib that will store the filename, so only one library per
 #   Jagati package can be shared this way.
@@ -1482,7 +1449,7 @@ macro(AddJagatiLibrary)
 
     set(LocalLinkArray "${JagatiLinkLibraryArray}")
     list(REMOVE_ITEM LocalLinkArray "${${PROJECT_NAME}LibTarget}")
-    target_link_libraries("${${PROJECT_NAME}LibTarget}" ${LocalLinkArray};${JagatiLinkDirArray})
+    target_link_libraries("${${PROJECT_NAME}LibTarget}" ${LocalLinkArray})
 
     install(
         TARGETS "${${PROJECT_NAME}LibTarget}"
@@ -1560,9 +1527,8 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 #
 
 macro(AddJagatiExecutable)
-    add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
-    target_link_libraries("${${PROJECT_NAME}BinTarget}" 
-        ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
+    add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}") 
+    target_link_libraries(${${PROJECT_NAME}BinTarget} ${JagatiLinkLibraryArray})
 endmacro(AddJagatiExecutable)
 
 
@@ -1789,19 +1755,7 @@ macro(AddTestTarget)
         "${${PROJECT_NAME}TesterFilename}"
         "${${PROJECT_NAME}SourceFiles}"
     )
-
-    if(${LinkPrefix})
-        target_link_libraries(${${PROJECT_NAME}TestTarget} "${LinkPrefix}")
-    endif(${LinkPrefix})
-    foreach(OneLibrary "${JagatiLinkLibraryArray}")
-        target_link_libraries(${${PROJECT_NAME}TestTarget} ${OneLibrary})
-    endforeach(OneLibrary ${JagatiLinkLibraryArray})
-    if(${LinkSuffix})
-        target_link_libraries(${${PROJECT_NAME}TestTarget} "${LinkSuffix}")
-    endif(${LinkSuffix})
-
-    #target_link_libraries(${${PROJECT_NAME}TestTarget}
-    #    ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
+    target_link_libraries(${${PROJECT_NAME}TestTarget} ${JagatiLinkLibraryArray})
 
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
