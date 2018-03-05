@@ -124,9 +124,9 @@ class FileLists < JagatiTestCase
                      cmake.cache.value("StaticFoundationSwigFiles"),
                      "Expected SwigConfig.h to be in the Mezz_StaticFoundation list of Swig files.")
 
-        assert_match(/Dox\.h/,
+        assert_match(/HelloDoc\.h/,
                      cmake.cache.value("JagatiDoxArray"),
-                     "Expected Dox.h to be in the Mezz_StaticFoundation list of Main Source files.")
+                     "Expected HelloDoc.h to be in the Mezz_StaticFoundation list of Main Source files.")
 
     end
 

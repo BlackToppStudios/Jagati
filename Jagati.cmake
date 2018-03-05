@@ -831,9 +831,12 @@ macro(SetCommonCompilerFlags)
             set(CMAKE_EXECUTABLE_SUFFIX ".js")
         else(CompilerIsEmscripten)
             # Store thread library link information for later.
+            set(THREADS_PREFER_PTHREAD_FLAG ON)
             find_package(Threads)
-            set(LinkSuffix ${CMAKE_THREAD_LIBS_INIT})
-            set(LinkSuffix "${LinkSuffix}"  CACHE INTERNAL "" FORCE)
+            #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
+            #set(LinkSuffix ${CMAKE_THREAD_LIBS_INIT})
+            #set(LinkSuffix "${LinkSuffix}"  CACHE INTERNAL "" FORCE)
 
             # A few checks that are very specific.
             if(CpuIsAmd64 AND Platform64Bit)
@@ -961,7 +964,7 @@ endmacro(SetProjectVariables)
 
 macro(FindGitExecutable)
     if(NOT DEFINED MEZZ_GitExecutable)
-        find_program (MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages.")
+        find_program(MEZZ_GitExecutable git DOC "The git executable the Jagati will use to download packages.")
         if(NOT EXISTS "${MEZZ_GitExecutable}")
             message(FATAL_ERROR
                     "Git was not found or specified wrong currently MEZZ_GitExecutable is: ${MEZZ_GitExecutable}")
@@ -1479,12 +1482,11 @@ macro(AddJagatiLibrary)
 
     set(LocalLinkArray "${JagatiLinkLibraryArray}")
     list(REMOVE_ITEM LocalLinkArray "${${PROJECT_NAME}LibTarget}")
-    target_link_libraries("${${PROJECT_NAME}LibTarget}"
-        ${LinkPrefix};${LocalLinkArray};${JagatiLinkDirArray};${LinkSuffix})
+    target_link_libraries("${${PROJECT_NAME}LibTarget}" ${LocalLinkArray};${JagatiLinkDirArray})
 
     install(
         TARGETS "${${PROJECT_NAME}LibTarget}"
-        COMPONENT ${LibraryInstallationComponent}
+        COMPONENT ${LibraryInsftallationComponent}
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
@@ -1787,8 +1789,20 @@ macro(AddTestTarget)
         "${${PROJECT_NAME}TesterFilename}"
         "${${PROJECT_NAME}SourceFiles}"
     )
-    target_link_libraries(${${PROJECT_NAME}TestTarget}
-        ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
+
+    if(${LinkPrefix})
+        target_link_libraries(${${PROJECT_NAME}TestTarget} "${LinkPrefix}")
+    endif(${LinkPrefix})
+    foreach(OneLibrary "${JagatiLinkLibraryArray}")
+        target_link_libraries(${${PROJECT_NAME}TestTarget} ${OneLibrary})
+    endforeach(OneLibrary ${JagatiLinkLibraryArray})
+    if(${LinkSuffix})
+        target_link_libraries(${${PROJECT_NAME}TestTarget} "${LinkSuffix}")
+    endif(${LinkSuffix})
+
+    #target_link_libraries(${${PROJECT_NAME}TestTarget}
+    #    ${LinkPrefix};${JagatiLinkLibraryArray};${JagatiLinkDirArray};${LinkSuffix})
+
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
 
