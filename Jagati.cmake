@@ -1453,7 +1453,7 @@ macro(AddJagatiLibrary)
 
     install(
         TARGETS "${${PROJECT_NAME}LibTarget}"
-        COMPONENT ${LibraryInsftallationComponent}
+        COMPONENT ${LibraryInstallationComponent}
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
