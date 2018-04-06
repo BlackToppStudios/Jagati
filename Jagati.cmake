@@ -1939,4 +1939,5 @@ macro(IncludeJagatiPackage PassedPackageName)
     # Make the headers available in this directory.
     include_directories(${${RawPackageName}IncludeDir})
     include_directories(${${RawPackageName}GenHeadersDir})
+    link_directories(${${RawPackageName}BinaryDir})
 endmacro(IncludeJagatiPackage PackageName)
