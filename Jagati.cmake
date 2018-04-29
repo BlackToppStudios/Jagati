@@ -41,7 +41,7 @@
 
 # This is the basic package manager for the Mezzanine, called the Jagati. This will track and download packages from git
 # repositories. This will handle centrally locating Mezzanine packages and provide tools for finding and linking against
-# them appropriately. This will not be included directly in git repositories, but rather a small download snippet will 
+# them appropriately. This will not be included directly in git repositories, but rather a small download snippet will
 # ensure this stays up to date.
 
 # # Do something like this to include the Jagati. Try to use the newest version and
@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.22.2")
+    set(JagatiVersion "0.22.3")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -870,10 +870,11 @@ macro(SetCommonCompilerFlags)
             # C4365 - This is actually a useful warning about conversions changing signedness, but 50+ are thrown from
             #   the std lib for builds as simple as the just Mezz_StaticFoundation.
             # C4774 - BS warning about some sprintf derivative we never use.
+            # C4996 - Attempts to force "_s" versions of standard library methods, not all of which are cross-platform.
             # C5039 - BS warning thrown in the bowels of never included windows headers.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
-                /wd4987 /wd4365 /wd4774 /wd4623 /wd5039"
+                /wd4987 /wd4365 /wd4774 /wd4623 /wd4996 /wd5039"
             )
         else(CompilerIsMsvc)
             message(FATAL_ERROR
@@ -897,7 +898,7 @@ endmacro(SetCommonCompilerFlags)
 #       SetProjectVariables()
 #
 #   Result:
-#       This will set a number of source file lists to be empty so that other functions can append to them. Most of 
+#       This will set a number of source file lists to be empty so that other functions can append to them. Most of
 #       these exist as one per project and will be placed in the based scope so that they can be used by any including
 #       project. Their different purposes are covered here briefly, see the official docs for a better explanation:
 #
@@ -1135,7 +1136,7 @@ or '${${PROJECT_NAME}GenHeadersDir}'.")
     #if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
     #    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
     #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
+    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL
         "List of Header files for ${PROJECT_NAME}." FORCE)
     message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
     AddJagatiDoxInput("${TempHeaderFileToAdd}") # This can subtly different than the input.
@@ -1292,7 +1293,7 @@ endmacro(AddTestFile FileName)
 ########################################################################################################################
 # AddJagatiDoxInput
 #
-# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the 
+# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the
 # file is relative to the dox dir for this project.
 #
 # Usage:
@@ -1522,12 +1523,12 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 #
 # Results#
 #   A target named after the conents of variable ${PROJECT_NAME}BinTarget is created with all the files in the list
-#   ${PROJECT_NAME}MainSourceFiles then that target is linked to all the libraries in the JagatiLinkLibraryArray and 
+#   ${PROJECT_NAME}MainSourceFiles then that target is linked to all the libraries in the JagatiLinkLibraryArray and
 #   will include .
 #
 
 macro(AddJagatiExecutable)
-    add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}") 
+    add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
     target_link_libraries(${${PROJECT_NAME}BinTarget} ${JagatiLinkLibraryArray})
 endmacro(AddJagatiExecutable)
 
