@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.22.3")
+    set(JagatiVersion "0.22.4")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -1931,11 +1931,8 @@ macro(IncludeJagatiPackage PassedPackageName)
     set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
     GitUpdatePackage(${PackageName})
 
-    # If there is no binary dir for the package then we have not added it, so add it now.
-    if(NOT DEFINED ${RawPackageName}BinaryDir)
-        message(STATUS "============================================================================================")
-        add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
-    endif(NOT DEFINED ${RawPackageName}BinaryDir)
+    message(STATUS "============================================================================================")
+    add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
 
     # Make the headers available in this directory.
     include_directories(${${RawPackageName}IncludeDir})
