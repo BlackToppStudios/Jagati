@@ -246,6 +246,30 @@ endmacro(EnableIOSCrossCompile)
 ########################################################################################################################
 
 ########################################################################################################################
+# InitializeSingleScopeVars
+#
+# There have been several occasions in the history of the Jagati were is was desirable to have a variable that was set
+# only once for the whole project. These were often refactored away or their functionality removed, but when such items
+# are required this macro will be called once and executed in the scope of the parent most project.
+#
+#
+# Usage:
+#   # Don't, Only the Jagati should call this.
+#   InitializeSingleScopeVars()
+#
+# Result:
+#   The parent project is claimed by setting ParentProject.
+#   The index used to keep track of what subdirs have been added is cleared
+#
+
+macro(InitializeSingleScopeVars)
+    set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
+    set(AddDirectoryOnceIndex "" CACHE INTERNAL
+        "An index of directories added that need to penetrated most scopes, but be cleared every run"
+        FORCE)
+endmacro(InitializeSingleScopeVars)
+
+########################################################################################################################
 # ClaimParentProject
 #
 # This is used to determine what the parent-most project is. Whichever project calls this first will be presumed to be
@@ -269,7 +293,7 @@ macro(ClaimParentProject)
         message(STATUS "Project '${PROJECT_NAME}' acknowledges '${ParentProject}' as the Parent Project.")
     else(ParentProject)
         message(STATUS "Claiming '${PROJECT_NAME}' as the Parent Project.")
-        set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
+        InitializeSingleScopeVars()
     endif(ParentProject)
 endmacro(ClaimParentProject)
 
@@ -1852,6 +1876,30 @@ endmacro(AddIDEVisibility Files)
 # Getting Jagati packages, What URLs and functions can we use to get Jagati Packages and know what Exists?
 ########################################################################################################################
 ########################################################################################################################
+# AddSubdirectoryOnce
+#
+# Add a directory to a project, but only if it is new.
+#
+# Usage:
+#   AddSubdirectoryOnce("/Sub/Project/Directory")
+#   AddSubdirectoryOnce("c:\Sub\Project\Directory")
+#
+# Results:
+#   If the directory has not already been added to the project then add it now. This is tracked by appending newly added
+#   source directories to the list AddDirectoryOnceIndex, checking this list here and clearing it each startup.
+#
+
+macro(AddSubdirectoryOnce SourceDirectoryToAdd BinaryDirectoryToAdd)
+    # Look for the passed directory in the index.
+    list(FIND AddDirectoryOnceIndex "${SourceDirectoryToAdd}" FoundDirectoryInAddOnceIndex)
+    if("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
+        # not found add and include
+        set(AddDirectoryOnceIndex "${AddDirectoryOnceIndex};${SourceDirectoryToAdd}" CACHE INTERNAL "" FORCE)
+        add_subdirectory("${SourceDirectoryToAdd}" "${BinaryDirectoryToAdd}")
+    endif("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
+endmacro(AddSubdirectoryOnce Directory)
+
+########################################################################################################################
 # GitUpdatePackage
 #
 # This gets the latest source code for the package specified. This does not touch git branches so features can be tried
@@ -1930,12 +1978,7 @@ macro(IncludeJagatiPackage PassedPackageName)
     set(TargetPackageSourceDir "${MEZZ_PackageDirectory}${PackageName}/")
     set(TargetPackageBinaryDir "${MEZZ_PackageDirectory}${PackageName}-build/")
     GitUpdatePackage(${PackageName})
-
-    # If there is no binary dir for the package then we have not added it, so add it now.
-    if(NOT DEFINED ${RawPackageName}BinaryDir)
-        message(STATUS "============================================================================================")
-        add_subdirectory("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
-    endif(NOT DEFINED ${RawPackageName}BinaryDir)
+    AddSubdirectoryOnce("${TargetPackageSourceDir}" "${TargetPackageBinaryDir}")
 
     # Make the headers available in this directory.
     include_directories(${${RawPackageName}IncludeDir})
