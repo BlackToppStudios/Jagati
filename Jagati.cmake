@@ -1894,7 +1894,7 @@ macro(AddSubdirectoryOnce SourceDirectoryToAdd BinaryDirectoryToAdd)
     list(FIND AddDirectoryOnceIndex "${SourceDirectoryToAdd}" FoundDirectoryInAddOnceIndex)
     if("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
         # not found add and include
-        set(AddDirectoryOnceIndex "${AddDirectoryOnceIndex};${SourceDirectoryToAdd}" CACHE INTERNAL "" FORCE)
+        set(AddDirectoryOnceIndex "${AddDirectoryOnceIndex};${SourceDirectoryToAdd}")
         add_subdirectory("${SourceDirectoryToAdd}" "${BinaryDirectoryToAdd}")
     endif("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
 endmacro(AddSubdirectoryOnce Directory)
