@@ -264,7 +264,9 @@ endmacro(EnableIOSCrossCompile)
 
 macro(InitializeSingleScopeVars)
     set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
-    set(AddDirectoryOnceIndex "")
+    set(AddDirectoryOnceIndex "" CACHE INTERNAL
+        "An index of directories added that need to penetrated most scopes, but be cleared every run"
+        FORCE)
 endmacro(InitializeSingleScopeVars)
 
 ########################################################################################################################
