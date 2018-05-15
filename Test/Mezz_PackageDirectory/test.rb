@@ -4,6 +4,7 @@ class Mezz_PackageDirectory < JagatiTestCase
 
     # Because this was first set of tests, some basic sanity tests for the test tools
     def test_cmake
+        ENV.delete('MEZZ_PACKAGE_DIR')
         cmake = CMake.new(@source_dir)
 
         refute_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path')
@@ -30,7 +31,7 @@ class Mezz_PackageDirectory < JagatiTestCase
     def test_default_location
         ENV.delete('MEZZ_PACKAGE_DIR') # To prevent interference from system settings
 
-        cmake = run_cmake
+        cmake = run_cmake_no_dox
 
         # Does the Jagati pick a good location in the Build directory?
         expected_dir = "#{Dir.lpwd}/builds/#{@source_dir}-build/JagatiPackages"
@@ -48,10 +49,11 @@ class Mezz_PackageDirectory < JagatiTestCase
         FileUtils::mkdir_p package_dir
         ENV['MEZZ_PACKAGE_DIR'] = package_dir
 
-        cmake = run_cmake
+        cmake = run_cmake_no_dox
 
         expected_dir = package_dir
         assert_equal(expected_dir, cmake.cache.value('MEZZ_PackageDirectory'), 'Reads MEZZ_PACKAGE_DIR Dir from ENV')
+        ENV.delete('MEZZ_PACKAGE_DIR')
     end
 
     def test_location_from_arg
