@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.22.3")
+    set(JagatiVersion "0.23.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -263,7 +263,7 @@ endmacro(EnableIOSCrossCompile)
 #
 
 macro(InitializeSingleScopeVars)
-    set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project")
+    set(ParentProject "${PROJECT_NAME}" CACHE INTERNAL "Name of the parent project" FORCE)
     set(AddDirectoryOnceIndex "")
 endmacro(InitializeSingleScopeVars)
 
@@ -1892,7 +1892,7 @@ macro(AddSubdirectoryOnce SourceDirectoryToAdd BinaryDirectoryToAdd)
     list(FIND AddDirectoryOnceIndex "${SourceDirectoryToAdd}" FoundDirectoryInAddOnceIndex)
     if("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
         # not found add and include
-        set(AddDirectoryOnceIndex "${AddDirectoryOnceIndex};${SourceDirectoryToAdd}")
+        set(AddDirectoryOnceIndex "${AddDirectoryOnceIndex};${SourceDirectoryToAdd}" CACHE INTERNAL "" FORCE)
         add_subdirectory("${SourceDirectoryToAdd}" "${BinaryDirectoryToAdd}")
     endif("-1" EQUAL "${FoundDirectoryInAddOnceIndex}")
 endmacro(AddSubdirectoryOnce Directory)

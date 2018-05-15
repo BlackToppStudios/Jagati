@@ -4,6 +4,8 @@
 
 class JagatiTestCase < TestCase
     def initialize(arg)
+        # Prevent External BS or other tests from interfering with this test
+        ENV.delete('MEZZ_PACKAGE_DIR')
         # We presume that the class name matches the source directory.
         @source_dir = self.class.to_s
         super arg
@@ -22,6 +24,8 @@ class JagatiTestCase < TestCase
     def run_cmake_no_dox
         cmake = CMake.new(source_dir)
         cmake.add_argument("MEZZ_BuildDoxygen", "OFF")
+        cmake.add_argument("JAGATI_File", File.join(Dir.pwd, "..", "Jagati.cmake"))
+        cmake.add_argument("JAGATI_Download", "OFF")
         cmake.invoke
         cmake
     end
