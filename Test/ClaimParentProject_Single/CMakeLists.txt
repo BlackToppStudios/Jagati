@@ -47,3 +47,9 @@ message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VER
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 ClaimParentProject()
+
+
+########################################################################################################################
+
+# This just lifts the variable from a termporary to a cached var so Ruby can check it
+set(ParentProject "${ParentProject}" CACHE INTERNAL "" FORCE)
