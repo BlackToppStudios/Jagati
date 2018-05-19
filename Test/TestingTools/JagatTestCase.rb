@@ -14,20 +14,20 @@ class JagatiTestCase < TestCase
     # Use this when running cmake and never checking the cache. If you
     # don't need it don't bother populating it. If it will be created 
     # anyway, but is measured to be slightly slower.
-    def run_cmake
+    def run_cmake(arguments={})
         cmake = CMake.new(source_dir)
+        cmake.add_arguments(arguments)
         cmake.invoke
         cmake
     end
 
     # Same as previous method but avoid using doxygen
-    def run_cmake_no_dox
+    def run_cmake_no_dox(arguments={})
         cmake = CMake.new(source_dir)
-        cmake.add_argument("MEZZ_BuildDoxygen", "OFF")
-        cmake.add_argument("JAGATI_File", File.join(Dir.pwd, "..", "Jagati.cmake"))
-        cmake.add_argument("JAGATI_Download", "OFF")
-        cmake.invoke
-        cmake
+        arguments["MEZZ_BuildDoxygen"] = "OFF"
+        arguments["JAGATI_File"] = File.join(Dir.pwd, "..", "Jagati.cmake")
+        arguments["JAGATI_Download"] = "OFF"
+        run_cmake(arguments)
     end
 
     # Some tests will need the cache quite a bit, they should use this to

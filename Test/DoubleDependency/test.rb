@@ -114,7 +114,9 @@ class DoubleDependency < JagatiTestCase
         assert_match(/HelloDoc\.h/,
                      cmake.cache.value("JagatiDoxArray"),
                      "Expected HelloDoc.h to be in the Mezz_StaticFoundation list of Main Source files.")
-
+        # Build it again but with slightly different options
+        cmake = run_cmake_no_dox(CMAKE_BUILD_TYPE: "DEBUG")
+        cmake = run_cmake_no_dox(CMAKE_BUILD_TYPE: "RELEASE")
     end
 
 end

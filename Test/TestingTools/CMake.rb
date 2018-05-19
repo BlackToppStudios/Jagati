@@ -51,6 +51,12 @@ class CMake
         end
     end
 
+    def add_arguments(arguments={})
+        arguments.each do |name, value|
+            add_argument name, value
+        end
+    end
+
     def clear_arguments
         @args={}
         @cache = nil

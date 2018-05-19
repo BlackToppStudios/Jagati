@@ -48,3 +48,9 @@ include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
 IncludeJagatiPackage("StaticFoundation") # Never build just has cmake run.
+
+
+########################################################################################################################
+
+# This just lifts the variable from a termporary to a cached var so Ruby can check it
+set(ParentProject "${ParentProject}" CACHE INTERNAL "" FORCE)
