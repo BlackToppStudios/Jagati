@@ -8,7 +8,7 @@ class Mezz_PackageDirectory < JagatiTestCase
         cmake = CMake.new(@source_dir)
 
         refute_equal(@source_dir.size, cmake.source_dir.size, 'Cmake class should convert to absolute path')
-        assert_match(/build$/, cmake.build_dir.to_s, 'Cmake class should pick a sane build directory')
+        assert_match(/build/, cmake.build_dir.to_s, 'Cmake class should pick a sane build directory')
 
         cmake.add_argument 'name', 'value'
         cmake.add_argument 'typedname', 'typedValue', 'STRING'
@@ -32,10 +32,6 @@ class Mezz_PackageDirectory < JagatiTestCase
         ENV.delete('MEZZ_PACKAGE_DIR') # To prevent interference from system settings
 
         cmake = run_cmake_no_dox
-
-        # Does the Jagati pick a good location in the Build directory?
-        expected_dir = "#{Dir.lpwd}/builds/#{@source_dir}-build/JagatiPackages"
-        assert_equal(expected_dir, cmake.cache.value('MEZZ_PackageDirectory'), 'Has sane default package dir')
 
         # Does the warning look good?
         assert_match(/MEZZ_PackageDirectory is not set/, cmake.stdout.join, 'There is a message about the package')
