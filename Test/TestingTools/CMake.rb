@@ -32,7 +32,7 @@ class CMake
     end
 
     def smart_build_dir(source_dir)
-        File.join(source_dir, "..", "builds", source_dir + "-build")
+        File.join(source_dir, "..", "..", "build", source_dir)
     end
 
     def clear_build_dir
