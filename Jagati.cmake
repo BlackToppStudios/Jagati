@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.25.1")
+    set(JagatiVersion "0.26.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -91,11 +91,15 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 ########################################################################################################################
 # Package URLs
 
-# TODO - Move this into an external index file.
-
-set(Mezz_StaticFoundation_GitURL    "https://github.com/BlackToppStudios/Mezz_StaticFoundation.git")
-set(Mezz_Test_GitURL                "https://github.com/BlackToppStudios/Mezz_Test.git")
-set(Mezz_Foundation_GitURL          "https://github.com/BlackToppStudios/Mezz_Foundation.git")
+if(NOT JAGATI_IndexFile)
+    get_filename_component(JAGATI_IndexFolder "${JAGATI_File}" DIRECTORY)
+    set(JAGATI_IndexFile "${JAGATI_IndexFolder}/JagatiIndex.cmake" CACHE FILEPATH
+        "The file that defines the packages and download URLs that the Jagati will work with.")
+endif(NOT JAGATI_IndexFile)
+if(NOT JAGATI_IndexDownload)
+    #option(JAGATI_IndexDownload "Should the Jagati be downloaded automatically" ON)
+endif(NOT JAGATI_IndexDownload)
+include("${JAGATI_IndexFile}")
 
 ########################################################################################################################
 # Other Variables
@@ -1863,6 +1867,7 @@ add_custom_target(
             README.md
             COPYING.md
             .travis.yml
+            Jenkinsfile
             appveyor.yml
             codecov.yml
             "${Files}"
