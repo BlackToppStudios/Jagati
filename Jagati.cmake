@@ -97,7 +97,15 @@ if(NOT JAGATI_IndexFile)
         "The file that defines the packages and download URLs that the Jagati will work with.")
 endif(NOT JAGATI_IndexFile)
 if(NOT JAGATI_IndexDownload)
-    #option(JAGATI_IndexDownload "Should the Jagati be downloaded automatically" ON)
+    option(JAGATI_IndexDownload "Should the Jagati Package Index be downloaded automatically" ON)
+endif(NOT JAGATI_IndexDownload)
+if(NOT JAGATI_IndexDownload)
+    set(JAGATI_IndexChecksum "4daa43522a737ffcc4622089336cf742d57f7cea8b23a4125f
+e1f99acdf770100b040cf58e169946ed9f37bff8917965f3f729f9a95b4aba9cf094b4c7008de4"
+        CACHE STRING "The expected Checksum of the Jagati Package Index.")
+    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.25.2/JagatiIndex.cmake"
+        CACHE STRING "Where to download the Jagati from.")
+    file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
 endif(NOT JAGATI_IndexDownload)
 include("${JAGATI_IndexFile}")
 
