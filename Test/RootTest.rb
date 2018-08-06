@@ -21,6 +21,8 @@ OptionParser.new do |opts|
   opts.on('-h', '--help', 'See this help message') { |v| puts opts; exit; }
 end.parse!
 
+CMake.index_file = File.expand_path '../JagatiIndex.cmake'
+
 # Tests
 
 def require_test(test_name)

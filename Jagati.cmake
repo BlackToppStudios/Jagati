@@ -93,20 +93,24 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 if(NOT JAGATI_IndexFile)
     get_filename_component(JAGATI_IndexFolder "${JAGATI_File}" DIRECTORY)
+    message(STATUS "NOT JAGATI_IndexFile")
     set(JAGATI_IndexFile "${JAGATI_IndexFolder}/JagatiIndex.cmake" CACHE FILEPATH
         "The file that defines the packages and download URLs that the Jagati will work with.")
 endif(NOT JAGATI_IndexFile)
 if(NOT JAGATI_IndexDownload)
     option(JAGATI_IndexDownload "Should the Jagati Package Index be downloaded automatically" ON)
 endif(NOT JAGATI_IndexDownload)
-if(NOT JAGATI_IndexDownload)
-    set(JAGATI_IndexChecksum "4daa43522a737ffcc4622089336cf742d57f7cea8b23a4125f
-e1f99acdf770100b040cf58e169946ed9f37bff8917965f3f729f9a95b4aba9cf094b4c7008de4"
+if(JAGATI_IndexDownload)
+    set(JAGATI_IndexChecksum "3ebaf0eab6c2dd382cd027038a268398fd21ae6db2054c3334\
+b49e704d404c450defa3f7e4f36ba6aee39ab8e70875565f5b28104ae51a0893a5e8c04ccf8a07"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
     set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.25.2/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
-endif(NOT JAGATI_IndexDownload)
+endif(JAGATI_IndexDownload)
+message(STATUS "JAGATI_IndexFolder: ${JAGATI_IndexFolder}")
+message(STATUS "JAGATI_IndexFile: ${JAGATI_IndexFile}")
+message(STATUS "JAGATI_IndexUrl: ${JAGATI_IndexUrl}")
 include("${JAGATI_IndexFile}")
 
 ########################################################################################################################
