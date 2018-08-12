@@ -19,6 +19,7 @@ class CMake
 
     class << self
         attr_accessor :generator
+        attr_accessor :index_file
     end
 
     def initialize(source_dir, build_dir = smart_build_dir(source_dir))
@@ -63,6 +64,7 @@ class CMake
         @jagati = nil
         @targets = nil
         @outputs = nil
+        add_argument('JAGATI_IndexFile', CMake.index_file, 'FILEPATH')
     end
 
     def invocation_string
@@ -103,7 +105,9 @@ class CMake
         err.slice!(/From.*FETCH_HEAD\n/m) # Nuke git checkout messages
         err.slice!(/CMake.*MEZZ_PackageDirectory.*StandardJagatiSetup\)\n\n\n/m) # cut out MEZZ_PackageDirectory Error
         unless err.empty? then
-            raise "A CMake Error Occurred:\n" + stderr.join 
+            #require 'pry'; binding.pry
+            raise "A CMake Error Occurred:\n#{stderr.join}\n\nInvocation String:#{invocation_string}\n" +
+                  "@source_dir:#{@source_dir}\n@build_dir:#{@build_dir}\n@invoked:#{@invoked}\n@args:#{@args}"
         end
     end
 

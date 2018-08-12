@@ -12,7 +12,7 @@ class JagatiTestCase < TestCase
     end
 
     # Use this when running cmake and never checking the cache. If you
-    # don't need it don't bother populating it. If it will be created 
+    # don't need it don't bother populating it. If it will be created
     # anyway, but is measured to be slightly slower.
     def run_cmake(arguments={})
         cmake = CMake.new(source_dir)
