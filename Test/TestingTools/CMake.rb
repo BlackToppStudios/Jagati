@@ -65,6 +65,8 @@ class CMake
         @targets = nil
         @outputs = nil
         add_argument('JAGATI_IndexFile', CMake.index_file, 'FILEPATH')
+        add_argument('JAGATI_IndexDownload', false, 'BOOL')
+
     end
 
     def invocation_string
