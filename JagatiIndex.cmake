@@ -1,18 +1,10 @@
 #!/usr/bin/cmake
 #
-# This script serves as a list of packages for the Jagati so the URL of packages can be serperate
-# from all the functional logic. The goal is to allow game developers to provide their own package
-# list if desired.
+# This is a list of packages for the Jagati so the URL of packages can be seperate from all the functional logic. The
+# goal is to allow game developers to provide their own package list if desired.
 #
 
-# To add a package use the Following Synax:
-# PackageMetadata(PackageName Url DocString)
-
-# Move this to the Jagati in the next Upgrade and fully document it.
-function(PackageMetadata PackageName Url DocString)
-    # Consider Adding JagatiPackagesAvailable lists to allowing enumerating all URLs
-    set("${PackageName}_GitURL" "${Url}" CACHE STRING "${DocString}")
-endfunction(PackageMetadata PackageName Url DocString)
+# Cutom Pack list might include customn macros here to aid in defining packages.
 
 PackageMetadata(
     "Mezz_Foundation"

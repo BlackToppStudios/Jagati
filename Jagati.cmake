@@ -89,11 +89,40 @@ else("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 ########################################################################################################################
-# Package URLs
+# Index API
+
+########################################################################################################################
+# PackageMetadata
+#
+# This is intended to be used by repos to add a package that the Jagati can work with. This accepts the Name of the
+# package, the UTL to download it from, and a simple description of the package.
+#
+#
+# Usage:
+#   # From the index file
+#   PackageMetadata("PackageName" "https://url.com/folder/package_repo.git" "This is an example packaged.")
+#
+# Result:
+#   The Jagati is made aware of the package and after this CMakeLists.txt that use the Jagati will be able to use
+#   `IncludeJagatiPackage("PackageName")` and they should work correctly. Those CMakeLists.txt will need to meet any
+#   other requirements for IncludeJagatiPackage (Like running the StandardJagatiSetup).
+#
+
+set(JAGATI_PackageList "Jagati" CACHE STRING "A list of all Jagati Packages from the index, always reloaded." FORCE)
+
+# Move this to the Jagati in the next Upgrade and fully document it.
+function(PackageMetadata PackageName Url DocString)
+    set(JAGATI_PackageList "${JAGATI_PackageList};${PackageName}" CACHE STRING
+        "A list of all Jagati Packages from the index, always reloaded." FORCE)
+    set("${PackageName}_GitURL" "${Url}" CACHE STRING "${DocString}")
+endfunction(PackageMetadata PackageName Url DocString)
+
+########################################################################################################################
+# Loading the Package Index
 
 if(NOT JAGATI_IndexFile)
+    message(STATUS "Jagati Indexfile not provided, using default.")
     get_filename_component(JAGATI_IndexFolder "${JAGATI_File}" DIRECTORY)
-    message(STATUS "NOT JAGATI_IndexFile")
     set(JAGATI_IndexFile "${JAGATI_IndexFolder}/JagatiIndex.cmake" CACHE FILEPATH
         "The file that defines the packages and download URLs that the Jagati will work with.")
 endif(NOT JAGATI_IndexFile)
@@ -101,17 +130,26 @@ if(NOT JAGATI_IndexDownload)
     option(JAGATI_IndexDownload "Should the Jagati Package Index be downloaded automatically" ON)
 endif(NOT JAGATI_IndexDownload)
 if(JAGATI_IndexDownload)
-    set(JAGATI_IndexChecksum "3ebaf0eab6c2dd382cd027038a268398fd21ae6db2054c3334\
-b49e704d404c450defa3f7e4f36ba6aee39ab8e70875565f5b28104ae51a0893a5e8c04ccf8a07"
+    set(JAGATI_IndexChecksum "d262ea84e29b00313700a00e8a9ae4d99e1270c0084c606108fc9abfe2908c1845\
+c4cbcaf0736fa7a5fadfdb84a4880a5f2651b30febcb5afde30a5ccb3b7b18"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
-    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.25.2/JagatiIndex.cmake"
+    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.26.0/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
 endif(JAGATI_IndexDownload)
-message(STATUS "JAGATI_IndexFolder: ${JAGATI_IndexFolder}")
-message(STATUS "JAGATI_IndexFile: ${JAGATI_IndexFile}")
-message(STATUS "JAGATI_IndexUrl: ${JAGATI_IndexUrl}")
+
+message(STATUS "Pre-load Index settings:")
+message(STATUS "\tJAGATI_IndexFolder: ${JAGATI_IndexFolder}")
+message(STATUS "\tJAGATI_IndexFile: ${JAGATI_IndexFile}")
+message(STATUS "\tJAGATI_IndexUrl: ${JAGATI_IndexUrl}")
+message(STATUS "\tJAGATI_IndexChecksum: ${JAGATI_IndexChecksum}")
+
 include("${JAGATI_IndexFile}")
+
+message(STATUS "Index loaded, Packages include: ${JAGATI_PackageList}")
+foreach(JAGATI_OnePackage ${JAGATI_PackageList})
+    message(STATUS "\t${JAGATI_OnePackage}")
+endforeach(JAGATI_OnePackage )
 
 ########################################################################################################################
 # Other Variables
