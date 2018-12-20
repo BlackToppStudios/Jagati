@@ -16,8 +16,8 @@ pipeline {
                     agent { label "MacOSSierra" }
                     steps { checkout scm }
                 }
-                stage('RaspianJessie') {
-                    agent { label "RaspianJessie" }
+                stage('Raspbian') {
+                    agent { label "Raspbian" }
                     steps { checkout scm }
                 }
                 stage('UbuntuClang') {
@@ -61,8 +61,8 @@ pipeline {
                         dir('Test') { sh """export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja""" }
                     }
                 }
-                stage('RaspianJessie') {
-                    agent { label "RaspianJessie" }
+                stage('Raspbian') {
+                    agent { label "Raspbian" }
                     steps {
                         dir('Test') { sh 'ruby RootTest.rb -GNinja' }
                     }
