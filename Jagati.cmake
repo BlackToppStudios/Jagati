@@ -948,9 +948,10 @@ macro(SetCommonCompilerFlags)
             # C4774 - BS warning about some sprintf derivative we never use.
             # C4996 - Attempts to force "_s" versions of standard library methods, not all of which are cross-platform.
             # C5039 - BS warning thrown in the bowels of never included windows headers.
+            # C5045 - Alerts to when compiler would add instructions to mitigate Spectre if /Qspectre switch were used.
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
-                /wd4987 /wd4365 /wd4774 /wd4623 /wd4996 /wd5039"
+                /wd4987 /wd4365 /wd4774 /wd4623 /wd4996 /wd5039 /wd5045"
             )
         else(CompilerIsMsvc)
             message(FATAL_ERROR
