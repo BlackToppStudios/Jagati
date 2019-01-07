@@ -4,7 +4,7 @@
 # goal is to allow game developers to provide their own package list if desired.
 #
 
-# Cutom Pack list might include customn macros here to aid in defining packages.
+# Custom Package lists might include customn macros here to aid in defining packages, those would go here.
 
 PackageMetadata(
     "Mezz_Foundation"
@@ -34,4 +34,10 @@ PackageMetadata(
     "Mezz_SerializationBackendXML"
     "https://github.com/BlackToppStudios/Mezz_SerializationBackendXML.git"
     "Mezzanine Serialization Implementation serializing to XML."
+)
+
+PackageMetadata(
+    "Mezz_Mezzy"
+    "https://github.com/BlackToppStudios/Mezz_Mezzy.git"
+    "Tool for running code in each Mezzanine repo."
 )

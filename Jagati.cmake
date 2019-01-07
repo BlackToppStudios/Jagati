@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2018 BlackTopp Studios Inc.
+# © Copyright 2010 - 2019 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.26.0")
+    set(JagatiVersion "0.26.2")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -130,10 +130,10 @@ if(NOT JAGATI_IndexDownload)
     option(JAGATI_IndexDownload "Should the Jagati Package Index be downloaded automatically" ON)
 endif(NOT JAGATI_IndexDownload)
 if(JAGATI_IndexDownload)
-    set(JAGATI_IndexChecksum "d262ea84e29b00313700a00e8a9ae4d99e1270c0084c606108fc9abfe2908c1845\
-c4cbcaf0736fa7a5fadfdb84a4880a5f2651b30febcb5afde30a5ccb3b7b18"
+    set(JAGATI_IndexChecksum "9e807bc243fa7c5b52982c6c3dc2f2a79cd954575d1206aab\
+77f82ae26ee693429566e1f7c8d7d62b209235688fdcbb5d4d0b3101e63bccfeed439bfb8a9c5e2"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
-    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.26.0/JagatiIndex.cmake"
+    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.26.2/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
 endif(JAGATI_IndexDownload)
