@@ -24,11 +24,11 @@ The current Appveyor (Windows) build status is:
 The current Jenkins, which covers Linux (Emscripten, Rasberry Pi, Ubuntu and Fedora), old Mac OS X (High Sierra) and old windows (7 64 bit msvc and mingw), build status is available on the [BTS Jenkins Instance](http://blacktopp.ddns.net:8080/blue/organizations/jenkins/Jagati/activity). The current status is: [![Build Status](http://blacktopp.ddns.net:8080/job/Jagati/job/master/badge/icon)](http://blacktopp.ddns.net:8080/blue/organizations/jenkins/Jagati/activity)
 
 
-# Opinions 
+# Opinions
 
 This software enforces some *opinions* on the software that uses it. These are conventions, artificial restrictions that
-allow problems to be reasoned about in easier ways. There is a problem with how free and open a C++ project can be, any 
-C++ project can be arbitrarily complex and do anything with directories and inclusion or exclusion of code, headers and 
+allow problems to be reasoned about in easier ways. There is a problem with how free and open a C++ project can be, any
+C++ project can be arbitrarily complex and do anything with directories and inclusion or exclusion of code, headers and
 dependencies. Our thinking is that some enforced opinions will make working with C++ as software packages easier.
 
 Any opinion can be avoided by using the less restrictive CMake syntax. Some things are impossible to do using just the
@@ -48,7 +48,7 @@ Here is a (partial) summary of opinions
 9. Including a package should make its header folder available for inclusion.
 10. Including a package should link to the library it provides.
 
-# Usage 
+# Usage
 
 To keep the Jagati as simple as possible it is a single CMakeLists.txt file that is intended to be downloaded
 dynamically as part of the software build process.
@@ -66,10 +66,10 @@ if(NOT JAGATI_Download)
     option(JAGATI_Download "Should the Jagati be downloaded automatically" ON)
 endif(NOT JAGATI_Download)
 if(JAGATI_Download)
-    set(JAGATI_Checksum "5417802bf9150088c086df70453e091b060b6d03edf005f90dd\
-a39b504906f76bffa0dbcc02248597e536beceed7dc90c8c582aae9f4a98447efdf8d609b23c0"
+    set(JAGATI_Checksum "8e4980390f1819721142bf7940238e9e535d20316540fce9bb4\
+3287bbffc382020567662e33f31db66d75897042aede72e0b5bb781cafa73834a09aa25340b6f"
         CACHE STRING "Check that when the Jagati is downloaded the right one is used (for consistency and security).")
-    set(JAGATI_Url "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.25.1/Jagati.cmake"
+    set(JAGATI_Url "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.26.2/Jagati.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_Url}" "${JAGATI_File}" EXPECTED_HASH SHA512=${JAGATI_Checksum})
 endif(JAGATI_Download)
@@ -83,7 +83,7 @@ in remarks directly in the file Jagati.cmake.
 If you want to control where the package source is download, (if you have multiple projects or just want to make the
 source code easy to explore) you should set the MEZZ_PACKAGE_DIR. This sets the CMake variable MEZZ_PackageDirectory
 which controls where the Jagati downloads all the Mezzanine Packages. Setting this to in a system or user wide
-environment variable has the effect of deduplicating all of your 
+environment variable has the effect of deduplicating all of your
 
 This can be set in Bash with:
 
@@ -100,7 +100,7 @@ set MEZZ_PACKAGE_DIR=C:\users\sqeaky\code\
 
 This build tool is sophisticated enough to need unit tests, so it has them. At the time of this writing the tests are
 limited, but more will be added as bugs are found or features added. Running them is completely optional for most users,
-but if you want a basic sanity check or just to see what they do, you can easily run them. 
+but if you want a basic sanity check or just to see what they do, you can easily run them.
 
 To run the tests (which is optional for most users) you will need a Ruby interpretter. These were written using Ruby
 Ruby 2.3.3 and tested on JRuby 1.7.26 (which implements Ruby 1.9.3), and no special Ruby features newer than 1.9.3 were
@@ -139,10 +139,10 @@ You have skipped tests. Run with --verbose for details.
 
 ## Current Test Coverage
 
-Tests can be a good source of examples. Each test case occupies its own subdirectory in the Test/ directory. Each 
-directory has a test.rb file with some (hopefully) simple to read ruby code that scrapes CMake caches and other files
-CMake leaves around to verify the Jagati works. This is a brief summary of each test that might be a decent example (The
-best is FileLists):
+Going forward we want to test each API in the Jagati. Each test case occupies its own subdirectory in the Test/
+directory. Each directory has a test.rb file with some (hopefully) simple to read ruby code that scrapes CMake caches
+and other files CMake leaves around to verify the Jagati works. Tests can be a good source of examples. This is a brief
+summary of each test that might be a decent example (The best is FileLists):
 
    - ClaimParentProject_Parent - Tests for some of the simplest functionality
    - ClaimParentProject_Single - Tests for some of the simplest functionality
@@ -174,57 +174,11 @@ Many of the tests are negative case or check error messages, do no use these as 
    - FileLists_BadTestMissing
    - FileLists_BadTestRoot
 
+Note the "Bad" don't copy bad things.
+
 ### Testing Tools
 
 These aren't examples either:
 
    - RootTest.rb - The main test script
    - TestingTools - A bunch of ruby code that makes testing CMake scripts easy.
-
-
-## Testing Plans
-
-Going forward we want to test each API in the Jagati, here are the functiona and macros and how testable they are.
-
-Currently most of what is called by StandardJagatiSetup and all of the platform detection macros work and are tested.
-This excludes FindGitExecutable because that call depends entirely on external state so it can't be easily tested. All
-the other functions are listed here and a brief description of the short term plans to test them.
-
-   - EnableIOSCrossCompile - Testable by variable extraction
-   - ClaimParentProject - ✔
-   - CreateLocationVars - This will need testing later once it accepts external configuration.
-   - CreateLocations - Manually tested, automating buys little, low priority.
-   - DecideOutputNames - Check that setting the 3 vars works as expected. Trivially testable.
-   - IdentifyCPU - Can be checked by variable.
-   - IdentifyOS -  ✔
-   - IdentifyCompiler - ✔
-   - IdentifyDebug - ✔
-   - SetCommonCompilerFlags - Not testable because platform details
-   - SetProjectVariables - Trivially Testable
-   - FindGitExecutable - Not Testing, too system dependent.
-   - StandardJagatiSetup - ✔
-   - UseStaticLinking - ✔
-   - ChooseCodeCoverage - ✔
-   - SetCodeCoverage - ✔
-   - AddHeaderFile - ✔
-   - AddSourceFile - ✔
-   - AddMainSourceFile - ✔
-   - AddTestFile - ✔
-   - AddJagatiDoxInput - ✔
-   - AddSwigEntryPoint - ✔
-   - AddManualJagatiLibrary - (Tested indirectly by AddJagatiLibrary tests in Libraries tests)
-   - AddJagatiLibrary - ✔ 
-   
-   - ChooseLibraryType - ✔
-   - CreateCoverageTarget - ✔
-   
-   - AddJagatiConfig - Testable by variables and by reading file with EmitConfig
-   - EmitConfig - testable by reading file
-   - AddJagatiCompileOption - testable by reading file with EmitConfig
-   - EmitTestCode - We can test this by file
-   - AddTestTarget - This can be tested by target.
-   - AddTestDirectory - ✔ Tested in FileLists tests when Mezz_Test is checked. Not ideal but there is some coverage.
-   - ShowList - This can be tested by reading output, but doesn't need testing.
-   - AddIDEVisibility - Doesn't need testing, if it doesn't work life will get more difficult immediately.
-   - GitUpdatePackage - Not unit testable, tested in parts of larger integration tests.
-   - IncludeJagatiPackage - Not unit testable, tested in parts of larger integration tests.
