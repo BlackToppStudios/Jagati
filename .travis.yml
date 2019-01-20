@@ -1,7 +1,7 @@
 sudo: required
-dist: trusty
+dist: xenial
 language: cpp
-osx_image: xcode8.3
+osx_image: xcode10.1
 
 os:
 #  - linux # Whenever travis starts keeping up to date we can use this again.
