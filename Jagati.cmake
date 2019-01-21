@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.27.0")
+    set(JagatiVersion "0.27.1")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 

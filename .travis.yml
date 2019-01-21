@@ -4,11 +4,7 @@ language: cpp
 osx_image: xcode10.1
 
 os:
-#  - linux # Whenever travis starts keeping up to date we can use this again.
   - osx
-
-compiler:
-  - gcc
 
 script:
   - cd Test
