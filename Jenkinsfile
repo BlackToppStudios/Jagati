@@ -12,6 +12,10 @@ pipeline {
                     agent { label "FedoraGcc" }
                     steps { checkout scm }
                 }
+                stage('MacOSAir') {
+                    agent { label "MacOSAir" }
+                    steps { checkout scm }
+                }
                 stage('MacOSSierra') {
                     agent { label "MacOSSierra" }
                     steps { checkout scm }
@@ -53,6 +57,12 @@ pipeline {
                     agent { label "FedoraGcc" }
                     steps {
                         dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                    }
+                }
+                stage('MacOSAir') {
+                    agent { label "MacOSAir" }
+                    steps {
+                        dir('Test') { sh """export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja""" }
                     }
                 }
                 stage('MacOSSierra') {
