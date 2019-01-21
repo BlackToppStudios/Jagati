@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.26.2")
+    set(JagatiVersion "0.27.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -155,7 +155,7 @@ endforeach(JAGATI_OnePackage )
 # Other Variables
 
 set(MEZZ_Copyright
-"// © Copyright 2010 - 2018 BlackTopp Studios Inc.\n\
+"// © Copyright 2010 - 2019 BlackTopp Studios Inc.\n\
 /* This file is part of The Mezzanine Engine.\n\
 \n\
     The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
