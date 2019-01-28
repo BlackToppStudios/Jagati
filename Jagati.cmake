@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.27.2")
+    set(JagatiVersion "0.27.3")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -133,7 +133,7 @@ if(JAGATI_IndexDownload)
     set(JAGATI_IndexChecksum "9e807bc243fa7c5b52982c6c3dc2f2a79cd954575d1206aab\
 77f82ae26ee693429566e1f7c8d7d62b209235688fdcbb5d4d0b3101e63bccfeed439bfb8a9c5e2"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
-    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.27.2/JagatiIndex.cmake"
+    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.27.3/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
 endif(JAGATI_IndexDownload)
@@ -847,7 +847,7 @@ endmacro(IdentifyDebug)
 #           Treat warnings as errors are set.
 #           Turn off compiler logos.
 #           Enable Position independent code or otherwise fix linker issues.
-#           Turn on C++14.
+#           Turn on C++17.
 #
 
 macro(SetCommonCompilerFlags)
@@ -928,6 +928,7 @@ macro(SetCommonCompilerFlags)
     else(CompilerDesignNix)
         if(CompilerIsMsvc)
             # Used:
+            # /std:c++17 - Enables C++17 as the language standard.
             # /nologo - Skips a few lines of microsoft branding.
             # /Wall - Enable all warnings.
             # /WX - treat warnings as errors.
@@ -949,7 +950,7 @@ macro(SetCommonCompilerFlags)
             # C4996 - Attempts to force "_s" versions of standard library methods, not all of which are cross-platform.
             # C5039 - BS warning thrown in the bowels of never included windows headers.
             # C5045 - Alerts to when compiler would add instructions to mitigate Spectre if /Qspectre switch were used.
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /nologo /Wall /WX /MT \
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /nologo /Wall /WX /MT \
                 /wd4710 /wd4514 /wd4251 /wd4820 /wd4571 /wd4626 /wd4625 /wd5026 /wd5027 /wd4221 /wd4711 \
                 /wd4987 /wd4365 /wd4774 /wd4623 /wd4996 /wd5039 /wd5045"
             )
