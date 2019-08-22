@@ -6,11 +6,9 @@
 
 # Custom Package lists might include customn macros here to aid in defining packages, those would go here.
 
-PackageMetadata(
-    "Mezz_Foundation"
-    "https://github.com/BlackToppStudios/Mezz_Foundation.git"
-    "This package provides the most basic of runtime components and datatypes."
-)
+#
+# Foundational Packages
+#
 
 PackageMetadata(
     "Mezz_PackageName"
@@ -31,10 +29,46 @@ PackageMetadata(
 )
 
 PackageMetadata(
+    "Mezz_Foundation"
+    "https://github.com/BlackToppStudios/Mezz_Foundation.git"
+    "This package provides the most basic of runtime components and datatypes."
+)
+
+PackageMetadata(
+    "Mezz_FlowControl"
+    "https://github.com/BlackToppStudios/Mezz_FlowControl.git"
+    "This package contains advanced structures for controlling logic flow in sophisticated systems."
+)
+
+PackageMetadata(
+    "Mezz_IOStreams"
+    "https://github.com/BlackToppStudios/Mezz_IOStreams.git"
+    "This package contains basic helper types for simple I/O."
+)
+
+PackageMetadata(
+    "Mezz_Filesystem"
+    "https://github.com/BlackToppStudios/Mezz_Filesystem.git"
+    "This package contains a number of utilities for accessing the local filesystems."
+)
+
+PackageMetadata(
     "Mezz_SerializationBackendXML"
     "https://github.com/BlackToppStudios/Mezz_SerializationBackendXML.git"
     "Mezzanine Serialization Implementation serializing to XML."
 )
+
+#
+# Core Packages
+#
+
+#
+# Extra Packages
+#
+
+#
+# Tool Packages
+#
 
 PackageMetadata(
     "Mezz_Mezzy"
