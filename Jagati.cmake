@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.28.1")
+    set(JagatiVersion "0.29.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -95,8 +95,7 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 # PackageMetadata
 #
 # This is intended to be used by repos to add a package that the Jagati can work with. This accepts the Name of the
-# package, the UTL to download it from, and a simple description of the package.
-#
+# package, the URL to download it from, and a simple description of the package.
 #
 # Usage:
 #   # From the index file
@@ -110,7 +109,6 @@ endif("${CMAKE_VERSION}" VERSION_GREATER "3.1.0")
 
 set(JAGATI_PackageList "Jagati" CACHE STRING "A list of all Jagati Packages from the index, always reloaded." FORCE)
 
-# Move this to the Jagati in the next Upgrade and fully document it.
 function(PackageMetadata PackageName Url DocString)
     set(JAGATI_PackageList "${JAGATI_PackageList};${PackageName}" CACHE STRING
         "A list of all Jagati Packages from the index, always reloaded." FORCE)
@@ -131,9 +129,9 @@ if(NOT JAGATI_IndexDownload)
 endif(NOT JAGATI_IndexDownload)
 if(JAGATI_IndexDownload)
     set(JAGATI_IndexChecksum "4ad9b0ff814ef986cbb82a47c9ae3fe6c77f403925ac17608\
-6c316532d61ce76d14e461b633ae9f30b25a5f7e982772206684e498baf9380e80a0a3bb4b2d485"
+6c316532d61ce76d14e461b633ae9f30b25a5f7e982772206684e498baf9380e80a0a3bb4b2d485;flaksjdf;laksdjf;alskdjf"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
-    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.28.1/JagatiIndex.cmake"
+    set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.29.0/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
     file(DOWNLOAD "${JAGATI_IndexUrl}" "${JAGATI_IndexFile}" EXPECTED_HASH SHA512=${JAGATI_IndexChecksum})
 endif(JAGATI_IndexDownload)
@@ -149,13 +147,13 @@ include("${JAGATI_IndexFile}")
 message(STATUS "Index loaded, Packages include: ${JAGATI_PackageList}")
 foreach(JAGATI_OnePackage ${JAGATI_PackageList})
     message(STATUS "\t${JAGATI_OnePackage}")
-endforeach(JAGATI_OnePackage )
+endforeach(JAGATI_OnePackage)
 
 ########################################################################################################################
-# Other Variables
+# File construction variables
 
 set(MEZZ_Copyright
-"// © Copyright 2010 - 2019 BlackTopp Studios Inc.\n\
+"// © Copyright 2010 - 2020 BlackTopp Studios Inc.\n\
 /* This file is part of The Mezzanine Engine.\n\
 \n\
     The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
@@ -231,17 +229,17 @@ include(ExternalProject)
 #
 
 macro(EnableIOSCrossCompile)
-    if( NOT CMAKE_GENERATOR STREQUAL "Xcode" )
+    if(NOT CMAKE_GENERATOR STREQUAL "Xcode")
         message(FATAL_ERROR "XCode generator required to cross-compile to iOS.")
-    endif( NOT CMAKE_GENERATOR STREQUAL "Xcode" )
-    if( NOT LibraryBuildType STREQUAL "STATIC" )
+    endif(NOT CMAKE_GENERATOR STREQUAL "Xcode")
+    if(NOT LibraryBuildType STREQUAL "STATIC")
         message(FATAL_ERROR "iOS only permits static builds.")
-    endif( NOT LibraryBuildType STREQUAL "STATIC" )
+    endif(NOT LibraryBuildType STREQUAL "STATIC")
 
     set(CMAKE_SYSTEM_NAME "AppleIOS")
-    if( NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "" )
+    if(NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "")
         set(CMAKE_SYSTEM_VERSION $ENV{IOS_SDK_VERSION})
-    endif( NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "" )
+    endif(NOT "$ENV{IOS_SDK_VERSION}" STREQUAL "")
 
     set(CMAKE_SYSTEM_PROCESSOR arm)
     set(CMAKE_CROSSCOMPILING_TARGET IOS)
@@ -261,23 +259,27 @@ macro(EnableIOSCrossCompile)
     set(CMAKE_C_COMPILER_WORKS TRUE)
 
     # Set Bundle stuff
-    if( NOT DEFINED MEZZ_iOSCompanyName )
+    if(NOT DEFINED MEZZ_iOSCompanyName)
         set(MEZZ_iOSCompanyName "BlackToppStudios")
-    endif( NOT DEFINED MEZZ_iOSCompanyName )
-    set(MEZZ_iOSCompanyName ${MEZZ_iOSCompanyName} CACHE STRING "The name of the company building the iOS target.  Used to generate the Bundle ID.")
+    endif(NOT DEFINED MEZZ_iOSCompanyName)
+    set(MEZZ_iOSCompanyName ${MEZZ_iOSCompanyName} CACHE
+        STRING "The name of the company building the iOS target. Used to generate the Bundle ID."
+    )
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.${MEZZ_iOSCompanyName}.\${PRODUCT_NAME:rfc1034identifier}")
 
     # Determine our target
-    option(MEZZ_iOSSimulator "Whether or not to compile iOS binaries to target a simulator. Disable for physical device." ON)
-    if( MEZZ_iOSSimulator )
+    option(MEZZ_iOSSimulator
+        "Whether or not to compile iOS binaries to target a simulator. Disable for physical device." ON
+    )
+    if(MEZZ_iOSSimulator)
         set(XCODE_IOS_TARGET iphonesimulator)
         set(IOS_ARCH x86_64)
         message(STATUS "Configuring iOS build for Simulator using architecture(s): ${IOS_ARCH}")
-    else( MEZZ_iOSSimulator )
+    else(MEZZ_iOSSimulator)
         set(XCODE_IOS_TARGET iphoneos)
         set(IOS_ARCH armv7 armv7s arm64)
         message(STATUS "Configuring iOS build for Device using architecture(s): ${IOS_ARCH}")
-    endif( MEZZ_iOSSimulator )
+    endif(MEZZ_iOSSimulator)
     set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE STRING "Build architecture for iOS")
 
     # We need to find the iOS SDK to use
@@ -888,11 +890,14 @@ macro(SetCommonCompilerFlags)
         # -Wsign-promo - Prevent issues with enums and ints choosing a signed version of a datatype when using unsigned.
         # -Wstrict-overflow=2 - When the compiler re-arranges some math that might cause an integer overflow.
         # -Wundef - Fail when undeclared preprocessor macros are used, almost always a bug/platform error.
+        #
+        # Warning supression - These hurt more than help
+        # -Wno-weak-vtables - weak vtables aren't an issue because compiler remove dupes and source access removes risk.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         -std=c++17 -Wall -Wextra -Werror -pedantic-errors \
         -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
-        -Wstrict-overflow=2 -Wundef")
+        -Wstrict-overflow=2 -Wundef -Wno-weak-vtables")
 
         # Emscripten is a unique beast.
         if(CompilerIsEmscripten)
@@ -1210,7 +1215,7 @@ macro(AddHeaderFile FileName)
 or '${${PROJECT_NAME}GenHeadersDir}'.")
         endif("${FileName}" MATCHES "${${PROJECT_NAME}IncludeDir}")
     else(EXISTS "${FileName}")
-        # File does not exist, so lets search for it in the header folder.
+        # File does not exist as an abosolute path, so lets search for it in the header folders.
         if(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
             # Found It! Add to list
             set(TempHeaderFileToAdd "${${PROJECT_NAME}IncludeDir}${FileName}")
@@ -1723,7 +1728,8 @@ endmacro(AddJagatiCompileOption VariableName HelpString DefaultSetting)
 ########################################################################################################################
 # EmitConfig
 #
-# Emit a config file as constructed by AddJagatiConfig and add the file name to the header list.
+# Emit a config file constructed through assembling all data given to AddJagatiConfig and add the file name to the
+# header list.
 #
 # Usage:
 #   # Call after 0 or more calls to AddJagatiConfig and the parentmost scope has been claimed and SetProjectVariables
@@ -1766,6 +1772,390 @@ macro(EmitConfig)
     AddHeaderFile("${${PROJECT_NAME}ConfigFilename}")
 endmacro(EmitConfig)
 
+########################################################################################################################
+########################################################################################################################
+# Exception Main creation
+########################################################################################################################
+########################################################################################################################
+
+
+########################################################################################################################
+# AddJagatiException
+#
+# Add an exception to list of exception that the Jagati will retain for constructing a header later when
+# EmitExceptionHeader is called.
+#
+# Usage:
+#   # Call after SetProjectVariables to add one entry to the exception list:
+#   AddJagatiException("NameOfNewException" "Parent/BaseClass" "BriefDocumentationString")
+#   AddJagatiException("InputOutPut" "Base" "Base Exception for all IO")
+#
+# Result:
+#   This will create or append exception data to 5 variables for EmitExceptionHeader to use later:
+#       JagatiExceptionCodes - Parts of the ExceptionCode enumration to be emitted.
+#       JagatiExceptionClasses - Complete text for classes to be emitted.
+#       JagatiExceptionCodeToClassString - A minimal snippet of code to be inserted in Enum to String function.
+#       JagatiExceptionClassStringToCode - A minimal snippet of code to be inserted in String to Enum function.
+#       JagatiExceptionNumber - A number indicating the current exception number presuming that Base is 0.
+#
+set(JagatiExceptionNumber "1")
+
+macro(AddJagatiException Name BaseClass Documentation)
+    math(EXPR JagatiExceptionNumber "${JagatiExceptionNumber}+1")
+
+    set(JagatiExceptionCodes
+        "${JagatiExceptionCodes}    ${Name}Code = ${JagatiExceptionNumber},\n"
+    )
+
+    set(JagatiExceptionClasses
+        "${JagatiExceptionClasses}\n\
+/// @brief ${Documentation}\n\
+class MEZZ_LIB ${Name} : public ${BaseClass}\n\
+{\n\
+public:\n\
+    /// @copydoc Mezzanine::Exception::Base::Base
+    ${Name}\n\
+        ( const Mezzanine::StringView& Message,\n\
+          const Mezzanine::StringView& SrcFunction,\n\
+          const Mezzanine::StringView& SrcFile,\n\
+          const Mezzanine::Whole FileLine)\n\
+      : ${BaseClass}(Message, SrcFunction, SrcFile, FileLine)\n\
+    {}\n\
+\n\
+    /// @brief Default Copy Constructor\n\
+    ${Name}(const ${Name}&) = default;\n\
+    /// @brief Default Move Constructor\n\
+    ${Name}(${Name}&&) = default;\n\
+    /// @brief Virtual Deconstructor.\n\
+    virtual ~${Name}() = default;\n\
+    /// @return A StringView containing a human readable name for this type, \"${Name}\".\n\
+    static StringView TypeName() noexcept\n\
+        { return \"${Name}\"; }\n\
+}; // ${Name}\n\
+\n\
+template<>\n\
+struct ExceptionFactory<ExceptionCode::${Name}Code>\n\
+{
+    /// @copydoc ExceptionFactory::Type\n\
+    using Type = ${Name};\n\
+};\n\
+\n"
+    )
+
+    set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}\n\
+        case ExceptionCode::${Name}Code: return \"${Name}\";\n"
+    )
+
+    set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}\n\
+        case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code;\n"
+    )
+
+    # Lift the scope of all these parts
+    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(JagatiExceptionCodes "${JagatiExceptionIndex}" PARENT_SCOPE)
+        set(JagatiExceptionClasses "${JagatiExceptionClasses}" PARENT_SCOPE)
+        set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}" PARENT_SCOPE)
+        set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}" PARENT_SCOPE)
+        set(JagatiExceptionNumber "${JagatiExceptionNumber}" PARENT_SCOPE)
+    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+endmacro(AddJagatiException Name BaseClass)
+
+########################################################################################################################
+# EmitExceptionHeader
+#
+# Emit a Header file constructed through assembling all data given to AddJagatiException and add the file name to the
+# header list.
+#
+# Usage:
+#   # Call after 0 or more calls to AddJagatiException and the parentmost scope has been claimed and SetProjectVariables
+#   # has initialized the file lists.
+#   EmitExceptionHeader()
+#
+# Result:
+#   This will create a Header file (MezzException.h by default) with all the Exceptions added by AddJagatiException in
+#   all projects and this will a variable with the Header's full filename, and that will be passed to AddJagatiHeader:
+#       ${PROJECT_NAME}ExceptionFilename - The absolute path and filename of the file writtern, this
+#           derived from the variable ${PROJECT_NAME}GenHeadersDir and will contain the project name.
+#
+macro(EmitExceptionHeader)
+    # Create Parts of the file
+    set(ExceptionHeaderGuard
+        "${MEZZ_Copyright}#ifndef Mezz_Exception_h\n#define Mezz_Exception_h\n\n"
+    )
+
+    set(NamespaceHeader "\
+#include \"DataTypes.h\"\n\n\
+namespace Mezzanine\n{\n\
+namespace Exception\n{\n\
+\n"
+    )
+
+    # Assemble all the enums
+    set(ExceptionEnumHeader "\
+/// @brief A collection of number corresponding 1 to 1 with each exception class.\n\
+enum class ExceptionCode : Whole\n\
+{\n\
+    FirstCode = 0, ///< Used to indicate the numerical start of the range of exception codes.\n\
+    NotAnExceptionCode = 0, ///< Used to indicate no exception at all.\n\
+    FirstValidCode = 1, ///< Used to indicate the numerical start of the range of VALID exception codes.\n\
+    BaseCode = 1, ///< Corresponds to the base exception class @ref Exception::Base .\n\
+"
+    )
+    set(ExceptionEnumFooter "\
+    LastCode = ${JagatiExceptionNumber} ///< Used to indicate the numerical end of the range of exceptions.\n\
+};\n\
+\n"
+    )
+
+    # The base exception code
+    set(JagatiExceptionBaseClass "\
+/// @brief This is intended to be the base class for all exceptions in the Mezzanine.\n\
+class MEZZ_LIB Base : public std::exception\n\
+{\n\
+private:\n\
+    /// @brief This stores the Error Message.\n\
+    const Mezzanine::String ErrorMessage;\n\
+    /// @brief This stores the function name where the exception originated.\n\
+    const Mezzanine::String Function;\n\
+    /// @brief This stores the file where the exception originated.\n\
+    const Mezzanine::String File;\n\
+    /// @brief This stores the line number where the exception originated.\n\
+    const Mezzanine::Whole Line;\n\
+\n\
+public:\n\
+    /// @brief Fully initializing constructor.\n\
+    /// @param Message The error message.\n\
+    /// @param SrcFunction The name of the throwing function.\n\
+    /// @param SrcFile The name of the throwing file.\n\
+    /// @param FileLine The number of the throwing line.\n\
+    Base(const Mezzanine::StringView& Message,\n\
+                  const Mezzanine::StringView& SrcFunction,\n\
+                  const Mezzanine::StringView& SrcFile,\n\
+                  const Mezzanine::Whole FileLine)\n\
+        : ErrorMessage(Message),\n\
+          Function(SrcFunction),\n\
+          File(SrcFile),\n\
+          Line(FileLine)\n\
+    {}\n\
+\n\
+    /// @brief Default Copy Constructor\n\
+    Base(const Base&) = default;\n\
+    /// @brief Default Move Constructor\n\
+    Base(Base&&) = default;\n\
+    /// @brief Virtual Deconstructor.\n\
+    virtual ~Base() = default;\n\
+\n\
+    /// @brief Get the Error Message associated with this exception.\n\
+    /// @return A StringView containing the error message.\n\
+    virtual StringView GetMessage() const noexcept\n\
+        { return ErrorMessage; }\n\
+\n\
+    /// @brief Get the function this was thrown from.\n\
+    /// @return A StringView containing the function that threw this.\n\
+    virtual StringView GetOriginatingFunction() const noexcept\n\
+        { return Function; }\n\
+\n\
+    /// @brief Get the file this was thrown from.\n\
+    /// @return A StringView containing the file with the code throwing this.\n\
+    virtual StringView GetOriginatingFile() const noexcept\n\
+        { return File; }\n\
+\n\
+    /// @brief Get the line this was thrown from.\n\
+    /// @return A Whole containing the line number this was thrown from.\n\
+    virtual Whole GetOriginatingLine() const noexcept\n\
+        { return Line; }\n\
+\n\
+    /// @brief Get the typename of this.\n\
+    /// @return A StringView containing a human readable name for this type, \"Base\".\n\
+    static StringView TypeName() noexcept\n\
+        { return \"Base\"; }\n\
+\n\
+    /// @brief Get the error message in the std compatible way.\n\
+    /// @return A pointer to a C-String, containing the same messages as @ref GetMessage().\n\
+    virtual const char* what() const noexcept\n\
+        { return ErrorMessage.c_str(); }\n\
+\n\
+}; // Base Exception class\n\
+\n\
+/// @brief Template class that serves as the base for exception factories.\n\
+/// @details Additional exceptions and their factories have to specialize from this template changing the type value\n\
+/// to the new exception type.This allows our exception macro to find the appropriate factory at compile when\n\
+/// template are being resolved. So this system can be extended with additional exceptions wherever desired.\n\
+/// Attempting to create an unknown exception simply won't compile because the base exception class being abstract.\n\
+template <Mezzanine::Exception::ExceptionCode N>\n\
+struct ExceptionFactory\n\
+{
+    /// @brief This allows parameterized uses of this type so exception can be throw without directly using the type.\n\
+    using Type = Base;\n\
+    //typedef BaseException Type;\n\
+};\n\
+\n"
+    )
+
+    # Base Exception Factory Macro
+    set(ExceptionFactoryMacro "\
+#ifndef MEZZ_EXCEPTION\n\
+/// @brief An easy way to throw exceptions with rich information.\n\
+/// @details An important part of troubleshooting errors from the users perspective is being able to tie a specific\n\
+/// 'fix' to a specific error message. An important part of that is catching the right exceptions at the right time.\n\
+/// It is also important to not allocate more memory or other resources while creating an exception.\n\
+/// @n @n\n\
+/// This macro makes doing all of these easy. Every exception thrown by this macro with provide the function name,\n\
+/// the file name and the line in the file from which it was thrown. That provides all the information the developer\n\
+/// needs to identify the issue. This uses some specific template machinery to generate specifically typed exceptions\n\
+/// static instances at compile to insure the behaviors a programmer needs. Since these are allocated (optimized out\n\
+/// really) when the program is first loaded so there will be no allocations when this is called, and the type is\n\
+/// controlled by the error number parameter.\n\
+/// @n @n\n\
+/// As long as the developer provides a unique string for each failure, then any messages logged or presented to the\n\
+/// user or log will uniquely identify that specific problem. This allows the user to perform very specific web\n\
+/// searches and potentially allows troubleshooters/technicians to skip lengthy diagnostics steps.\n\
+/// @param num A specific code from the @ref ExceptionBase::ExceptionCodes enum will control the type of exception\n\
+/// produced.\n\
+/// @param desc A message/description to be passed through to the exceptions constructor.\n\
+#define MEZZ_EXCEPTION(num, msg) throw Mezzanine::Exception::ExceptionFactory\
+<Mezzanine::Exception::ExceptionCode::num>::Type(msg, __func__, __FILE__, __LINE__ );\n\
+#endif\n\
+\n"
+    )
+
+    # Convert Error Codes to Strings
+    set(ExceptionCodeToClassStringFunctionHeader
+        "StringView ExceptionClassNameFromCode(const Mezzanine::Exception::ExceptionCode Code)"
+    )
+
+    set(ExceptionCodeToClassStringFunctionPrototype "\
+/// @brief Convert an ExceptionCode to a string containing the class name.\n\
+/// @param Code The number you have that you want as a string.\n\
+/// @return A StringView with a class name like \"Exception::InputOutPut\"\n\
+${ExceptionCodeToClassStringFunctionHeader};\n\
+\n"
+    )
+
+    set(ExceptionCodeToClassStringFunction "\
+${ExceptionCodeToClassStringFunctionHeader}\n\
+{\n\
+    switch(Code)\n\
+    {\
+${JagatiExceptionCodeToClassString}\
+        case ExceptionCode::BaseCode: return \"Base\";\n\
+        case ExceptionCode::NotAnExceptionCode: return \"NotAnException\";\n\
+    }\n\
+}\n\
+\n"
+    )
+
+    # Convert Strings to Error Codes
+    set(ExceptionClassStringHashFunctionHeader
+        "constexpr unsigned int ExceptionNameHash(const char* ToHash, int Index"
+    )
+
+    set(ExceptionClassStringHashFunctionPrototype "\
+/// @brief A simple way to hash Exception names at compile time.\n\
+/// @details This is intended to be simple and fast to compile not rigorously checked for other hashing purposes\n\
+/// and this shouldn't be used elsewhere.\n\
+/// @param ToHash The string to hash.\n\
+/// @param Index The current character to bake into the hash, defaults to 0 and is used to seek the end.\n\
+/// @return An unsigned int at compile time that is a hash of the name passed.\n\
+/// @note Copied from StackOverflow with written permission under under cc by-sa 4.0 with attribution required\n\
+/// https://stackoverflow.com/questions/16388510/evaluate-a-string-with-a-switch-in-c .\n\
+${ExceptionClassStringHashFunctionHeader} = 0);\n\
+\n"
+    )
+
+    set(ExceptionClassStringHashFunction "\
+${ExceptionClassStringHashFunctionHeader})\n\
+{\n\
+    return !ToHash[Index] ?\n\
+           5381 :
+           (ExceptionNameHash(ToHash, Index+1) * 33) ^ static_cast<unsigned int>(ToHash[Index]);\n\
+}\n\
+\n"
+    )
+
+    set(ExceptionClassStringToCodeFunctionHeader
+        "Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(String ClassName)"
+    )
+
+    set(ExceptionClassStringToCodeFunctionPrototype "\
+/// @brief Get the ExceptionCode for the given string.\n\
+/// @param ClassName The string to convert.\n\
+/// @return A valid entry from the ExceptionCode enum or ExceptionCode::NotAnExceptionCode for invalid input.\n\
+${ExceptionClassStringToCodeFunctionHeader};\n\
+\n"
+    )
+
+    set(ExceptionClassStringToCodeFunction "\
+${ExceptionClassStringToCodeFunctionHeader}\n\
+{\n\
+    switch(ExceptionNameHash(ClassName.c_str()))\n\
+    {\
+${JagatiExceptionClassStringToCode}\
+        case ExceptionNameHash(\"Base\"): return ExceptionCode::BaseCode;\n\
+        default: return ExceptionCode::NotAnExceptionCode;\n\
+    }\n\
+}\n\
+\n"
+    )
+
+    # Lets support streaming of ExceptionCode enums
+    set(ExceptionCodeStreamingFunctionHeader
+        "std::ostream& operator<<(std::ostream& Stream, Mezzanine::Exception::ExceptionCode Code)"
+    )
+
+    set(ExceptionCodeStreamingFunctionPrototype "\
+/// @brief Stream Exception code value by converting them to strings.\n\
+/// @param Stream Any valid std::ostream, like cout or any fstream to send this too.\n\
+/// @param Code Any ExceptionCode instance to emit.\n\
+/// @return The passed ostream is returned to allow for operator chaining.\n\
+${ExceptionCodeStreamingFunctionHeader};\n\
+\n"
+    )
+
+    set(ExceptionCodeStreamingFunction "\
+${ExceptionCodeStreamingFunctionHeader}\n\
+{\n\
+    return Stream << \"Exception::\"\n\
+                  << Mezzanine::Exception::ExceptionClassNameFromCode(Code);\n\
+}\n\
+\n"
+    )
+
+    # Close it all out
+    set(ExceptionFooter "\
+} // namespace Exception\n\
+} // namespace Mezzanine\n\n\
+#endif // Mezz_Exception_h\n\
+"
+    )
+
+    # Assemble the parts: Enum + template + baseclase + classes + functions
+    set(${PROJECT_NAME}ExceptionContent "\
+${ExceptionHeaderGuard}${NamespaceHeader}\
+${ExceptionEnumHeader}${JagatiExceptionCodes}${ExceptionEnumFooter}\
+${ExceptionCodeToClassStringFunctionPrototype}\
+${ExceptionClassStringToCodeFunctionPrototype}\
+${ExceptionClassStringHashFunctionPrototype}\
+${ExceptionCodeStreamingFunctionPrototype}\
+${JagatiExceptionBaseClass}${JagatiExceptionClasses}\
+${ExceptionFactoryMacro}\
+${ExceptionCodeToClassStringFunction}\
+${ExceptionClassStringHashFunction}\
+${ExceptionClassStringToCodeFunction}\
+${ExceptionCodeStreamingFunction}\
+${ExceptionFooter}"
+    )
+
+    # Lift all relevant variables
+    set(${PROJECT_NAME}ExceptionFilename "${${PROJECT_NAME}GenHeadersDir}MezzException.h")
+    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(${PROJECT_NAME}ExceptionFilename "${${PROJECT_NAME}ExceptionFilename}" PARENT_SCOPE)
+    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+
+    # Write the file
+    message(STATUS "Emitting Exception Header File - ${${PROJECT_NAME}ExceptionFilename}")
+    file(WRITE "${${PROJECT_NAME}ExceptionFilename}" "${${PROJECT_NAME}ExceptionContent}")
+endmacro(EmitExceptionHeader)
 
 ########################################################################################################################
 ########################################################################################################################
