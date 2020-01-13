@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ AddSourceFile("Hello.cpp")
 AddSourceFile("Hello2.cpp")
 
 AddHeaderFile("Hello.h")
-AddHeaderFile("Hello2.h") 
+AddHeaderFile("Hello2.h")
 
 AddJagatiDoxInput("HelloDoc.h")
 AddSwigEntryPoint("${FileLists_BadSwigRoot_Test_RootDir}HelloSwig.h") # This line will fail because its misplaced.

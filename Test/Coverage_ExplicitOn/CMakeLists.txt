@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -73,9 +73,9 @@ CreateDefaultCoverageTarget(Hello2) # this should use file lists automatically.
 set(CompilerSupportsCoverage    "${CompilerSupportsCoverage}"
         CACHE INTERNAL "Lifting CompilerSupportsCoverage for testing,")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"  CACHE INTERNAL 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"  CACHE INTERNAL
         "Lifting CMAKE_CXX_FLAGS for testing,")
-set(CoverageTest_Enabled_HeaderFiles "${CoverageTest_Enabled_HeaderFiles}"  CACHE INTERNAL 
+set(CoverageTest_Enabled_HeaderFiles "${CoverageTest_Enabled_HeaderFiles}"  CACHE INTERNAL
         "Lifting CoverageTest_Enabled_HeaderFiles for testing,")
-set(CoverageTest_Enabled_SourceFiles "${CoverageTest_Enabled_SourceFiles}"  CACHE INTERNAL 
+set(CoverageTest_Enabled_SourceFiles "${CoverageTest_Enabled_SourceFiles}"  CACHE INTERNAL
         "Lifting CoverageTest_Enabled_SourceFiles for testing,")

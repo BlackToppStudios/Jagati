@@ -156,6 +156,7 @@ summary of each test that might be a decent example (The best is FileLists):
    - Libraries_Static - How to set static linking
    - LocationVars - How to get at of directory variables.
    - Mezz_PackageDirectory - How the Jagati interacts with environment variables
+   - Exceptions - Generation of many types of exceptions
 
 ### Failing Cases
 

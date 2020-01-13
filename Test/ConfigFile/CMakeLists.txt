@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -57,6 +57,7 @@ AddHeaderFile("Hello.h")
 
 # Can the coverage stuff consume lists correctly?
 EmitConfig()
+AddConfigSource()
 
 
 # Everything above this line is a reasonable example of use.
@@ -66,13 +67,13 @@ EmitConfig()
 # Storing some values in the cache for testing. Testing the values of variables sounds off until you
 # accept that variables are part of the API.
 
-set(${PROJECT_NAME}SourceFiles      "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL 
+set(${PROJECT_NAME}SourceFiles      "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL
                                     "Lifting ${PROJECT_NAME}SourceFiles for testing,")
-set(${PROJECT_NAME}HeaderFiles      "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL 
+set(${PROJECT_NAME}HeaderFiles      "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL
                                     "Lifting ${PROJECT_NAME}HeaderFiles for testing,")
-set(${PROJECT_NAME}TestSourceFiles  "${${PROJECT_NAME}TestSourceFiles}" CACHE INTERNAL 
+set(${PROJECT_NAME}TestSourceFiles  "${${PROJECT_NAME}TestSourceFiles}" CACHE INTERNAL
                                     "Lifting ${PROJECT_NAME}TestSourceFiles for testing,")
-set(${PROJECT_NAME}SwigFiles        "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL 
+set(${PROJECT_NAME}SwigFiles        "${${PROJECT_NAME}SwigFiles}" CACHE INTERNAL
                                     "Lifting ${PROJECT_NAME}SwigFiles for testing,")
-set(JagatiDoxArray                  "${JagatiDoxArray}" CACHE INTERNAL 
+set(JagatiDoxArray                  "${JagatiDoxArray}" CACHE INTERNAL
                                     "Lifting JagatiDoxArray for testing,")

@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2019 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -897,13 +897,13 @@ macro(SetCommonCompilerFlags)
         -std=c++17 -Wall -Wextra -Werror -pedantic-errors \
         -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Wmissing-declarations \
         -Wmissing-include-dirs -Wold-style-cast -Wredundant-decls -Wshadow -Wconversion -Wsign-promo \
-        -Wstrict-overflow=2 -Wundef -Wno-weak-vtables")
+        -Wstrict-overflow=2 -Wundef")
 
         # Emscripten is a unique beast.
         if(CompilerIsEmscripten)
             # The same warnings as clang.
             set(CMAKE_CXX_FLAGS "-s DISABLE_EXCEPTION_CATCHING=0 ${CMAKE_CXX_FLAGS} -Weverything \
-            -Wno-documentation-unknown-command -Wno-c++98-compat")
+            -Wno-documentation-unknown-command -Wno-c++98-compat -Wno-weak-vtables")
 
             # This is exe on windows and nothing on most platforms, but without this emscripten output is... wierd.
             set(CMAKE_EXECUTABLE_SUFFIX ".js")
@@ -928,7 +928,7 @@ macro(SetCommonCompilerFlags)
             endif(CompilerIsGCC)
             if(CompilerIsClang)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
-                    -Wno-documentation-unknown-command -Wno-c++98-compat")
+                    -Wno-documentation-unknown-command -Wno-c++98-compat -Wno-weak-vtables")
             endif(CompilerIsClang)
         endif(CompilerIsEmscripten)
 
@@ -1262,7 +1262,12 @@ macro(AddSourceFile FileName)
             # Found it in the Source dir.
             list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
-            message(SEND_ERROR "Found'${FileName}' outside source directory, move to '${${PROJECT_NAME}SourceDir}'.")
+            if(("${FileName}" MATCHES "${${PROJECT_NAME}GenSourceDir}"))
+                list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+            else(("${FileName}" MATCHES "${${PROJECT_NAME}GenSourceDir}"))
+                message(SEND_ERROR "Found'${FileName}' outside source directory and outside of config source directory\
+, move to '${${PROJECT_NAME}SourceDir}'.")
+            endif(("${FileName}" MATCHES "${${PROJECT_NAME}GenSourceDir}"))
         endif("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
     else(EXISTS "${FileName}")
         # File does not exist, so lets search for it in the source folder.
@@ -1769,8 +1774,26 @@ macro(EmitConfig)
     message(STATUS "Emitting Config Header File - ${${PROJECT_NAME}ConfigFilename}")
     file(WRITE "${${PROJECT_NAME}ConfigFilename}" "${${PROJECT_NAME}ConfigContent}")
 
-    AddHeaderFile("${${PROJECT_NAME}ConfigFilename}")
 endmacro(EmitConfig)
+
+########################################################################################################################
+# AddConfigSource
+#
+# Adds the config source and/or headers files to the default library target for the current Jagati Package.
+#
+# Usage:
+#   # Call after EmitConfig has been called an before the call to AddJagatiLibrary, Only call this once per
+#   # project, when using default Mezzanine packages this is done in Mezz_Foundation.
+#   AddConfigSource()
+#
+# Result:
+#   This will add files emitted by EmitExceptionSource to the main library target for the current Jagati Package as
+#   though AddHeaderFile or AddSourceFile were called for each file emitted.
+#
+
+macro(AddConfigSource)
+    AddHeaderFile("${${PROJECT_NAME}ConfigFilename}")
+endmacro(AddConfigSource)
 
 ########################################################################################################################
 ########################################################################################################################
@@ -1843,11 +1866,11 @@ struct ExceptionFactory<ExceptionCode::${Name}Code>\n\
     )
 
     set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}\n\
-        case ExceptionCode::${Name}Code: return \"${Name}\";\n"
+        case ExceptionCode::${Name}Code: return \"${Name}\";"
     )
 
     set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}\n\
-        case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code;\n"
+        case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code;"
     )
 
     # Lift the scope of all these parts
@@ -1861,26 +1884,41 @@ struct ExceptionFactory<ExceptionCode::${Name}Code>\n\
 endmacro(AddJagatiException Name BaseClass)
 
 ########################################################################################################################
-# EmitExceptionHeader
+# EmitExceptionSource
 #
 # Emit a Header file constructed through assembling all data given to AddJagatiException and add the file name to the
 # header list.
 #
 # Usage:
 #   # Call after 0 or more calls to AddJagatiException and the parentmost scope has been claimed and SetProjectVariables
-#   # has initialized the file lists.
-#   EmitExceptionHeader()
+#   # has initialized the file lists. Call before you intend to use the emitted sources in a build target.
+#   EmitExceptionSource()
 #
 # Result:
-#   This will create a Header file (MezzException.h by default) with all the Exceptions added by AddJagatiException in
-#   all projects and this will a variable with the Header's full filename, and that will be passed to AddJagatiHeader:
-#       ${PROJECT_NAME}ExceptionFilename - The absolute path and filename of the file writtern, this
+#   This will create a Header file (MezzException.h by default) and Source file (MezzException.h by default) with all
+#   the Exceptions added by AddJagatiException in all projects and this will a variable with the Header's full filename,
+#   and that will be passed to AddJagatiHeader:
+#       ${PROJECT_NAME}ExceptionHeaderFilename - The absolute path and filename of the Header file written, this is
 #           derived from the variable ${PROJECT_NAME}GenHeadersDir and will contain the project name.
+#       ${PROJECT_NAME}ExceptionSourceFilename - The absolute path and filename of the Source file written, this is
+#           derived from the variable ${PROJECT_NAME}GenSourceDir and will contain the project name.
 #
-macro(EmitExceptionHeader)
+#       ${PROJECT_NAME}ExceptionHeaderContent - The content of the header file emitted.
+#       ${PROJECT_NAME}ExceptionSourceContent - The content of the source file emitted.
+#
+
+macro(EmitExceptionSource)
     # Create Parts of the file
     set(ExceptionHeaderGuard
-        "${MEZZ_Copyright}#ifndef Mezz_Exception_h\n#define Mezz_Exception_h\n\n"
+        "#ifndef Mezz_Exception_h\n#define Mezz_Exception_h\n\n"
+    )
+
+    set(NamespaceSourceHeader "\
+#include \"DataTypes.h\"\n\
+#include \"MezzException.h\"\n\n\
+namespace Mezzanine\n{\n\
+namespace Exception\n{\n\
+\n"
     )
 
     set(NamespaceHeader "\
@@ -2033,15 +2071,19 @@ ${ExceptionCodeToClassStringFunctionHeader};\n\
     )
 
     set(ExceptionCodeToClassStringFunction "\
+SAVE_WARNING_STATE\n\
+SUPPRESS_CLANG_WARNING(\"-Wcovered-switch-default\")\n\n\
 ${ExceptionCodeToClassStringFunctionHeader}\n\
 {\n\
     switch(Code)\n\
     {\
-${JagatiExceptionCodeToClassString}\
+${JagatiExceptionCodeToClassString}\n\
         case ExceptionCode::BaseCode: return \"Base\";\n\
-        case ExceptionCode::NotAnExceptionCode: return \"NotAnException\";\n\
+        case ExceptionCode::NotAnExceptionCode:\n\
+        default: return \"NotAnException\";\n\
     }\n\
-}\n\
+}\n\n\
+RESTORE_WARNING_STATE\n\
 \n"
     )
 
@@ -2073,24 +2115,20 @@ ${ExceptionClassStringHashFunctionHeader})\n\
 \n"
     )
 
-    set(ExceptionClassStringToCodeFunctionHeader
-        "Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(String ClassName)"
-    )
-
     set(ExceptionClassStringToCodeFunctionPrototype "\
 /// @brief Get the ExceptionCode for the given string.\n\
 /// @param ClassName The string to convert.\n\
 /// @return A valid entry from the ExceptionCode enum or ExceptionCode::NotAnExceptionCode for invalid input.\n\
-${ExceptionClassStringToCodeFunctionHeader};\n\
+Mezzanine::Exception::ExceptionCode MEZZ_LIB ExceptionCodeFromClassname(String ClassName);\n\
 \n"
     )
 
     set(ExceptionClassStringToCodeFunction "\
-${ExceptionClassStringToCodeFunctionHeader}\n\
+Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(String ClassName)\n\
 {\n\
     switch(ExceptionNameHash(ClassName.c_str()))\n\
     {\
-${JagatiExceptionClassStringToCode}\
+${JagatiExceptionClassStringToCode}\n\
         case ExceptionNameHash(\"Base\"): return ExceptionCode::BaseCode;\n\
         default: return ExceptionCode::NotAnExceptionCode;\n\
     }\n\
@@ -2122,15 +2160,18 @@ ${ExceptionCodeStreamingFunctionHeader}\n\
     )
 
     # Close it all out
-    set(ExceptionFooter "\
+    set(ExceptionNamespaceFooter "\
 } // namespace Exception\n\
 } // namespace Mezzanine\n\n\
-#endif // Mezz_Exception_h\n\
 "
     )
 
+    set(ExceptionGuardFooter "#endif // Mezz_Exception_h\n"
+    )
+
     # Assemble the parts: Enum + template + baseclase + classes + functions
-    set(${PROJECT_NAME}ExceptionContent "\
+    set(${PROJECT_NAME}ExceptionHeaderContent "\
+${MEZZ_Copyright}\
 ${ExceptionHeaderGuard}${NamespaceHeader}\
 ${ExceptionEnumHeader}${JagatiExceptionCodes}${ExceptionEnumFooter}\
 ${ExceptionCodeToClassStringFunctionPrototype}\
@@ -2139,23 +2180,57 @@ ${ExceptionClassStringHashFunctionPrototype}\
 ${ExceptionCodeStreamingFunctionPrototype}\
 ${JagatiExceptionBaseClass}${JagatiExceptionClasses}\
 ${ExceptionFactoryMacro}\
+${ExceptionNamespaceFooter}${ExceptionGuardFooter}"
+    )
+
+    set(${PROJECT_NAME}ExceptionSourceContent "\
+${MEZZ_Copyright}\
+${NamespaceSourceHeader}\
 ${ExceptionCodeToClassStringFunction}\
 ${ExceptionClassStringHashFunction}\
 ${ExceptionClassStringToCodeFunction}\
 ${ExceptionCodeStreamingFunction}\
-${ExceptionFooter}"
+${ExceptionNamespaceFooter}"
     )
 
-    # Lift all relevant variables
-    set(${PROJECT_NAME}ExceptionFilename "${${PROJECT_NAME}GenHeadersDir}MezzException.h")
+    # Create and lift all relevant variables
+    set(${PROJECT_NAME}ExceptionHeaderFilename "${${PROJECT_NAME}GenHeadersDir}MezzException.h")
+    set(${PROJECT_NAME}ExceptionSourceFilename "${${PROJECT_NAME}GenSourceDir}MezzException.cpp")
+
     if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${PROJECT_NAME}ExceptionFilename "${${PROJECT_NAME}ExceptionFilename}" PARENT_SCOPE)
+        set(${PROJECT_NAME}ExceptionHeaderFilename "${${PROJECT_NAME}ExceptionHeaderFilename}" PARENT_SCOPE)
+        set(${PROJECT_NAME}ExceptionSourceFilename "${${PROJECT_NAME}ExceptionSourceFilename}" PARENT_SCOPE)
+        set(${PROJECT_NAME}ExceptionHeaderContent "${${PROJECT_NAME}ExceptionHeaderContent}" PARENT_SCOPE)
+        set(${PROJECT_NAME}ExceptionSourceContent "${${PROJECT_NAME}ExceptionSourceContent}" PARENT_SCOPE)
     endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
 
-    # Write the file
-    message(STATUS "Emitting Exception Header File - ${${PROJECT_NAME}ExceptionFilename}")
-    file(WRITE "${${PROJECT_NAME}ExceptionFilename}" "${${PROJECT_NAME}ExceptionContent}")
-endmacro(EmitExceptionHeader)
+    # Write the files
+    message(STATUS "Emitting Exception Header File - ${${PROJECT_NAME}ExceptionHeaderFilename}")
+    file(WRITE "${${PROJECT_NAME}ExceptionHeaderFilename}" "${${PROJECT_NAME}ExceptionHeaderContent}")
+    message(STATUS "Emitting Exception Source File - ${${PROJECT_NAME}ExceptionSourceFilename}")
+    file(WRITE "${${PROJECT_NAME}ExceptionSourceFilename}" "${${PROJECT_NAME}ExceptionSourceContent}")
+
+endmacro(EmitExceptionSource)
+
+########################################################################################################################
+# AddExceptionSource
+#
+# Adds the exception source and headers files to the default library target for the current Jagati Package.
+#
+# Usage:
+#   # Call after EmitExceptionSource has been called an before the call to AddJagatiLibrary, Only call this once per
+#   # project, when using default Mezzanine packages this is done in Mezz_Foundation.
+#   AddExceptionSource()
+#
+# Result:
+#   This will add files emitted by EmitExceptionSource to the main library target for the current Jagati Package as
+#   though AddHeaderFile or AddSourceFile were called for each file emitted.
+#
+
+macro(AddExceptionSource)
+    AddHeaderFile("${${PROJECT_NAME}ExceptionHeaderFilename}")
+    AddSourceFile("${${PROJECT_NAME}ExceptionSourceFilename}")
+endmacro(AddExceptionSource)
 
 ########################################################################################################################
 ########################################################################################################################

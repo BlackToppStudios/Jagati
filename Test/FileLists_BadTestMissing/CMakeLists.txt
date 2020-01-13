@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@ include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
 
-AddSourceFile("Hello.cpp") 
+AddSourceFile("Hello.cpp")
 AddSourceFile("Hello2.cpp")
 
 AddHeaderFile("Hello.h")
