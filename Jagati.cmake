@@ -2072,7 +2072,7 @@ ${ExceptionCodeToClassStringFunctionHeader};\n\
 
     set(ExceptionCodeToClassStringFunction "\
 SAVE_WARNING_STATE\n\
-SUPPRESS_CLANG_WARNING(\"-Wcovered-switch-default\")\n\n\
+SUPPRESS_CLANG_WARNING(\"-Wcovered-switch-default\")\n\
 ${ExceptionCodeToClassStringFunctionHeader}\n\
 {\n\
     switch(Code)\n\
@@ -2082,7 +2082,7 @@ ${JagatiExceptionCodeToClassString}\n\
         case ExceptionCode::NotAnExceptionCode:\n\
         default: return \"NotAnException\";\n\
     }\n\
-}\n\n\
+}\n\
 RESTORE_WARNING_STATE\n\
 \n"
     )
@@ -2124,6 +2124,8 @@ Mezzanine::Exception::ExceptionCode MEZZ_LIB ExceptionCodeFromClassname(String C
     )
 
     set(ExceptionClassStringToCodeFunction "\
+SAVE_WARNING_STATE\n\
+SUPPRESS_VC_WARNING(4307)\n\
 Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(String ClassName)\n\
 {\n\
     switch(ExceptionNameHash(ClassName.c_str()))\n\
@@ -2133,6 +2135,7 @@ ${JagatiExceptionClassStringToCode}\n\
         default: return ExceptionCode::NotAnExceptionCode;\n\
     }\n\
 }\n\
+RESTORE_WARNING_STATE\n\
 \n"
     )
 
