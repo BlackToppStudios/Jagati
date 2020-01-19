@@ -16,10 +16,6 @@ pipeline {
                     agent { label "MacOSAir" }
                     steps { checkout scm }
                 }
-                stage('MacOSSierra') {
-                    agent { label "MacOSSierra" }
-                    steps { checkout scm }
-                }
                 stage('Raspbian') {
                     agent { label "Raspbian" }
                     steps { checkout scm }
@@ -65,12 +61,6 @@ pipeline {
                         dir('Test') { sh """export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja""" }
                     }
                 }
-                stage('MacOSSierra') {
-                    agent { label "MacOSSierra" }
-                    steps {
-                        dir('Test') { sh """export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja""" }
-                    }
-                }
                 stage('Raspbian') {
                     agent { label "Raspbian" }
                     steps {
@@ -83,6 +73,7 @@ pipeline {
                         dir('Test') { sh 'ruby RootTest.rb -GNinja' }
                      }
                 }
+                // Emscripten needs custom commands not supported in the test suite.
                 //stage('UbuntuEmscripten') {
                 //    agent { label "UbuntuEmscripten" }
                 //    steps {
