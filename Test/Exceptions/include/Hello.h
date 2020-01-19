@@ -45,21 +45,21 @@
 // This file is just a function in a separate compilation unit.
 
 /// @brief Throws a Base exception.
-void tryBaseActionButFail();
+[[ noreturn ]] void tryBaseActionButFail();
 
 /// @brief Throws a Animal exception.
-void tryAnimalActionButFail();
+[[ noreturn ]] void tryAnimalActionButFail();
 
 /// @brief Throws a Mammal exception.
-void tryMammalActionButFail();
+[[ noreturn ]] void tryMammalActionButFail();
 
 /// @brief Throws a Dog exception.
-void tryDogActionButFail();
+[[ noreturn ]] void tryDogActionButFail();
 
 /// @brief Throws a Cat exception.
-void tryCatActionButFail();
+[[ noreturn ]] void tryCatActionButFail();
 
 /// @brief Throws a Fish exception.
-void tryFishActionButFail();
+[[ noreturn ]] void tryFishActionButFail();
 
 #endif
