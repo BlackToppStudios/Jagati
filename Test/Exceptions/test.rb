@@ -13,8 +13,7 @@ class Exceptions < JagatiTestCase
         cmake.outputs.run_tests
 
         #require 'pry'; binding.pry
-        assert_equal("", cmake.outputs.view_stderr, "Just get outputo0")
-        #assert_equal(1, cmake.outputs.test_success_count, "Expected two tests passes")
+        assert_equal(66, cmake.outputs.test_success_count, "Expected two tests passes")
         assert_equal(0, cmake.outputs.test_failed_count, "Expected 0 tests failures")
         assert_equal("Success", cmake.outputs.test_worst_result, "Expected only success")
 

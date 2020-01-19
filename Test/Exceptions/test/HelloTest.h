@@ -48,6 +48,9 @@
 DEFAULT_TEST_GROUP(HelloTest, HelloTest)
 {
     using String = Mezzanine::String;
+
+    String ExpectedFilename = "hello.cpp";
+
     // Tests should use the macros from TestMacros.h to automatically function, filename and line number.
     try
     {
@@ -57,8 +60,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("BaseThrownMessage", String("Base Exception"), String(e.GetMessage()));
         TEST_EQUAL("BaseThrownWhat", String("Base Exception"), String(e.what()));
         TEST_EQUAL("BaseThrownFunction", String("tryBaseActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("BaseThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("BaseThrownTypename", String("Base"), String(e.TypeName()));
+
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("BaseThrownFile", ExpectedFilename, AllLowerFile);
 
         //TEST("BaseCastBaseNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
         TEST("BaseCastAnimalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
@@ -75,9 +80,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("AnimalThrownMessage", String("Animal Exception"), String(e.GetMessage()));
         TEST_EQUAL("AnimalThrownWhat", String("Animal Exception"), String(e.what()));
         TEST_EQUAL("AnimalThrownFunction", String("tryAnimalActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("AnimalThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("AnimalThrownTypename", String("Animal"), String(e.TypeName()));
 
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("AnimalThrownFile", ExpectedFilename, AllLowerFile);
 
         TEST("AnimalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
         //TEST("AnimalCastAnimalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
@@ -94,9 +100,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("MammalThrownMessage", String("Mammal Exception"), String(e.GetMessage()));
         TEST_EQUAL("MammalThrownWhat", String("Mammal Exception"), String(e.what()));
         TEST_EQUAL("MammalThrownFunction", String("tryMammalActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("MammalThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("MammalThrownTypename", String("Mammal"), String(e.TypeName()));
 
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("MammalThrownFile", ExpectedFilename, AllLowerFile);
 
         TEST("MammalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
         TEST("MammalCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
@@ -113,9 +120,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("DogThrownMessage", String("Dog Exception"), String(e.GetMessage()));
         TEST_EQUAL("DogThrownWhat", String("Dog Exception"), String(e.what()));
         TEST_EQUAL("DogThrownFunction", String("tryDogActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("DogThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("DogThrownTypename", String("Dog"), String(e.TypeName()));
 
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("DogThrownFile", ExpectedFilename, AllLowerFile);
 
         TEST("DogCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
         TEST("DogCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
@@ -132,8 +140,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("CatThrownMessage", String("Cat Exception"), String(e.GetMessage()));
         TEST_EQUAL("CatThrownWhat", String("Cat Exception"), String(e.what()));
         TEST_EQUAL("CatThrownFunction", String("tryCatActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("CatThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("CatThrownTypename", String("Cat"), String(e.TypeName()));
+
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("CatThrownFile", ExpectedFilename, AllLowerFile);
 
 
         TEST("CatCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
@@ -152,9 +162,10 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST_EQUAL("FishThrownMessage", String("Fish Exception"), String(e.GetMessage()));
         TEST_EQUAL("FishThrownWhat", String("Fish Exception"), String(e.what()));
         TEST_EQUAL("FishThrownFunction", String("tryFishActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_STRING_CONTAINS("FishThrownFile", String("Hello.cpp"), String(e.GetOriginatingFile()));
         TEST_EQUAL("FishThrownTypename", String("Fish"), String(e.TypeName()));
 
+        String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
+        TEST_STRING_CONTAINS("FishThrownFile", ExpectedFilename, AllLowerFile);
 
         TEST("FishCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
         TEST("FishCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );

@@ -141,6 +141,6 @@ class CMakeOutput
 
     def test_worst_result
         error_on_binary
-        view_stderr[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].split(" ")[-1]
+        view_stderr[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].to_s.split(" ")[-1]
     end
 end
