@@ -1811,7 +1811,7 @@ endmacro(AddConfigSource)
 # Usage:
 #   # Call after SetProjectVariables to add one entry to the exception list:
 #   AddJagatiException("NameOfNewException" "Parent/BaseClass" "BriefDocumentationString")
-#   AddJagatiException("InputOutPut" "Base" "Base Exception for all IO")
+#   AddJagatiException("InputOutput" "Base" "Base Exception for all IO")
 #
 # Result:
 #   This will create or append exception data to 5 variables for EmitExceptionHeader to use later:
@@ -2065,7 +2065,7 @@ struct ExceptionFactory\n\
     set(ExceptionCodeToClassStringFunctionPrototype "\
 /// @brief Convert an ExceptionCode to a string containing the class name.\n\
 /// @param Code The number you have that you want as a string.\n\
-/// @return A StringView with a class name like \"Exception::InputOutPut\"\n\
+/// @return A StringView with a class name like \"Exception::InputOutput\"\n\
 ${ExceptionCodeToClassStringFunctionHeader};\n\
 \n"
     )
@@ -2119,16 +2119,16 @@ ${ExceptionClassStringHashFunctionHeader})\n\
 /// @brief Get the ExceptionCode for the given string.\n\
 /// @param ClassName The string to convert.\n\
 /// @return A valid entry from the ExceptionCode enum or ExceptionCode::NotAnExceptionCode for invalid input.\n\
-Mezzanine::Exception::ExceptionCode MEZZ_LIB ExceptionCodeFromClassname(String ClassName);\n\
+Mezzanine::Exception::ExceptionCode MEZZ_LIB ExceptionCodeFromClassname(StringView ClassName);\n\
 \n"
     )
 
     set(ExceptionClassStringToCodeFunction "\
 SAVE_WARNING_STATE\n\
 SUPPRESS_VC_WARNING(4307)\n\
-Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(String ClassName)\n\
+Mezzanine::Exception::ExceptionCode ExceptionCodeFromClassname(StringView ClassName)\n\
 {\n\
-    switch(ExceptionNameHash(ClassName.c_str()))\n\
+    switch(ExceptionNameHash(ClassName.data()))\n\
     {\
 ${JagatiExceptionClassStringToCode}\n\
         case ExceptionNameHash(\"Base\"): return ExceptionCode::BaseCode;\n\
@@ -2169,8 +2169,7 @@ ${ExceptionCodeStreamingFunctionHeader}\n\
 "
     )
 
-    set(ExceptionGuardFooter "#endif // Mezz_Exception_h\n"
-    )
+    set(ExceptionGuardFooter "#endif // Mezz_Exception_h\n")
 
     # Assemble the parts: Enum + template + baseclase + classes + functions
     set(${PROJECT_NAME}ExceptionHeaderContent "\

@@ -69,7 +69,8 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST("BaseCastAnimalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
         TEST("BaseCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
         TEST("BaseCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("BaseCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );        TEST("BaseCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("BaseCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
+        TEST("BaseCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
     }
 
     try
@@ -89,7 +90,8 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         //TEST("AnimalCastAnimalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
         TEST("AnimalCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
         TEST("AnimalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("AnimalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );        TEST("AnimalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("AnimalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
+        TEST("AnimalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
     }
 
     try
@@ -109,7 +111,8 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST("MammalCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
         //TEST("MammalCastMammalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
         TEST("MammalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("MammalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );        TEST("MammalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("MammalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
+        TEST("MammalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
     }
 
     try
@@ -129,7 +132,8 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
         TEST("DogCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
         TEST("DogCastMammalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
         //TEST("DogCastDogNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("DogCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );        TEST("DogCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("DogCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
+        TEST("DogCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
     }
 
     try
