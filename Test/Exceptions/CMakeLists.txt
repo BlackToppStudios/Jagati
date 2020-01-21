@@ -39,22 +39,57 @@
 
 ########################################################################################################################
 cmake_minimum_required(VERSION 2.8)
-project(FileLists_BadTest_Test_)
+project(Exception_Test_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
 ##########################################################################|#############################################
-# Don't Download or Verify but setup the Jagati
+# Don't Download or Verify but include and setup the Jagati
 include("${CMAKE_SOURCE_DIR}/../../Jagati.cmake")
 
 StandardJagatiSetup()
+IncludeJagatiPackage("Test")
+IncludeJagatiPackage("StaticFoundation")
 
+# Everything above this line is well tested.
+########################################################################################################################
+
+AddJagatiException("Animal" "Base" "Exception for all animals.")
+AddJagatiException("Mammal" "Animal" "Is an animal exception, only warm blooded.")
+AddJagatiException("Dog" "Mammal" "An exception for canids which are all mammals.")
+AddJagatiException("Cat" "Mammal" "An exception for canids which are all mammals.")
+AddJagatiException("Fish" "Animal" "An except for fish which are derived directly from mammal.")
+EmitExceptionSource()
+AddExceptionSource()
+
+
+# Everything below this line is well tested.
+########################################################################################################################
+
+# Add all the kinds of source files a robust project might have.
 AddSourceFile("Hello.cpp")
 
-AddSourceFile("Hello2.cpp")
+AddMainSourceFile("Main.cpp")
 
 AddHeaderFile("Hello.h")
-AddHeaderFile("Hello2.h")
+
+AddTestFile("HelloTest.h")
 
 AddJagatiDoxInput("HelloDoc.h")
 AddSwigEntryPoint("HelloSwig.h")
-AddTestFile("${FileLists_BadTest_Test_RootDir}HelloTest.h") # This line is erroneous for this test.
+
+# Can the coverage and test stuff consume lists correctly?
+ChooseCodeCoverage("OFF")
+EmitTestCode()
+
+# Add Useful targets
+AddJagatiLibrary()
+AddJagatiExecutable()
+AddTestTarget()
+CreateCoverageTarget(HelloCoverage "Hello.cpp")
+
+# Everything above this line is a reasonable example of use.
+##########################################################################|#############################################
+# Everything below this lines is kind of crazy and done only for testing.
+
+# Storing some values in the cache for testing. Testing the values of variables sounds off until you
+# accept that variables are part of the API.

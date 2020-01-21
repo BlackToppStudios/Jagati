@@ -1,4 +1,4 @@
-7,// © Copyright 2010 - 2020 BlackTopp Studios Inc.
+// © Copyright 2010 - 2020 BlackTopp Studios Inc.
 /* This file is part of The Mezzanine Engine.
 
     The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -37,24 +37,39 @@
    Joseph Toppi - toppij@gmail.com
    John Blackwood - makoenergy02@gmail.com
 */
-#ifndef _hello_dox_h
-#define _hello_dox_h
 
-/**
-    @mainpage HelloDocumentation
+// A super simple application for the purpose testing builds.
 
-    This is a sample doxygen page for example purposes
 
-    Here is a link to @ref AnotherPage
-*/
+#include "Hello.h"
+#include "MezzException.h"
 
-// The pages below are intended to be put into their own files as they are worked on.
-// All of these have links pointing to them.
+void tryBaseActionButFail()
+{
+    MEZZ_EXCEPTION(BaseCode, "Base Exception");
+}
 
-/**
-    @page AnotherPage Another Page
+void tryAnimalActionButFail()
+{
+    MEZZ_EXCEPTION(AnimalCode, "Animal Exception");
+}
 
-    This is a page that is linked to by the main page.
-*/
+void tryMammalActionButFail()
+{
+    MEZZ_EXCEPTION(MammalCode, "Mammal Exception");
+}
 
-#endif
+void tryDogActionButFail()
+{
+    MEZZ_EXCEPTION(DogCode, "Dog Exception");
+}
+
+void tryCatActionButFail()
+{
+    MEZZ_EXCEPTION(CatCode, "Cat Exception");
+}
+
+void tryFishActionButFail()
+{
+    MEZZ_EXCEPTION(FishCode, "Fish Exception");
+}

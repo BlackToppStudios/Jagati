@@ -94,48 +94,53 @@ class CMakeOutput
         raise RuntimeError.new "Binary was run instead of tests" unless @last_run == :tests
     end
 
+
+    def find_count_in_stderr(needle)
+        view_stderr[/$\s+#{needle} \d+/].to_s[/\d+/].to_i
+    end
+
     def test_success_count
         error_on_binary
-        view_stderr[/$\s+Success \d+/][/\d+/].to_i
+        find_count_in_stderr 'Success'
     end
 
     def test_warning_count
         error_on_binary
-        view_stderr[/$\s+Warning \d+/][/\d+/].to_i
+        find_count_in_stderr 'Warning'
     end
 
     def test_skipped_count
         error_on_binary
-        view_stderr[/$\s+Skipped \d+/][/\d+/].to_i
+        find_count_in_stderr 'Skipped'
     end
 
     def test_cancelled_count
         error_on_binary
-        view_stderr[/$\s+Cancelled \d+/][/\d+/].to_i
+        find_count_in_stderr 'Cancelled'
     end
 
     def test_inconclusive_count
         error_on_binary
-        view_stderr[/$\s+Inconclusive \d+/][/\d+/].to_i
+        find_count_in_stderr 'Inconclusive'
     end
 
     def test_failed_count
         error_on_binary
-        view_stderr[/$\s+Failed \d+/][/\d+/].to_i
+        find_count_in_stderr 'Failed'
     end
 
     def test_unknown_count
         error_on_binary
-        view_stderr[/$\s+Unknown \d+/][/\d+/].to_i
+        find_count_in_stderr 'Unknown'
     end
 
     def test_not_applicable_count
         error_on_binary
-        view_stderr[/$\s+NotApplicable \d+/][/\d+/].to_i
+        find_count_in_stderr 'NotApplicable'
     end
 
     def test_worst_result
         error_on_binary
-        view_stderr[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].split(" ")[-1]
+        view_stderr[/$\s+From \d+ tests the worst result is: [a-zA-Z]+/].to_s.split(" ")[-1]
     end
 end

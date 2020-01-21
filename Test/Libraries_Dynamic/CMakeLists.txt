@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -67,5 +67,5 @@ AddJagatiLibrary()          # This is rest of what we are testing (in TestLibrar
 # Storing some values in the cache for testing. Testing the values of variables sounds off until you
 # accept that variables are part of the API.
 
-#set(LibraryInstallationComponent    "${LibraryInstallationComponent}"   
+#set(LibraryInstallationComponent    "${LibraryInstallationComponent}"
 #       CACHE INTERNAL "Lifting LibraryInstallationComponent for testing,") #Untested, considered internal

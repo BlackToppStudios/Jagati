@@ -1,4 +1,5 @@
-# This is a suite of test for the Jagati
+# A bunch of monkey patching for the test suite to make the code simpler at the cost of adding for possible surprises
+# for experiences rubyists,.
 
 
 # Pick some test Suite in the standard library and give it some alias all our tests will use.
@@ -10,7 +11,7 @@ rescue
     TestCase = MiniTest::Unit::TestCase
 end
 
-# Dir doesn't guarantee a case on #pwd, this allows us
+# Dir doesn't guarantee a case on #pwd, this does
 def samecase_drive(path)
     if path.nil? then return nil end
     cleaned = path.to_s
@@ -18,21 +19,21 @@ def samecase_drive(path)
     cleaned
 end
 
-# No guarantee of casing on drive letters
+# No guarantee of casing on drive letters, so get it lowercase.
 class Dir
     def self.lpwd
         samecase_drive(Dir.pwd)
     end
 end
 
-# Problems with trailing slashes were common, so we added this
+# Problems with trailing slashes were common, so we added this.
 class ::Pathname
     def with_slash
         samecase_drive(to_s + '/')
     end
 end
 
-# CMake "ON" is true
+# CMake "ON" is true, and this tests for that.
 class String
     # To Boolean
     def to_b

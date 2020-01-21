@@ -144,18 +144,19 @@ directory. Each directory has a test.rb file with some (hopefully) simple to rea
 and other files CMake leaves around to verify the Jagati works. Tests can be a good source of examples. This is a brief
 summary of each test that might be a decent example (The best is FileLists):
 
-   - ClaimParentProject_Parent - Tests for some of the simplest functionality
-   - ClaimParentProject_Single - Tests for some of the simplest functionality
-   - ConfigFile - Currently Skipped because not entirely implemented
-   - Coverage_ExplicitOff - Turn off line coverage
-   - Coverage_ExplicitOn - Turn on line coverage
+   - ClaimParentProject_Parent - Tests for some of the simplest functionality.
+   - ClaimParentProject_Single - Tests for some of the simplest functionality.
+   - ConfigFile - Currently Skipped because not entirely implemented.
+   - Coverage_ExplicitOff - Turn off line coverage.
+   - Coverage_ExplicitOn - Turn on line coverage.
    - Coverage_NotSet - When line coverage is not set it is off.
-   - FileLists - A complete example that shows how to add files, include Mezzanine Packages and more
+   - FileLists - A complete example that shows how to add files, include Mezzanine Packages and more.
    - Identify - How to get at a bunch of platform detection variables.
-   - Libraries_Dynamic - How to set dynamic linking
-   - Libraries_Static - How to set static linking
+   - Libraries_Dynamic - How to set dynamic linking.
+   - Libraries_Static - How to set static linking.
    - LocationVars - How to get at of directory variables.
-   - Mezz_PackageDirectory - How the Jagati interacts with environment variables
+   - Mezz_PackageDirectory - How the Jagati interacts with environment variables.
+   - Exceptions - Generation of many types of exceptions.
 
 ### Failing Cases
 

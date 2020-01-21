@@ -54,3 +54,5 @@ require_test 'FileLists_BadSwigMissing'
 require_test 'FileLists_BadSwigRoot'
 require_test 'FileLists_BadTestMissing'
 require_test 'FileLists_BadTestRoot'
+
+require_test 'Exceptions'

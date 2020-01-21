@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2017 BlackTopp Studios Inc.
+# © Copyright 2010 - 2020 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ set(CompilerSupportsCoverage    "${CompilerSupportsCoverage}"
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" CACHE INTERNAL
         "Lifting CMAKE_CXX_FLAGS for testing,")
-set(CoverageTest_Disabled_HeaderFiles "${CoverageTest_Disabled_HeaderFiles}" CACHE INTERNAL 
+set(CoverageTest_Disabled_HeaderFiles "${CoverageTest_Disabled_HeaderFiles}" CACHE INTERNAL
         "Lifting CoverageTest_Disabled_HeaderFiles for testing,")
-set(CoverageTest_Disabled_SourceFiles "${CoverageTest_Disabled_SourceFiles}" CACHE INTERNAL 
+set(CoverageTest_Disabled_SourceFiles "${CoverageTest_Disabled_SourceFiles}" CACHE INTERNAL
         "Lifting CoverageTest_Disabled_SourceFiles for testing,")
