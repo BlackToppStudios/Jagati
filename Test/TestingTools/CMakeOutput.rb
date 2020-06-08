@@ -11,13 +11,14 @@ class CMakeOutput
     attr_reader :stderr
 
     def view_stderr
-        encoding_options = {
-            :invalid            => :replace,
-            :undef              => :replace,
-            :replace            => '',
-            :universal_newline  => true
-        }
-        stdout.join("").encode(Encoding.find('ASCII'), encoding_options)
+        stdout.
+            join("").
+            encode(Encoding.find('ASCII'),
+                :invalid            => :replace,
+                :undef              => :replace,
+                :replace            => '',
+                :universal_newline  => true
+            )
     end
 
     ###############################################################

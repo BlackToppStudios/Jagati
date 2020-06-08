@@ -922,7 +922,8 @@ macro(SetCommonCompilerFlags)
             endif(SystemIsLinux)
             if(CompilerIsGCC)
                 if(NOT SystemIsMacOSX)
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+                    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs") # Test without this, it seems to be needed
+                                                                          # only in old GCC versions.
                 endif(NOT SystemIsMacOSX)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
             endif(CompilerIsGCC)
@@ -1188,14 +1189,18 @@ endmacro(SetCodeCoverage)
 ########################################################################################################################
 
 ########################################################################################################################
-# AddHeaderFile
+# AddHeaderFile and ForceAddHeaderFile
 #
-# Append the give header file to the list of header files for this project.
+# Append the give header file to the list of header files for this project in a safe way enforcing Jagati safety checks
+# and oopinions. Use ForceAddHeaderFile to force skippping checks and automatic doxygen inclusion.
 #
 # Usage:
 #   # Call it and pass the name of the header file to add. This must be called after SetProjectVariables() which is part
 #   # of the StandardJagatiSetup.
 #   AddHeaderFile("Hello.h")
+#
+#   # Do not use ForceAddHeaderFile without understanding why the checks are in place:
+#   ForceAddHeaderFile("BeReadyForThisToBreak.h")
 #
 # Result:
 #   The variable ${PROJECT_NAME}HeaderFiles in the parent scope will have the file appended.
@@ -1229,30 +1234,33 @@ or '${${PROJECT_NAME}GenHeadersDir}'.")
         endif(EXISTS "${${PROJECT_NAME}IncludeDir}${FileName}")
     endif(EXISTS "${FileName}")
 
-    list(APPEND ${PROJECT_NAME}HeaderFiles "${TempHeaderFileToAdd}")
-    # This was another possible way to do this without forcing the cache, but couldn't force through enough scope
-    # levels. There are good reasons to not cache this, but they don't "it needs to work".
-    #if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    #    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" PARENT_SCOPE)
-    #endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL
-        "List of Header files for ${PROJECT_NAME}." FORCE)
-    message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
+    ForceAddHeaderFile("${TempHeaderFileToAdd}")
     AddJagatiDoxInput("${TempHeaderFileToAdd}") # This can subtly different than the input.
 endmacro(AddHeaderFile FileName)
 
+macro(ForceAddHeaderFile FileName)
+    list(APPEND ${PROJECT_NAME}HeaderFiles "${FileName}")
+    set(${PROJECT_NAME}HeaderFiles "${${PROJECT_NAME}HeaderFiles}" CACHE INTERNAL
+        "List of Header files for ${PROJECT_NAME}." FORCE)
+    message(STATUS "Header File Added to '${PROJECT_NAME}HeaderFiles' : '${FileName}'")
+endmacro(ForceAddHeaderFile FileName)
+
 ########################################################################################################################
-# AddSourceFile
+# AddSourceFile and ForceAddSourceFile
 #
-# Append the given source file to the list of source files for the library part of this project.
+# Append the given source file to the list of source files for the library part of this project in a safe way with basic
+# checks enforcing Jagati package opinions. Use ForceAddSourceFile to force skipping checks.
 #
 # Usage:
 #   # Call it and pass the name of the source file to add. This must be called after SetProjectVariables() which is part
 #   # of the StandardJagatiSetup.
 #   AddSourceFile("Hello.cpp")
 #
+#   # Do not call ForceAddSourceFile without understanding ramifications completely.
+#   ForceAddSourceFile("Hello.cpp")
+#
 # Result:
-#   The variable ${PROJECT_NAME}SourceFiles in the parent scope will have the file appended.
+#   The variable ${PROJECT_NAME}SourceFiles in the cache will have the file appended.
 #
 
 macro(AddSourceFile FileName)
@@ -1260,10 +1268,10 @@ macro(AddSourceFile FileName)
         # It exists but does its location make sense?
         if("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
             # Found it in the Source dir.
-            list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+            ForceAddSourceFile("${FileName}")
         else("${FileName}" MATCHES "${${PROJECT_NAME}SourceDir}")
             if(("${FileName}" MATCHES "${${PROJECT_NAME}GenSourceDir}"))
-                list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
+                ForceAddSourceFile("${FileName}")
             else(("${FileName}" MATCHES "${${PROJECT_NAME}GenSourceDir}"))
                 message(SEND_ERROR "Found'${FileName}' outside source directory and outside of config source directory\
 , move to '${${PROJECT_NAME}SourceDir}'.")
@@ -1273,17 +1281,20 @@ macro(AddSourceFile FileName)
         # File does not exist, so lets search for it in the source folder.
         if(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
             # Found It! Add to list.
-            list(APPEND ${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceDir}${FileName}")
+            ForceAddSourceFile("${${PROJECT_NAME}SourceDir}${FileName}")
         else(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
             # Not Found bail.
             message(SEND_ERROR "Could not find '${FileName}' in source directory, check '${${PROJECT_NAME}SourceDir}'.")
         endif(EXISTS "${${PROJECT_NAME}SourceDir}${FileName}")
     endif(EXISTS "${FileName}")
+endmacro(AddSourceFile FileName)
 
+macro(ForceAddSourceFile FileName)
+    list(APPEND ${PROJECT_NAME}SourceFiles "${FileName}")
     set(${PROJECT_NAME}SourceFiles "${${PROJECT_NAME}SourceFiles}" CACHE INTERNAL
         "List of Source files for ${PROJECT_NAME}." FORCE)
     message(STATUS "Source File Added to '${PROJECT_NAME}SourceFiles' : '${FileName}'")
-endmacro(AddSourceFile FileName)
+endmacro(ForceAddSourceFile FileName)
 
 ########################################################################################################################
 # AddMainSourceFile
@@ -1395,10 +1406,11 @@ endmacro(AddTestFile FileName)
 
 
 ########################################################################################################################
-# AddJagatiDoxInput
+# AddJagatiDoxInput and ForceAddJagatiDoxInput
 #
-# Add input files to list of all files doxygen will scan. If an existing absolute path isn't passed this presumes the
-# file is relative to the dox dir for this project.
+# Add input files to list of all files doxygen will scan with all the Jagati safety checks and opinions enforce. If an
+# existing absolute path isn't passed this presumes the file is relative to the dox dir for this project. To skip checks
+# use ForceAddJagatiDoxInput.
 #
 # Usage:
 #   # Call any time after SetProjectVariables(). If doxygen is installed and the option is chosen then html docs will be
@@ -1406,6 +1418,9 @@ endmacro(AddTestFile FileName)
 #   AddJagatiDoxInput("${StaticFoundationConfigFilename}")
 #   AddJagatiDoxInput("${DoxFiles}")
 #   AddJagatiDoxInput("foo.h")
+#
+#   # Do not use ForceAddJagatiDoxInput, without understanding how it might break:
+#   ForceAddJagatiDoxInput("HeaderThatMightBreakDoxygen.h")
 #
 # Results:
 #   The file will be checked for validity and appended to the list JagatiDoxArray.
@@ -1438,10 +1453,13 @@ macro(AddJagatiDoxInput FileName)
         endif(EXISTS "${${PROJECT_NAME}DoxDir}${FileName}")
     endif(EXISTS "${FileName}")
 
-    # File has been added scope and report it.
+    ForceAddJagatiDoxInput("${FileName}")
+endmacro(AddJagatiDoxInput FileName)
+
+macro(ForceAddJagatiDoxInput FileName)
     set(JagatiDoxArray "${JagatiDoxArray}"  CACHE INTERNAL "List of all Jagati Doxygen inputs" FORCE)
     message(STATUS "Doxygen Input Added: '${FileName}'")
-endmacro(AddJagatiDoxInput FileName)
+endmacro(ForceAddJagatiDoxInput FileName)
 
 ########################################################################################################################
 # Append the given source file to the list of files to be used as SWIG inputs.
@@ -1801,6 +1819,49 @@ endmacro(AddConfigSource)
 ########################################################################################################################
 ########################################################################################################################
 
+########################################################################################################################
+# IntializeExceptions
+#
+# Prepares the exception creation system for use, This should only be called once per project. By default this is
+# initializaed by the Foundation package and doesn't need to be called elsewhere.
+#
+# Usage:
+#   # Call after the StandardJagatiSetup, from a single place in the project:
+#   IntializeExceptions()
+#
+# Results:
+#   A number of variables will be set to an initial state that allows adding exceptions and using the exception system:
+#       JagatiExceptionNewline - A sentinel value used for internal string manipulation during exception generation.
+#       JagatiExceptionSemicolon - A sentinel value used for internal string manipulation during exception generation.
+#       JagatiExceptionNumber - A counter for exceptions to track enum values.
+#       JagatiExceptionCodesRaw - An internal string for partially generated code used in the exception enum.
+#       JagatiExceptionClassesRaw - An internal string for partially generated code used in the exception classes.
+#       JagatiExceptionCodeToClassStringRaw - Another internal string with generate code to converting enums to strings.
+#       JagatiExceptionClassStringToCodeRaw - Another internal string with generate code to converting strings to enums.
+#
+#       JagatiExceptionHeaderFilename - Contains the single exception header file.
+#       JagatiExceptionSourceFilename - Contains the single exception source file.
+#
+
+macro(IntializeExceptions)
+    message(STATUS "Initializing Exceptions")
+
+    set(JagatiExceptionNewline "XXX" CACHE INTERNAL "Used in the Jagati Exception System as placeholder for newlines.")
+    set(JagatiExceptionSemicolon "ZZZ" CACHE INTERNAL "Used in the Jagati Exception System as placeholder for ';'.")
+
+    set(JagatiExceptionNumber "1" CACHE INTERNAL "A counter for exceptions to track enum values.")
+    set(JagatiExceptionCodesRaw "" CACHE INTERNAL "Partially generated code used in the exception enum.")
+    set(JagatiExceptionClassesRaw "" CACHE INTERNAL "Partially generated code used in the exception classes.")
+    set(JagatiExceptionCodeToClassStringRaw "" CACHE INTERNAL "Partially generate code to converting enums to strings.")
+    set(JagatiExceptionClassStringToCodeRaw "" CACHE INTERNAL "Partially generate code to converting strings to enums.")
+
+    set(JagatiExceptionHeaderFilename "${${PROJECT_NAME}GenHeadersDir}MezzException.h" CACHE INTERNAL
+        "Used to refer to the Jagati Exception Header file.")
+    set(JagatiExceptionSourceFilename "${${PROJECT_NAME}GenSourceDir}MezzException.cpp" CACHE INTERNAL
+        "Used to refer to the Jagati Exception Source file.")
+
+endmacro(IntializeExceptions)
+
 
 ########################################################################################################################
 # AddJagatiException
@@ -1814,73 +1875,68 @@ endmacro(AddConfigSource)
 #   AddJagatiException("InputOutput" "Base" "Base Exception for all IO")
 #
 # Result:
-#   This will create or append exception data to 5 variables for EmitExceptionHeader to use later:
-#       JagatiExceptionCodes - Parts of the ExceptionCode enumration to be emitted.
-#       JagatiExceptionClasses - Complete text for classes to be emitted.
-#       JagatiExceptionCodeToClassString - A minimal snippet of code to be inserted in Enum to String function.
-#       JagatiExceptionClassStringToCode - A minimal snippet of code to be inserted in String to Enum function.
+#   This will create or append exception data to 5 cache variables for EmitExceptionHeader to use later:
+#       JagatiExceptionCodesRaw - Parts of the ExceptionCode enumration to be emitted, unformatted.
+#       JagatiExceptionClassesRaw - Complete text for classes to be emitted.
+#       JagatiExceptionCodeToClassStringRaw - A minimal snippet of code to be inserted in Enum to String function.
+#       JagatiExceptionClassStringToCodeRaw - A minimal snippet of code to be inserted in String to Enum function.
 #       JagatiExceptionNumber - A number indicating the current exception number presuming that Base is 0.
 #
-set(JagatiExceptionNumber "1")
 
 macro(AddJagatiException Name BaseClass Documentation)
-    math(EXPR JagatiExceptionNumber "${JagatiExceptionNumber}+1")
+    math(EXPR JagatiExceptionNumberRaw "${JagatiExceptionNumber}+1")
+    set(JagatiExceptionNumber "${JagatiExceptionNumberRaw}"
+        CACHE INTERNAL "A counter for exceptions to track enum values.")
 
-    set(JagatiExceptionCodes
-        "${JagatiExceptionCodes}    ${Name}Code = ${JagatiExceptionNumber},\n"
+    set(JagatiExceptionCodesRaw
+        "${JagatiExceptionCodesRaw}    ${Name}Code = ${JagatiExceptionNumber},${JagatiExceptionNewline}"
+        CACHE INTERNAL "Partially generated code used in the exception enum.")
+
+    set(JagatiExceptionClassesRaw
+        "${JagatiExceptionClassesRaw}${JagatiExceptionNewline}\
+/// @brief ${Documentation}${JagatiExceptionNewline}\
+class MEZZ_LIB ${Name} : public ${BaseClass}${JagatiExceptionNewline}\
+{${JagatiExceptionNewline}\
+public:${JagatiExceptionNewline}\
+    /// @copydoc Mezzanine::Exception::Base::Base${JagatiExceptionNewline}\
+    ${Name}${JagatiExceptionNewline}\
+        ( const Mezzanine::StringView& Message,${JagatiExceptionNewline}\
+          const Mezzanine::StringView& SrcFunction,${JagatiExceptionNewline}\
+          const Mezzanine::StringView& SrcFile,${JagatiExceptionNewline}\
+          const Mezzanine::Whole FileLine)${JagatiExceptionNewline}\
+      : ${BaseClass}(Message, SrcFunction, SrcFile, FileLine)${JagatiExceptionNewline}\
+    {}${JagatiExceptionNewline}\
+${JagatiExceptionNewline}\
+    /// @brief Default Copy Constructor${JagatiExceptionNewline}\
+    ${Name}(const ${Name}&) = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+    /// @brief Default Move Constructor${JagatiExceptionNewline}\
+    ${Name}(${Name}&&) = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+    /// @brief Virtual Deconstructor.${JagatiExceptionNewline}\
+    virtual ~${Name}() = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+    /// @return A StringView containing a human readable name for this type, \"${Name}\".${JagatiExceptionNewline}\
+    static StringView TypeName() noexcept${JagatiExceptionNewline}\
+        { return \"${Name}\"${JagatiExceptionSemicolon} }${JagatiExceptionNewline}\
+}${JagatiExceptionSemicolon} // ${Name}${JagatiExceptionNewline}\
+${JagatiExceptionNewline}\
+template<>${JagatiExceptionNewline}\
+struct ExceptionFactory<ExceptionCode::${Name}Code>${JagatiExceptionNewline}\
+{${JagatiExceptionNewline}\
+    /// @copydoc ExceptionFactory::Type${JagatiExceptionNewline}\
+    using Type = ${Name}${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+}${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+${JagatiExceptionNewline}"
+        CACHE INTERNAL "Partially generated code used in the exception classes."
     )
 
-    set(JagatiExceptionClasses
-        "${JagatiExceptionClasses}\n\
-/// @brief ${Documentation}\n\
-class MEZZ_LIB ${Name} : public ${BaseClass}\n\
-{\n\
-public:\n\
-    /// @copydoc Mezzanine::Exception::Base::Base
-    ${Name}\n\
-        ( const Mezzanine::StringView& Message,\n\
-          const Mezzanine::StringView& SrcFunction,\n\
-          const Mezzanine::StringView& SrcFile,\n\
-          const Mezzanine::Whole FileLine)\n\
-      : ${BaseClass}(Message, SrcFunction, SrcFile, FileLine)\n\
-    {}\n\
-\n\
-    /// @brief Default Copy Constructor\n\
-    ${Name}(const ${Name}&) = default;\n\
-    /// @brief Default Move Constructor\n\
-    ${Name}(${Name}&&) = default;\n\
-    /// @brief Virtual Deconstructor.\n\
-    virtual ~${Name}() = default;\n\
-    /// @return A StringView containing a human readable name for this type, \"${Name}\".\n\
-    static StringView TypeName() noexcept\n\
-        { return \"${Name}\"; }\n\
-}; // ${Name}\n\
-\n\
-template<>\n\
-struct ExceptionFactory<ExceptionCode::${Name}Code>\n\
-{
-    /// @copydoc ExceptionFactory::Type\n\
-    using Type = ${Name};\n\
-};\n\
-\n"
+    set(JagatiExceptionCodeToClassStringRaw "${JagatiExceptionCodeToClassStringRaw}${JagatiExceptionNewline}\
+        case ExceptionCode::${Name}Code: return \"${Name}\"${JagatiExceptionSemicolon}"
+        CACHE INTERNAL "Partially generate code to converting enums to strings"
     )
 
-    set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}\n\
-        case ExceptionCode::${Name}Code: return \"${Name}\";"
+    set(JagatiExceptionClassStringToCodeRaw "${JagatiExceptionClassStringToCodeRaw}${JagatiExceptionNewline}\
+        case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code${JagatiExceptionSemicolon}"
+        CACHE INTERNAL "Partially generate code to converting strings to enums."
     )
-
-    set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}\n\
-        case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code;"
-    )
-
-    # Lift the scope of all these parts
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiExceptionCodes "${JagatiExceptionIndex}" PARENT_SCOPE)
-        set(JagatiExceptionClasses "${JagatiExceptionClasses}" PARENT_SCOPE)
-        set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}" PARENT_SCOPE)
-        set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}" PARENT_SCOPE)
-        set(JagatiExceptionNumber "${JagatiExceptionNumber}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiException Name BaseClass)
 
 ########################################################################################################################
@@ -1890,24 +1946,34 @@ endmacro(AddJagatiException Name BaseClass)
 # header list.
 #
 # Usage:
-#   # Call after 0 or more calls to AddJagatiException and the parentmost scope has been claimed and SetProjectVariables
-#   # has initialized the file lists. Call before you intend to use the emitted sources in a build target.
+#   # Call after IntializeExceptions has been called by any project. This should be called in each project after calls
+#   # to AddJagatiException to insure that the emitted files have all enum values and exceptions.
+#
 #   EmitExceptionSource()
 #
 # Result:
-#   This will create a Header file (MezzException.h by default) and Source file (MezzException.h by default) with all
-#   the Exceptions added by AddJagatiException in all projects and this will a variable with the Header's full filename,
-#   and that will be passed to AddJagatiHeader:
-#       ${PROJECT_NAME}ExceptionHeaderFilename - The absolute path and filename of the Header file written, this is
-#           derived from the variable ${PROJECT_NAME}GenHeadersDir and will contain the project name.
-#       ${PROJECT_NAME}ExceptionSourceFilename - The absolute path and filename of the Source file written, this is
-#           derived from the variable ${PROJECT_NAME}GenSourceDir and will contain the project name.
+#   This will create a Header file (MezzException.h by default) and Source file (MezzException.cpp by default) with all
+#   the Exceptions added by AddJagatiException in all projects, and this file will be placed in the build directory for
+#   the project that called IntializeExceptions
 #
-#       ${PROJECT_NAME}ExceptionHeaderContent - The content of the header file emitted.
-#       ${PROJECT_NAME}ExceptionSourceContent - The content of the source file emitted.
-#
-
 macro(EmitExceptionSource)
+
+    # Format Unformatted vars from cache.
+    string(REPLACE "${JagatiExceptionNewline}" "\n" JagatiExceptionCodes ${JagatiExceptionCodesRaw})
+
+    string(REPLACE "${JagatiExceptionNewline}" "\n" JagatiExceptionClassesPart ${JagatiExceptionClassesRaw})
+    string(REPLACE "${JagatiExceptionSemicolon}" ";" JagatiExceptionClasses ${JagatiExceptionClassesPart})
+
+    string(REPLACE "${JagatiExceptionNewline}" "\n"
+           JagatiExceptionCodeToClassStringPart ${JagatiExceptionCodeToClassStringRaw})
+    string(REPLACE "${JagatiExceptionSemicolon}" ";"
+           JagatiExceptionCodeToClassString ${JagatiExceptionCodeToClassStringPart})
+
+    string(REPLACE "${JagatiExceptionNewline}" "\n"
+           JagatiExceptionClassStringToCodePart ${JagatiExceptionClassStringToCodeRaw})
+    string(REPLACE "${JagatiExceptionSemicolon}" ";"
+           JagatiExceptionClassStringToCode ${JagatiExceptionClassStringToCodePart})
+
     # Create Parts of the file
     set(ExceptionHeaderGuard
         "#ifndef Mezz_Exception_h\n#define Mezz_Exception_h\n\n"
@@ -2058,22 +2124,19 @@ struct ExceptionFactory\n\
     )
 
     # Convert Error Codes to Strings
-    set(ExceptionCodeToClassStringFunctionHeader
-        "StringView ExceptionClassNameFromCode(const Mezzanine::Exception::ExceptionCode Code)"
-    )
 
     set(ExceptionCodeToClassStringFunctionPrototype "\
 /// @brief Convert an ExceptionCode to a string containing the class name.\n\
 /// @param Code The number you have that you want as a string.\n\
 /// @return A StringView with a class name like \"Exception::InputOutput\"\n\
-${ExceptionCodeToClassStringFunctionHeader};\n\
+StringView MEZZ_LIB ExceptionClassNameFromCode(Mezzanine::Exception::ExceptionCode Code);\n\
 \n"
     )
 
     set(ExceptionCodeToClassStringFunction "\
 SAVE_WARNING_STATE\n\
 SUPPRESS_CLANG_WARNING(\"-Wcovered-switch-default\")\n\
-${ExceptionCodeToClassStringFunctionHeader}\n\
+StringView ExceptionClassNameFromCode(Mezzanine::Exception::ExceptionCode Code)\n\
 {\n\
     switch(Code)\n\
     {\
@@ -2088,9 +2151,6 @@ RESTORE_WARNING_STATE\n\
     )
 
     # Convert Strings to Error Codes
-    set(ExceptionClassStringHashFunctionHeader
-        "constexpr unsigned int ExceptionNameHash(const char* ToHash, int Index"
-    )
 
     set(ExceptionClassStringHashFunctionPrototype "\
 /// @brief A simple way to hash Exception names at compile time.\n\
@@ -2101,12 +2161,12 @@ RESTORE_WARNING_STATE\n\
 /// @return An unsigned int at compile time that is a hash of the name passed.\n\
 /// @note Copied from StackOverflow with written permission under under cc by-sa 4.0 with attribution required\n\
 /// https://stackoverflow.com/questions/16388510/evaluate-a-string-with-a-switch-in-c .\n\
-${ExceptionClassStringHashFunctionHeader} = 0);\n\
+constexpr unsigned int MEZZ_LIB ExceptionNameHash(const char* ToHash, int Index = 0);\n\
 \n"
     )
 
     set(ExceptionClassStringHashFunction "\
-${ExceptionClassStringHashFunctionHeader})\n\
+constexpr unsigned int ExceptionNameHash(const char* ToHash, int Index)\n\
 {\n\
     return !ToHash[Index] ?\n\
            5381 :
@@ -2140,21 +2200,18 @@ RESTORE_WARNING_STATE\n\
     )
 
     # Lets support streaming of ExceptionCode enums
-    set(ExceptionCodeStreamingFunctionHeader
-        "std::ostream& operator<<(std::ostream& Stream, Mezzanine::Exception::ExceptionCode Code)"
-    )
 
     set(ExceptionCodeStreamingFunctionPrototype "\
 /// @brief Stream Exception code value by converting them to strings.\n\
 /// @param Stream Any valid std::ostream, like cout or any fstream to send this too.\n\
 /// @param Code Any ExceptionCode instance to emit.\n\
 /// @return The passed ostream is returned to allow for operator chaining.\n\
-${ExceptionCodeStreamingFunctionHeader};\n\
+std::ostream& MEZZ_LIB operator<<(std::ostream& Stream, Mezzanine::Exception::ExceptionCode Code);\n\
 \n"
     )
 
     set(ExceptionCodeStreamingFunction "\
-${ExceptionCodeStreamingFunctionHeader}\n\
+std::ostream& operator<<(std::ostream& Stream, Mezzanine::Exception::ExceptionCode Code)\n\
 {\n\
     return Stream << \"Exception::\"\n\
                   << Mezzanine::Exception::ExceptionClassNameFromCode(Code);\n\
@@ -2172,7 +2229,7 @@ ${ExceptionCodeStreamingFunctionHeader}\n\
     set(ExceptionGuardFooter "#endif // Mezz_Exception_h\n")
 
     # Assemble the parts: Enum + template + baseclase + classes + functions
-    set(${PROJECT_NAME}ExceptionHeaderContent "\
+    set(JagatiExceptionHeaderContent "\
 ${MEZZ_Copyright}\
 ${ExceptionHeaderGuard}${NamespaceHeader}\
 ${ExceptionEnumHeader}${JagatiExceptionCodes}${ExceptionEnumFooter}\
@@ -2185,7 +2242,7 @@ ${ExceptionFactoryMacro}\
 ${ExceptionNamespaceFooter}${ExceptionGuardFooter}"
     )
 
-    set(${PROJECT_NAME}ExceptionSourceContent "\
+    set(JagatiExceptionSourceContent "\
 ${MEZZ_Copyright}\
 ${NamespaceSourceHeader}\
 ${ExceptionCodeToClassStringFunction}\
@@ -2195,22 +2252,11 @@ ${ExceptionCodeStreamingFunction}\
 ${ExceptionNamespaceFooter}"
     )
 
-    # Create and lift all relevant variables
-    set(${PROJECT_NAME}ExceptionHeaderFilename "${${PROJECT_NAME}GenHeadersDir}MezzException.h")
-    set(${PROJECT_NAME}ExceptionSourceFilename "${${PROJECT_NAME}GenSourceDir}MezzException.cpp")
-
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(${PROJECT_NAME}ExceptionHeaderFilename "${${PROJECT_NAME}ExceptionHeaderFilename}" PARENT_SCOPE)
-        set(${PROJECT_NAME}ExceptionSourceFilename "${${PROJECT_NAME}ExceptionSourceFilename}" PARENT_SCOPE)
-        set(${PROJECT_NAME}ExceptionHeaderContent "${${PROJECT_NAME}ExceptionHeaderContent}" PARENT_SCOPE)
-        set(${PROJECT_NAME}ExceptionSourceContent "${${PROJECT_NAME}ExceptionSourceContent}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-
     # Write the files
-    message(STATUS "Emitting Exception Header File - ${${PROJECT_NAME}ExceptionHeaderFilename}")
-    file(WRITE "${${PROJECT_NAME}ExceptionHeaderFilename}" "${${PROJECT_NAME}ExceptionHeaderContent}")
-    message(STATUS "Emitting Exception Source File - ${${PROJECT_NAME}ExceptionSourceFilename}")
-    file(WRITE "${${PROJECT_NAME}ExceptionSourceFilename}" "${${PROJECT_NAME}ExceptionSourceContent}")
+    message(STATUS "Emitting Exception Header File - ${JagatiExceptionHeaderFilename}")
+    file(WRITE "${JagatiExceptionHeaderFilename}" "${JagatiExceptionHeaderContent}")
+    message(STATUS "Emitting Exception Source File - ${JagatiExceptionSourceFilename}")
+    file(WRITE "${JagatiExceptionSourceFilename}" "${JagatiExceptionSourceContent}")
 
 endmacro(EmitExceptionSource)
 
@@ -2230,8 +2276,9 @@ endmacro(EmitExceptionSource)
 #
 
 macro(AddExceptionSource)
-    AddHeaderFile("${${PROJECT_NAME}ExceptionHeaderFilename}")
-    AddSourceFile("${${PROJECT_NAME}ExceptionSourceFilename}")
+    ForceAddHeaderFile("${JagatiExceptionHeaderFilename}")
+    ForceAddJagatiDoxInput("${JagatiExceptionHeaderFilename}")
+    ForceAddSourceFile("${JagatiExceptionSourceFilename}")
 endmacro(AddExceptionSource)
 
 ########################################################################################################################
