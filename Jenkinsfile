@@ -75,7 +75,7 @@ pipeline {
                         }
                     }
                 }
-            }
+            } // parallel
         } // CheckoutAndTest
     } // Stages
 
