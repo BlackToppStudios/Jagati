@@ -54,14 +54,14 @@ pipeline {
                     agent { label "Windows10Mingw32" }
                     steps {
                         checkout scm
-                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' }
+                        dir('Test') { bat 'ruby RootTest.rb -G"Ninja"' }
                     }
                 }
                 stage('Windows10Mingw64') {
                     agent { label "Windows10Mingw64" }
                     steps {
                         checkout scm
-                        dir('Test') { bat 'ruby RootTest.rb -G"MinGW Makefiles"' }
+                        dir('Test') { bat 'ruby RootTest.rb -G"Ninja"' }
                     }
                 }
                 stage('Windows10MSVC') {
@@ -70,7 +70,7 @@ pipeline {
                         checkout scm
                         dir('Test') {
                             bat """
-                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G"Visual Studio 15 2017 Win64"'
+                                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x86_amd64 && ruby RootTest.rb -G"Visual Studio 16 2019"'
                             """
                         }
                     }
