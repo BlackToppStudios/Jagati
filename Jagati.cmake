@@ -922,8 +922,9 @@ macro(SetCommonCompilerFlags)
             endif(SystemIsLinux)
             if(CompilerIsGCC)
                 if(NOT SystemIsMacOSX)
-                    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs") # Test without this, it seems to be needed
-                                                                          # only in old GCC versions.
+                    if(GCC_MAJOR <= 7))
+                        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++fs")
+                    endif(GCC_MAJOR <= 7)
                 endif(NOT SystemIsMacOSX)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wlogical-op -Wnoexcept -Wstrict-null-sentinel")
             endif(CompilerIsGCC)
