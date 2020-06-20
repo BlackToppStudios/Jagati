@@ -42,6 +42,7 @@
 
 #include "SuppressWarnings.h"
 
+SAVE_WARNING_STATE
 SUPPRESS_VC_WARNING(4668) // A Prprocessor macro was used and never defined, because the VS Headers are poorly written.
 
 #include <iostream>
