@@ -915,7 +915,11 @@ macro(SetCommonCompilerFlags)
 
             # A few checks that are very specific.
             if(CpuIsAmd64 AND Platform64Bit)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+                if(MEZZ_Force32Bit)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+                else(MEZZ_Force32Bit)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+                endif(MEZZ_Force32Bit)
             endif(CpuIsAmd64 AND Platform64Bit)
             if(SystemIsLinux)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
