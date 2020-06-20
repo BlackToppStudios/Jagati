@@ -53,6 +53,8 @@ IncludeJagatiPackage("StaticFoundation")
 # Everything above this line is well tested.
 ########################################################################################################################
 
+IntializeExceptions()
+
 AddJagatiException("Animal" "Base" "Exception for all animals.")
 AddJagatiException("Mammal" "Animal" "Is an animal exception, only warm blooded.")
 AddJagatiException("Dog" "Mammal" "An exception for canids which are all mammals.")

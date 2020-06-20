@@ -60,7 +60,13 @@ add_executable(Hello2 "${${PROJECT_NAME}HeaderFiles};${${PROJECT_NAME}SourceFile
 # case in TestCoverage#test_explicit_on
 ChooseCodeCoverage("ON")
 
-CreateCoverageTarget(Hello "Hello.cpp")
+# Ninja build system wants a command for every file.
+add_custom_command(
+    OUTPUT "hello.cpp"
+    COMMAND ${CMAKE_COMMAND} -E touch "hello.cpp"
+)
+
+CreateCoverageTarget(Hello "hello.cpp")
 CreateDefaultCoverageTarget(Hello2) # this should use file lists automatically.
 
 # Everything above this line is a reasonable example of use.
