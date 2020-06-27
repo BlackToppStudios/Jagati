@@ -1942,15 +1942,6 @@ ${JagatiExceptionNewline}"
         case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code${JagatiExceptionSemicolon}"
         CACHE INTERNAL "Partially generate code to converting strings to enums."
     )
-
-    # Lift the scope of all these parts
-    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
-        set(JagatiExceptionCodes "${JagatiExceptionIndex}" PARENT_SCOPE)
-        set(JagatiExceptionClasses "${JagatiExceptionClasses}" PARENT_SCOPE)
-        set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}" PARENT_SCOPE)
-        set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}" PARENT_SCOPE)
-        set(JagatiExceptionNumber "${JagatiExceptionNumber}" PARENT_SCOPE)
-    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiException Name BaseClass)
 
 ########################################################################################################################
