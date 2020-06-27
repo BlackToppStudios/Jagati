@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.0")
+    set(JagatiVersion "0.30.1")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -1905,9 +1905,9 @@ class MEZZ_LIB ${Name} : public ${BaseClass}${JagatiExceptionNewline}\
 public:${JagatiExceptionNewline}\
     /// @copydoc Mezzanine::Exception::Base::Base${JagatiExceptionNewline}\
     ${Name}${JagatiExceptionNewline}\
-        ( const Mezzanine::StringView& Message,${JagatiExceptionNewline}\
-          const Mezzanine::StringView& SrcFunction,${JagatiExceptionNewline}\
-          const Mezzanine::StringView& SrcFile,${JagatiExceptionNewline}\
+        ( const Mezzanine::StringView Message,${JagatiExceptionNewline}\
+          const Mezzanine::StringView SrcFunction,${JagatiExceptionNewline}\
+          const Mezzanine::StringView SrcFile,${JagatiExceptionNewline}\
           const Mezzanine::Whole FileLine)${JagatiExceptionNewline}\
       : ${BaseClass}(Message, SrcFunction, SrcFile, FileLine)${JagatiExceptionNewline}\
     {}${JagatiExceptionNewline}\
@@ -1942,6 +1942,15 @@ ${JagatiExceptionNewline}"
         case ExceptionNameHash(\"${Name}\"): return ExceptionCode::${Name}Code${JagatiExceptionSemicolon}"
         CACHE INTERNAL "Partially generate code to converting strings to enums."
     )
+
+    # Lift the scope of all these parts
+    if(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
+        set(JagatiExceptionCodes "${JagatiExceptionIndex}" PARENT_SCOPE)
+        set(JagatiExceptionClasses "${JagatiExceptionClasses}" PARENT_SCOPE)
+        set(JagatiExceptionCodeToClassString "${JagatiExceptionCodeToClassString}" PARENT_SCOPE)
+        set(JagatiExceptionClassStringToCode "${JagatiExceptionClassStringToCode}" PARENT_SCOPE)
+        set(JagatiExceptionNumber "${JagatiExceptionNumber}" PARENT_SCOPE)
+    endif(NOT "${ParentProject}" STREQUAL "${PROJECT_NAME}")
 endmacro(AddJagatiException Name BaseClass)
 
 ########################################################################################################################
@@ -2037,9 +2046,9 @@ public:\n\
     /// @param SrcFunction The name of the throwing function.\n\
     /// @param SrcFile The name of the throwing file.\n\
     /// @param FileLine The number of the throwing line.\n\
-    Base(const Mezzanine::StringView& Message,\n\
-                  const Mezzanine::StringView& SrcFunction,\n\
-                  const Mezzanine::StringView& SrcFile,\n\
+    Base(const Mezzanine::StringView Message,\n\
+                  const Mezzanine::StringView SrcFunction,\n\
+                  const Mezzanine::StringView SrcFile,\n\
                   const Mezzanine::Whole FileLine)\n\
         : ErrorMessage(Message),\n\
           Function(SrcFunction),\n\
