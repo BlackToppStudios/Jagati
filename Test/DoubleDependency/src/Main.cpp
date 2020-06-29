@@ -40,8 +40,15 @@
 
 // A super simple application for the purpose testing builds.
 
+#include "SuppressWarnings.h"
+
+SAVE_WARNING_STATE
+SUPPRESS_VC_WARNING(4668) // A Prprocessor macro was used and never defined, because the VS Headers are poorly written.
+
 #include <iostream>
 #include <cstdlib>
+
+RESTORE_WARNING_STATE
 
 #include "Hello.h"
 #include "Hello2.h"

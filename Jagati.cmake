@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.1")
+    set(JagatiVersion "0.30.2")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -129,7 +129,7 @@ if(NOT JAGATI_IndexDownload)
 endif(NOT JAGATI_IndexDownload)
 if(JAGATI_IndexDownload)
     set(JAGATI_IndexChecksum "4ad9b0ff814ef986cbb82a47c9ae3fe6c77f403925ac17608\
-6c316532d61ce76d14e461b633ae9f30b25a5f7e982772206684e498baf9380e80a0a3bb4b2d485;flaksjdf;laksdjf;alskdjf"
+6c316532d61ce76d14e461b633ae9f30b25a5f7e982772206684e498baf9380e80a0a3bb4b2d485"
         CACHE STRING "The expected Checksum of the Jagati Package Index.")
     set(JAGATI_IndexUrl "https://raw.githubusercontent.com/BlackToppStudios/Jagati/0.29.0/JagatiIndex.cmake"
         CACHE STRING "Where to download the Jagati from.")
