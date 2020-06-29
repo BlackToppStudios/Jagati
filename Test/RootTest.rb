@@ -40,7 +40,7 @@ require_test 'Coverage_NotSet'
 require_test 'Libraries_Dynamic'
 require_test 'Libraries_Static'
 require_test 'Mezz_PackageDirectory'
-#require_test 'DoubleDependency' # This breaks when the Foundation doesn't initialize exceptions.
+require_test 'DoubleDependency' # This should test a repo dependencing on a repo that depends on exceptions.
 require_test 'FileLists'
 require_test 'FileLists_BadDoxMissing'
 require_test 'FileLists_BadDoxRoot'
