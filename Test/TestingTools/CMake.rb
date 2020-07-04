@@ -30,6 +30,7 @@ class CMake
         @stdout = []
         @stderr = []
         clear_arguments
+        detect_compiler
     end
 
     def smart_build_dir(source_dir)
@@ -119,6 +120,15 @@ class CMake
 
     def build_string
         "cmake --build ."
+    end
+
+    def detect_compiler
+        cmake_toolchain = ENV['CMAKE_TOOLCHAIN']
+        cc=ENV['CC']
+        cxx=ENV['CXX']
+        if cmake_toolchain then add_argument('CMAKE_C_COMPILER', cmake_toolchain) end
+        if cc then add_argument('CMAKE_C_COMPILER', cc) end
+        if cxx then add_argument('CMAKE_CXX_COMPILER', cxx) end
     end
 
     def build

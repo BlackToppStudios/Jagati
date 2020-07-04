@@ -33,7 +33,7 @@ pipeline {
                     agent { label "UbuntuClang" }
                     steps {
                         checkout scm
-                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') { sh 'export CC=clang && export CXX=clang++ && ruby RootTest.rb -GNinja' }
                     }
                 }
                 stage('UbuntuEmscripten') {
@@ -47,7 +47,7 @@ pipeline {
                     agent { label "UbuntuGcc" }
                     steps {
                         checkout scm
-                        dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') { sh 'export CC=gcc && export CXX=g++ && ruby RootTest.rb -GNinja' }
                     }
                 }
                 stage('Windows10Mingw32') {
