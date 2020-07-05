@@ -25,11 +25,15 @@ class CMakeOutput
     # Platform stuff
 
     def executable_prefix
-        if Gem.win_platform? then "" else "./" end
+        if Gem.win_platform? then '' else './' end
     end
 
     def executable_suffix
-        if Gem.win_platform? then ".exe" else "" end
+        if @cmake.cxx && @cmake.cxx.include?('em++') then
+            '.js'
+        else
+            if Gem.win_platform? then '.exe' else '' end
+        end
     end
 
     ###############################################################
@@ -49,6 +53,14 @@ class CMakeOutput
 
     def check_test_command
         check_output_folder_for_file(test_command)
+    end
+
+    def command_runner_prefix
+        if @cmake.cxx && @cmake.cxx.include?('em++') then 'node ' else '' end
+    end
+
+    def command_runner_suffix
+        if @cmake.cxx && @cmake.cxx.include?('em++') then ' NoThreads' else '' end
     end
 
     def check_output_folder_for_file(file)
@@ -78,13 +90,13 @@ class CMakeOutput
 
     def run_binary
         check_binary_command
-        run_command(binary_command)
+        run_command(command_runner_prefix + binary_command)
         @last_run = :binary
     end
 
     def run_tests
         check_test_command
-        run_command(test_command)
+        run_command(command_runner_prefix + test_command + command_runner_suffix)
         @last_run = :tests
     end
 

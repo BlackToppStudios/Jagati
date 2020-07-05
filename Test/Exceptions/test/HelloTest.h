@@ -56,127 +56,127 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
     {
         tryBaseActionButFail();
     } catch (const Mezzanine::Exception::Base& e) {
-        TEST_EQUAL("BaseThrownLine", 49u, e.GetOriginatingLine());
-        TEST_EQUAL("BaseThrownMessage", String("Base Exception"), String(e.GetMessage()));
-        TEST_EQUAL("BaseThrownWhat", String("Base Exception"), String(e.what()));
-        TEST_EQUAL("BaseThrownFunction", String("tryBaseActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("BaseThrownTypename", String("Base"), String(e.TypeName()));
+        TEST_EQUAL("BaseThrownLine", 49u, e.GetOriginatingLine())
+        TEST_EQUAL("BaseThrownMessage", String("Base Exception"), String(e.GetMessage()))
+        TEST_EQUAL("BaseThrownWhat", String("Base Exception"), String(e.what()))
+        TEST_EQUAL("BaseThrownFunction", String("tryBaseActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("BaseThrownTypename", String("Base"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("BaseThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("BaseThrownFile", ExpectedFilename, AllLowerFile)
 
-        //TEST("BaseCastBaseNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        TEST("BaseCastAnimalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        TEST("BaseCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        TEST("BaseCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("BaseCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        TEST("BaseCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        //TEST("BaseCastBaseNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        TEST("BaseCastAnimalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        TEST("BaseCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        TEST("BaseCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        TEST("BaseCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        TEST("BaseCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
     try
     {
         tryAnimalActionButFail();
     } catch (const Mezzanine::Exception::Animal& e) {
-        TEST_EQUAL("AnimalThrownLine", 54u, e.GetOriginatingLine());
-        TEST_EQUAL("AnimalThrownMessage", String("Animal Exception"), String(e.GetMessage()));
-        TEST_EQUAL("AnimalThrownWhat", String("Animal Exception"), String(e.what()));
-        TEST_EQUAL("AnimalThrownFunction", String("tryAnimalActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("AnimalThrownTypename", String("Animal"), String(e.TypeName()));
+        TEST_EQUAL("AnimalThrownLine", 54u, e.GetOriginatingLine())
+        TEST_EQUAL("AnimalThrownMessage", String("Animal Exception"), String(e.GetMessage()))
+        TEST_EQUAL("AnimalThrownWhat", String("Animal Exception"), String(e.what()))
+        TEST_EQUAL("AnimalThrownFunction", String("tryAnimalActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("AnimalThrownTypename", String("Animal"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("AnimalThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("AnimalThrownFile", ExpectedFilename, AllLowerFile)
 
-        TEST("AnimalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        //TEST("AnimalCastAnimalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        TEST("AnimalCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        TEST("AnimalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("AnimalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        TEST("AnimalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("AnimalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        //TEST("AnimalCastAnimalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        TEST("AnimalCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        TEST("AnimalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        TEST("AnimalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        TEST("AnimalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
     try
     {
         tryMammalActionButFail();
     } catch (const Mezzanine::Exception::Mammal& e) {
-        TEST_EQUAL("MammalThrownLine", 59u, e.GetOriginatingLine());
-        TEST_EQUAL("MammalThrownMessage", String("Mammal Exception"), String(e.GetMessage()));
-        TEST_EQUAL("MammalThrownWhat", String("Mammal Exception"), String(e.what()));
-        TEST_EQUAL("MammalThrownFunction", String("tryMammalActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("MammalThrownTypename", String("Mammal"), String(e.TypeName()));
+        TEST_EQUAL("MammalThrownLine", 59u, e.GetOriginatingLine())
+        TEST_EQUAL("MammalThrownMessage", String("Mammal Exception"), String(e.GetMessage()))
+        TEST_EQUAL("MammalThrownWhat", String("Mammal Exception"), String(e.what()))
+        TEST_EQUAL("MammalThrownFunction", String("tryMammalActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("MammalThrownTypename", String("Mammal"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("MammalThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("MammalThrownFile", ExpectedFilename, AllLowerFile)
 
-        TEST("MammalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        TEST("MammalCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        //TEST("MammalCastMammalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        TEST("MammalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("MammalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        TEST("MammalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("MammalCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        TEST("MammalCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        //TEST("MammalCastMammalNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        TEST("MammalCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        TEST("MammalCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        TEST("MammalCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
     try
     {
         tryDogActionButFail();
     } catch (const Mezzanine::Exception::Dog& e) {
-        TEST_EQUAL("DogThrownLine", 64u, e.GetOriginatingLine());
-        TEST_EQUAL("DogThrownMessage", String("Dog Exception"), String(e.GetMessage()));
-        TEST_EQUAL("DogThrownWhat", String("Dog Exception"), String(e.what()));
-        TEST_EQUAL("DogThrownFunction", String("tryDogActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("DogThrownTypename", String("Dog"), String(e.TypeName()));
+        TEST_EQUAL("DogThrownLine", 64u, e.GetOriginatingLine())
+        TEST_EQUAL("DogThrownMessage", String("Dog Exception"), String(e.GetMessage()))
+        TEST_EQUAL("DogThrownWhat", String("Dog Exception"), String(e.what()))
+        TEST_EQUAL("DogThrownFunction", String("tryDogActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("DogThrownTypename", String("Dog"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("DogThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("DogThrownFile", ExpectedFilename, AllLowerFile)
 
-        TEST("DogCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        TEST("DogCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        TEST("DogCastMammalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        //TEST("DogCastDogNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("DogCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        TEST("DogCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("DogCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        TEST("DogCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        TEST("DogCastMammalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        //TEST("DogCastDogNope", (nullptr != dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        TEST("DogCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        TEST("DogCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
     try
     {
         tryCatActionButFail();
     } catch (const Mezzanine::Exception::Cat& e) {
-        TEST_EQUAL("CatThrownLine", 69u, e.GetOriginatingLine());
-        TEST_EQUAL("CatThrownMessage", String("Cat Exception"), String(e.GetMessage()));
-        TEST_EQUAL("CatThrownWhat", String("Cat Exception"), String(e.what()));
-        TEST_EQUAL("CatThrownFunction", String("tryCatActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("CatThrownTypename", String("Cat"), String(e.TypeName()));
+        TEST_EQUAL("CatThrownLine", 69u, e.GetOriginatingLine())
+        TEST_EQUAL("CatThrownMessage", String("Cat Exception"), String(e.GetMessage()))
+        TEST_EQUAL("CatThrownWhat", String("Cat Exception"), String(e.what()))
+        TEST_EQUAL("CatThrownFunction", String("tryCatActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("CatThrownTypename", String("Cat"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("CatThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("CatThrownFile", ExpectedFilename, AllLowerFile)
 
 
-        TEST("CatCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        TEST("CatCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        TEST("CatCastMammalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        TEST("CatCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        //TEST("CatCastCatNope", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        TEST("CatCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("CatCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        TEST("CatCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        TEST("CatCastMammalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        TEST("CatCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        //TEST("CatCastCatNope", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        TEST("CatCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
     try
     {
         tryFishActionButFail();
     } catch (const Mezzanine::Exception::Fish& e) {
-        TEST_EQUAL("FishThrownLine", 74u, e.GetOriginatingLine());
-        TEST_EQUAL("FishThrownMessage", String("Fish Exception"), String(e.GetMessage()));
-        TEST_EQUAL("FishThrownWhat", String("Fish Exception"), String(e.what()));
-        TEST_EQUAL("FishThrownFunction", String("tryFishActionButFail"), String(e.GetOriginatingFunction()));
-        TEST_EQUAL("FishThrownTypename", String("Fish"), String(e.TypeName()));
+        TEST_EQUAL("FishThrownLine", 74u, e.GetOriginatingLine())
+        TEST_EQUAL("FishThrownMessage", String("Fish Exception"), String(e.GetMessage()))
+        TEST_EQUAL("FishThrownWhat", String("Fish Exception"), String(e.what()))
+        TEST_EQUAL("FishThrownFunction", String("tryFishActionButFail"), String(e.GetOriginatingFunction()))
+        TEST_EQUAL("FishThrownTypename", String("Fish"), String(e.TypeName()))
 
         String AllLowerFile = Mezzanine::Testing::AllLower(String(e.GetOriginatingFile()));
-        TEST_STRING_CONTAINS("FishThrownFile", ExpectedFilename, AllLowerFile);
+        TEST_STRING_CONTAINS("FishThrownFile", ExpectedFilename, AllLowerFile)
 
-        TEST("FishCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) );
-        TEST("FishCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) );
-        TEST("FishCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) );
-        TEST("FishCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) );
-        TEST("FishCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) );
-        //TEST("FishCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) );
+        TEST("FishCastBaseGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Base*>(&e)) )
+        TEST("FishCastAnimalGood", (nullptr != dynamic_cast<const Mezzanine::Exception::Animal*>(&e)) )
+        TEST("FishCastMammalNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Mammal*>(&e)) )
+        TEST("FishCastDogNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Dog*>(&e)) )
+        TEST("FishCastCatNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Cat*>(&e)) )
+        //TEST("FishCastFishNull", (nullptr == dynamic_cast<const Mezzanine::Exception::Fish*>(&e)) )
     }
 
 }

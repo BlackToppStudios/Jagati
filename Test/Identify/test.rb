@@ -6,14 +6,15 @@ class Identify < JagatiTestCase
         cmake = run_cmake_and_load_cache
 
         # Only a basic smoke, Did it run? Other tests, like those in the static foundation check this in other tests.
-        assert_match(/Detected OS as/, cmake.stdout.join, 'Detected OS message not present')
-
-        detected_platform_count = 0
-        if cmake.cache.value('SystemIsLinux').to_b   then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsWindows').to_b then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsMacOSX').to_b  then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsIOS').to_b     then detected_platform_count +=1 end
-        assert_equal(1, detected_platform_count, "Exactly one platform should be detected")
+        if false == cmake.cache.value('CompilerIsEmscripten').to_b then
+            assert_match(/Detected OS as/, cmake.stdout.join, 'Detected OS message not present')
+            detected_platform_count = 0
+            if cmake.cache.value('SystemIsLinux').to_b   then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsWindows').to_b then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsMacOSX').to_b  then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsIOS').to_b     then detected_platform_count +=1 end
+            assert_equal(1, detected_platform_count, "Exactly one platform should be detected")
+        end
 
         detected_arch_count = 0
         if cmake.cache.value('Platform32Bit').to_b then detected_arch_count +=1 end
@@ -32,8 +33,12 @@ class Identify < JagatiTestCase
         if cmake.cache.value('CompilerIsClang').to_b        then detected_compiler_count +=1 end
         if cmake.cache.value('CompilerIsIntel').to_b        then detected_compiler_count +=1 end
         if cmake.cache.value('CompilerIsMsvc').to_b         then detected_compiler_count +=1 end
-        if cmake.cache.value('CompilerIsEmscripten').to_b   then detected_compiler_count +=1 end
         assert_equal(1, detected_compiler_count, "Exactly one compiler should be detected")
+
+        if cmake.cache.value('CompilerIsEmscripten').to_b then
+            assert_match(/emcc/, cmake.cc, 'Emscripten c compiler is emcc')
+            assert_match(/em\+\+/, cmake.cxx, 'Emscripten c++ compiler is em++')
+        end
 
         assert_equal(cmake.cache.value('CompilerIsGCC').to_b || cmake.cache.value('CompilerIsClang').to_b ||
                         cmake.cache.value('CompilerIsEmscripten').to_b,

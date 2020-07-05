@@ -51,8 +51,8 @@ DEFAULT_TEST_GROUP(HelloTest, HelloTest)
     // number.
     TEST_EQUAL("getMessageIsHelloWorld",
                std::string("Hello World"),
-               getMessage(AnotherTestBitField::AB));
-    TEST_EQUAL("getPunctuationIsBang", '!', getPunctuation());
+               getMessage(AnotherTestBitField::AB))
+    TEST_EQUAL("getPunctuationIsBang", '!', getPunctuation())
 }
 
 #endif

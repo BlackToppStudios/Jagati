@@ -17,9 +17,13 @@ class CMake
     attr_reader :stdout
     attr_reader :stderr
 
+    attr_reader :cc
+    attr_reader :cxx
+
     class << self
         attr_accessor :generator
         attr_accessor :index_file
+        attr_accessor :force_32
     end
 
     def initialize(source_dir, build_dir = smart_build_dir(source_dir))
@@ -66,7 +70,7 @@ class CMake
         @outputs = nil
         add_argument('JAGATI_IndexFile', CMake.index_file, 'FILEPATH')
         add_argument('JAGATI_IndexDownload', false, 'BOOL')
-
+        detect_compiler
     end
 
     def invocation_string
@@ -119,6 +123,18 @@ class CMake
 
     def build_string
         "cmake --build ."
+    end
+
+    def detect_compiler
+        cmake_toolchain = ENV['CMAKE_TOOLCHAIN_FILE']
+        @cc = ENV['CC']
+        @cxx = ENV['CXX']
+        if cmake_toolchain then add_argument('CMAKE_TOOLCHAIN_FILE', cmake_toolchain) end
+        if @cc then add_argument('CMAKE_C_COMPILER', @cc) end
+        if @cxx then add_argument('CMAKE_CXX_COMPILER', @cxx) end
+
+        # Somehow this needs to be passed only to the static foundation builds. That will take a lot of extra code
+        #if CMake.force_32 then add_argument('MEZZ_ForceGcc32Bit', "ON") end
     end
 
     def build
