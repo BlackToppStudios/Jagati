@@ -13,7 +13,8 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
-                            hostname &&ruby RootTest.rb -GNinja
+                            hostname &&
+                            ruby RootTest.rb -GNinja
                         """}
                     }
                 }
@@ -22,6 +23,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
+                            hostname &&
                             export PATH='$PATH:/usr/local/bin/' && ruby RootTest.rb -GNinja
                         """}
                     }
@@ -31,6 +33,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
+                            hostname &&
                             ruby RootTest.rb -GNinja
                         """}
                     }
@@ -40,6 +43,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
+                            hostname &&
                             export CC=`which clang` &&
                             export CXX=`which clang++` &&
                             ruby RootTest.rb -GNinja
@@ -51,6 +55,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
+                            hostname &&
                             source ~/emsdk/emsdk_env.sh &&
                             export CMAKE_TOOLCHAIN_FILE=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake &&
                             export CC=`which emcc` &&
@@ -64,6 +69,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
+                            hostname &&
                             export CC=gcc && export CXX=g++ && ruby RootTest.rb -GNinja
                         """}
                     }
