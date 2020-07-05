@@ -18,6 +18,7 @@ require 'optparse'
 OptionParser.new do |opts|
   opts.banner = "Usage: ruby RootTest.rb [-G Optional Cmake Generator] [-h|--help]"
   opts.on('-G', '--Generator NAME', 'Name of CMake Generator') { |v| CMake.generator = v }
+  opts.on('-f', '--force_32', 'Force 32 bit gcc builds') { |v| CMake.force_32 = true }
   opts.on('-h', '--help', 'See this help message') { |v| puts opts; exit; }
 end.parse!
 

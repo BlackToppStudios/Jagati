@@ -73,7 +73,7 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { bat """
-                            ruby RootTest.rb -G"Ninja"
+                            ruby RootTest.rb -G"Ninja" --force_32
                         """}
                     }
                 }
