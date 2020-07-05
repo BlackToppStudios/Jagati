@@ -48,8 +48,8 @@
 DEFAULT_TEST_GROUP(HelloTest, HelloTest)
 {
     // Tests should use the macros from TestMacros.h to automatically function, filename and line number.
-    TEST_EQUAL("getMessageIsHelloWorld", std::string("Hello World"), getMessage());
-    TEST_EQUAL("getPunctuationIsBang", '!', getPunctuation());
+    TEST_EQUAL("getMessageIsHelloWorld", std::string("Hello World"), getMessage())
+    TEST_EQUAL("getPunctuationIsBang", '!', getPunctuation())
 }
 
 #endif
