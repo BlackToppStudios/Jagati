@@ -52,7 +52,7 @@ pipeline {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
                             source ~/emsdk/emsdk_env.sh &&
-                            export CMAKE_TOOL_CHAIN=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake &&
+                            export CMAKE_TOOLCHAIN_FILE=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake &&
                             export CC=`which emcc` &&
                             export CXX=`which em++` &&
                             ruby RootTest.rb -GNinja

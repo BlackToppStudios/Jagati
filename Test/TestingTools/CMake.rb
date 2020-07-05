@@ -31,7 +31,6 @@ class CMake
         @stdout = []
         @stderr = []
         clear_arguments
-        detect_compiler
     end
 
     def smart_build_dir(source_dir)
@@ -68,6 +67,7 @@ class CMake
         @outputs = nil
         add_argument('JAGATI_IndexFile', CMake.index_file, 'FILEPATH')
         add_argument('JAGATI_IndexDownload', false, 'BOOL')
+        detect_compiler
     end
 
     def invocation_string
@@ -123,7 +123,7 @@ class CMake
     end
 
     def detect_compiler
-        cmake_toolchain = ENV['CMAKE_TOOLCHAIN']
+        cmake_toolchain = ENV['CMAKE_TOOLCHAIN_FILE']
         cc = ENV['CC']
         cxx = ENV['CXX']
         if cmake_toolchain then add_argument('CMAKE_TOOLCHAIN_FILE', cmake_toolchain) end
