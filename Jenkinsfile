@@ -40,7 +40,9 @@ pipeline {
                     steps {
                         checkout scm
                         dir('Test') { sh """#!/bin/bash
-                            export CC=clang && export CXX=clang++ && ruby RootTest.rb -GNinja
+                            export CC=`which clang` &&
+                            export CXX=`which clang++` &&
+                            ruby RootTest.rb -GNinja
                         """}
                     }
                 }
