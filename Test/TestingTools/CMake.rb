@@ -129,7 +129,9 @@ class CMake
         if cmake_toolchain then add_argument('CMAKE_TOOLCHAIN_FILE', cmake_toolchain) end
         if cc then add_argument('CMAKE_C_COMPILER', cc) end
         if cxx then add_argument('CMAKE_CXX_COMPILER', cxx) end
-        if CMake.force_32 then add_argument('MEZZ_ForceGcc32Bit', "ON") end
+
+        # Somehow this needs to be passed only to the static foundation builds. That will take a lot of extra code
+        #if CMake.force_32 then add_argument('MEZZ_ForceGcc32Bit', "ON") end
     end
 
     def build
