@@ -60,7 +60,7 @@ class CMakeOutput
     end
 
     def command_runner_suffix
-        if @cmake.cxx && @cmake.cxx.include?('em++') then '' else ' NoThreads' end
+        if @cmake.cxx && @cmake.cxx.include?('em++') then ' NoThreads' else '' end
     end
 
     def check_output_folder_for_file(file)
