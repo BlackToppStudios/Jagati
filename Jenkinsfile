@@ -40,7 +40,12 @@ pipeline {
                     agent { label "UbuntuEmscripten" }
                     steps {
                         checkout scm
-                        //dir('Test') { sh 'ruby RootTest.rb -GNinja' }
+                        dir('Test') { sh """
+                            export CMAKE_TOOL_CHAIN=~/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake &&
+                            export CC=emcc &&
+                            export CXX=em++ &&
+                            ruby RootTest.rb -GNinja
+                        """}
                     }
                 }
                 stage('UbuntuGcc') {

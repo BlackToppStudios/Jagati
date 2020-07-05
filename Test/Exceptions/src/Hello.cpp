@@ -46,30 +46,30 @@
 
 void tryBaseActionButFail()
 {
-    MEZZ_EXCEPTION(BaseCode, "Base Exception");
+    MEZZ_EXCEPTION(BaseCode, "Base Exception")
 }
 
 void tryAnimalActionButFail()
 {
-    MEZZ_EXCEPTION(AnimalCode, "Animal Exception");
+    MEZZ_EXCEPTION(AnimalCode, "Animal Exception")
 }
 
 void tryMammalActionButFail()
 {
-    MEZZ_EXCEPTION(MammalCode, "Mammal Exception");
+    MEZZ_EXCEPTION(MammalCode, "Mammal Exception")
 }
 
 void tryDogActionButFail()
 {
-    MEZZ_EXCEPTION(DogCode, "Dog Exception");
+    MEZZ_EXCEPTION(DogCode, "Dog Exception")
 }
 
 void tryCatActionButFail()
 {
-    MEZZ_EXCEPTION(CatCode, "Cat Exception");
+    MEZZ_EXCEPTION(CatCode, "Cat Exception")
 }
 
 void tryFishActionButFail()
 {
-    MEZZ_EXCEPTION(FishCode, "Fish Exception");
+    MEZZ_EXCEPTION(FishCode, "Fish Exception")
 }
