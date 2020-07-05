@@ -55,8 +55,12 @@ class CMakeOutput
         check_output_folder_for_file(test_command)
     end
 
-    def command_runner
+    def command_runner_prefix
         if @cmake.cxx && @cmake.cxx.include?('em++') then 'node ' else '' end
+    end
+
+    def command_runner_suffix
+        if @cmake.cxx && @cmake.cxx.include?('em++') then '' else ' NoThreads' end
     end
 
     def check_output_folder_for_file(file)
@@ -86,13 +90,13 @@ class CMakeOutput
 
     def run_binary
         check_binary_command
-        run_command(command_runner + binary_command)
+        run_command(command_runner_prefix + binary_command)
         @last_run = :binary
     end
 
     def run_tests
         check_test_command
-        run_command(command_runner + test_command)
+        run_command(command_runner_prefix + test_command + command_runner_suffix)
         @last_run = :tests
     end
 
