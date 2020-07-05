@@ -126,7 +126,7 @@ class CMake
         cmake_toolchain = ENV['CMAKE_TOOLCHAIN']
         cc=ENV['CC']
         cxx=ENV['CXX']
-        if cmake_toolchain then add_argument('CMAKE_C_COMPILER', cmake_toolchain) end
+        if cmake_toolchain then add_argument('CMAKE_TOOLCHAIN_FILE', cmake_toolchain) end
         if cc then add_argument('CMAKE_C_COMPILER', cc) end
         if cxx then add_argument('CMAKE_CXX_COMPILER', cxx) end
     end
