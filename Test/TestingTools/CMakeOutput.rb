@@ -29,7 +29,7 @@ class CMakeOutput
     end
 
     def executable_suffix
-        if @cmake.cxx.include?('em++') then
+        if @cmake.cxx && @cmake.cxx.include?('em++') then
             '.js'
         else
             if Gem.win_platform? then '.exe' else '' end
@@ -56,7 +56,7 @@ class CMakeOutput
     end
 
     def command_runner
-        if @cmake.cxx.include?('em++') then 'node ' else '' end
+        if @cmake.cxx && @cmake.cxx.include?('em++') then 'node ' else '' end
     end
 
     def check_output_folder_for_file(file)
