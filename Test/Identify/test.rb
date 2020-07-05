@@ -35,8 +35,8 @@ class Identify < JagatiTestCase
         assert_equal(1, detected_compiler_count, "Exactly one compiler should be detected")
 
         if cmake.cache.value('CompilerIsEmscripten').to_b then
-            assert_equal('emcc', cmake.cc, 'Emscripten c compiler is emcc.')
-            assert_equal('em++', cmake.cxx, 'Emscripten c++ compiler is em++.')
+            assert_match(/emcc/, cmake.cc, 'Emscripten c compiler is emcc')
+            assert_match(/em\+\+/, cmake.cxx, 'Emscripten c++ compiler is em++')
         end
 
         assert_equal(cmake.cache.value('CompilerIsGCC').to_b || cmake.cache.value('CompilerIsClang').to_b ||
