@@ -8,14 +8,14 @@ class Identify < JagatiTestCase
         # Only a basic smoke, Did it run? Other tests, like those in the static foundation check this in other tests.
         if false == cmake.cache.value('CompilerIsEmscripten').to_b then
             assert_match(/Detected OS as/, cmake.stdout.join, 'Detected OS message not present')
+        else
+            detected_platform_count = 0
+            if cmake.cache.value('SystemIsLinux').to_b   then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsWindows').to_b then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsMacOSX').to_b  then detected_platform_count +=1 end
+            if cmake.cache.value('SystemIsIOS').to_b     then detected_platform_count +=1 end
+            assert_equal(1, detected_platform_count, "Exactly one platform should be detected")
         end
-
-        detected_platform_count = 0
-        if cmake.cache.value('SystemIsLinux').to_b   then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsWindows').to_b then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsMacOSX').to_b  then detected_platform_count +=1 end
-        if cmake.cache.value('SystemIsIOS').to_b     then detected_platform_count +=1 end
-        assert_equal(1, detected_platform_count, "Exactly one platform should be detected")
 
         detected_arch_count = 0
         if cmake.cache.value('Platform32Bit').to_b then detected_arch_count +=1 end
