@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.2")
+    set(JagatiVersion "0.30.3")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -1534,7 +1534,7 @@ endmacro(AddSwigEntryPoint FileName)
 #
 
 macro(AddManualJagatiLibrary TargetName)
-    list(APPEND JagatiLinkLibraryArray "${TargetName}")
+    list(PREPEND JagatiLinkLibraryArray "${TargetName}")
     list(REMOVE_DUPLICATES JagatiLinkLibraryArray)
 
     set(${PROJECT_NAME}Lib "${TargetName}" CACHE INTERNAL "" FORCE)
@@ -1656,7 +1656,7 @@ endmacro(CreateDefaultCoverageTarget ExecutableName)
 
 macro(AddJagatiExecutable)
     add_executable("${${PROJECT_NAME}BinTarget}" "${${PROJECT_NAME}MainSourceFiles}")
-    target_link_libraries(${${PROJECT_NAME}BinTarget} ${JagatiLinkLibraryArray})
+    target_link_libraries(${${PROJECT_NAME}BinTarget} ${${PROJECT_NAME}LibTarget})
 endmacro(AddJagatiExecutable)
 
 
@@ -2369,7 +2369,7 @@ macro(AddTestTarget)
         "${${PROJECT_NAME}TesterFilename}"
         "${${PROJECT_NAME}SourceFiles}"
     )
-    target_link_libraries(${${PROJECT_NAME}TestTarget} ${JagatiLinkLibraryArray})
+    target_link_libraries(${${PROJECT_NAME}TestTarget} ${${PROJECT_NAME}LibTarget})
 
     add_test("Run${${PROJECT_NAME}TestTarget}" ${${PROJECT_NAME}TestTarget})
 endmacro(AddTestTarget)
