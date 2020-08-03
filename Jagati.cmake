@@ -1534,7 +1534,8 @@ endmacro(AddSwigEntryPoint FileName)
 #
 
 macro(AddManualJagatiLibrary TargetName)
-    list(PREPEND JagatiLinkLibraryArray "${TargetName}")
+    set(JagatiLinkLibraryArray "${TargetName};${JagatiLinkLibraryArray}")
+    #list(PREPEND JagatiLinkLibraryArray "${TargetName}")   # TODO Switch to this when we support newer CMake: 3.16+
     list(REMOVE_DUPLICATES JagatiLinkLibraryArray)
 
     set(${PROJECT_NAME}Lib "${TargetName}" CACHE INTERNAL "" FORCE)
