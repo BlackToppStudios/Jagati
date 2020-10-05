@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.3")
+    set(JagatiVersion "0.30.4")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -935,6 +935,9 @@ macro(SetCommonCompilerFlags)
             if(CompilerIsClang)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything \
                     -Wno-documentation-unknown-command -Wno-c++98-compat -Wno-weak-vtables")
+                if(NOT SystemIsMacOSX)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wctad-maybe-unsupported")
+                endif(NOT SystemIsMacOSX)
             endif(CompilerIsClang)
         endif(CompilerIsEmscripten)
 
