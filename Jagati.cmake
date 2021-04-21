@@ -2001,10 +2001,11 @@ namespace Exception\n{\n\
 #include \"DataTypes.h\"\n\n\
 SAVE_WARNING_STATE\n\
 SUPPRESS_CLANG_WARNING(\"-Winconsistent-missing-destructor-override\")\n\
-#ifdef __clang_major__\n\
-#if __clang_major__ >= 11\n\
-SUPPRESS_CLANG_WARNING(\"-Wsuggest-destructor-override\")\n\
-#endif\n\
+    #ifndef MEZZ_MacOSX\n\
+        #if __clang_major__ >= 11\n\
+            SUPPRESS_CLANG_WARNING(\"-Wsuggest-destructor-override"\)\n\
+        #endif\n\
+    #endif\n\
 #endif\n\n\
 namespace Mezzanine\n{\n\
 namespace Exception\n{\n\
