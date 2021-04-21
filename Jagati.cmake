@@ -2001,6 +2001,7 @@ namespace Exception\n{\n\
 #include \"DataTypes.h\"\n\n\
 SAVE_WARNING_STATE\n\
 SUPPRESS_CLANG_WARNING(\"-Winconsistent-missing-destructor-override\")\n\
+#ifndef __clang_major__\n\
     #ifndef MEZZ_MacOSX\n\
         #if __clang_major__ >= 11\n\
             SUPPRESS_CLANG_WARNING(\"-Wsuggest-destructor-override\")\n\
