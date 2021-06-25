@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.5")
+    set(JagatiVersion "0.30.6")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -1921,7 +1921,7 @@ ${JagatiExceptionNewline}\
     /// @brief Default Move Constructor${JagatiExceptionNewline}\
     ${Name}(${Name}&&) = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
     /// @brief Virtual Deconstructor.${JagatiExceptionNewline}\
-    virtual ~${Name}() = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+    virtual ~${Name}() override = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
     /// @return A StringView containing a human readable name for this type, \"${Name}\".${JagatiExceptionNewline}\
     static StringView TypeName() noexcept${JagatiExceptionNewline}\
         { return \"${Name}\"${JagatiExceptionSemicolon} }${JagatiExceptionNewline}\
@@ -2066,7 +2066,7 @@ public:\n\
     /// @brief Default Move Constructor\n\
     Base(Base&&) = default;\n\
     /// @brief Virtual Deconstructor.\n\
-    virtual ~Base() = default;\n\
+    virtual ~Base() override = default;\n\
 \n\
     /// @brief Get the Error Message associated with this exception.\n\
     /// @return A StringView containing the error message.\n\
