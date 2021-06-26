@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.4")
+    set(JagatiVersion "0.30.6")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -1921,7 +1921,7 @@ ${JagatiExceptionNewline}\
     /// @brief Default Move Constructor${JagatiExceptionNewline}\
     ${Name}(${Name}&&) = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
     /// @brief Virtual Deconstructor.${JagatiExceptionNewline}\
-    virtual ~${Name}() = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
+    virtual ~${Name}() override = default${JagatiExceptionSemicolon}${JagatiExceptionNewline}\
     /// @return A StringView containing a human readable name for this type, \"${Name}\".${JagatiExceptionNewline}\
     static StringView TypeName() noexcept${JagatiExceptionNewline}\
         { return \"${Name}\"${JagatiExceptionSemicolon} }${JagatiExceptionNewline}\
@@ -1991,6 +1991,7 @@ macro(EmitExceptionSource)
     set(NamespaceSourceHeader "\
 #include \"DataTypes.h\"\n\
 #include \"MezzException.h\"\n\n\
+SAVE_WARNING_STATE\n\n\
 namespace Mezzanine\n{\n\
 namespace Exception\n{\n\
 \n"
@@ -1998,6 +1999,15 @@ namespace Exception\n{\n\
 
     set(NamespaceHeader "\
 #include \"DataTypes.h\"\n\n\
+SAVE_WARNING_STATE\n\
+SUPPRESS_CLANG_WARNING(\"-Winconsistent-missing-destructor-override\")\n\
+#ifdef __clang_major__\n\
+    #ifndef MEZZ_MacOSX\n\
+        #if __clang_major__ >= 11\n\
+            SUPPRESS_CLANG_WARNING(\"-Wsuggest-destructor-override\")\n\
+        #endif\n\
+    #endif\n\
+#endif\n\n\
 namespace Mezzanine\n{\n\
 namespace Exception\n{\n\
 \n"
@@ -2056,7 +2066,7 @@ public:\n\
     /// @brief Default Move Constructor\n\
     Base(Base&&) = default;\n\
     /// @brief Virtual Deconstructor.\n\
-    virtual ~Base() = default;\n\
+    virtual ~Base() override = default;\n\
 \n\
     /// @brief Get the Error Message associated with this exception.\n\
     /// @return A StringView containing the error message.\n\
@@ -2085,14 +2095,14 @@ public:\n\
 \n\
     /// @brief Get the error message in the std compatible way.\n\
     /// @return A pointer to a C-String, containing the same messages as @ref GetMessage().\n\
-    virtual const char* what() const noexcept\n\
+    virtual const char* what() const noexcept override\n\
         { return ErrorMessage.c_str(); }\n\
 \n\
 }; // Base Exception class\n\
 \n\
 /// @brief Template class that serves as the base for exception factories.\n\
 /// @details Additional exceptions and their factories have to specialize from this template changing the type value\n\
-/// to the new exception type.This allows our exception macro to find the appropriate factory at compile when\n\
+/// to the new exception type. This allows our exception macro to find the appropriate factory at compile when\n\
 /// template are being resolved. So this system can be extended with additional exceptions wherever desired.\n\
 /// Attempting to create an unknown exception simply won't compile because the base exception class being abstract.\n\
 template <Mezzanine::Exception::ExceptionCode N>\n\
@@ -2232,6 +2242,7 @@ std::ostream& operator<<(std::ostream& Stream, Mezzanine::Exception::ExceptionCo
     set(ExceptionNamespaceFooter "\
 } // namespace Exception\n\
 } // namespace Mezzanine\n\n\
+RESTORE_WARNING_STATE\n\n\
 "
     )
 
