@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2020 BlackTopp Studios Inc.
+# © Copyright 2010 - 2021 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ if(JagatiVersion)
     message(STATUS "Already loaded Jagati version '${JagatiVersion}', not loading again.")
     return()
 else(JagatiVersion)
-    set(JagatiVersion "0.30.6")
+    set(JagatiVersion "0.31.0")
     message(STATUS "Preparing Jagati Version: ${JagatiVersion}")
 endif(JagatiVersion)
 
@@ -153,7 +153,7 @@ endforeach(JAGATI_OnePackage)
 # File construction variables
 
 set(MEZZ_Copyright
-"// © Copyright 2010 - 2020 BlackTopp Studios Inc.\n\
+"// © Copyright 2010 - 2021 BlackTopp Studios Inc.\n\
 /* This file is part of The Mezzanine Engine.\n\
 \n\
     The Mezzanine Engine is free software: you can redistribute it and/or modify\n\
