@@ -38,7 +38,7 @@
 #   John Blackwood - makoenergy02@gmail.com
 
 ########################################################################################################################
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 # The underscore at the end of this name is just to make the tests easier to read.
 project(CoverageTest_Enabled_)
