@@ -1,4 +1,4 @@
-# © Copyright 2010 - 2020 BlackTopp Studios Inc.
+# © Copyright 2010 - 2021 BlackTopp Studios Inc.
 # This file is part of The Mezzanine Engine.
 #
 #    The Mezzanine Engine is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 #   John Blackwood - makoenergy02@gmail.com
 
 ########################################################################################################################
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.13)
 project(FileLists_BadMainSrcMissing_Test_)
 message(STATUS "${PROJECT_NAME} - Starting Configuration using CMake ${CMAKE_VERSION}.")
 
